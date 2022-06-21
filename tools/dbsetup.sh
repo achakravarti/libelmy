@@ -17,3 +17,14 @@
 # Creates database and user if it does not exist
 # Creates tables and triggers and sequences if database exists
 # Deletes and recreates everything if reset
+
+
+DEFINE_string 'host' '127.0.0.1' 'database host' 'h'
+DEFINE_integer 'port' '5433' 'database port' 'p'
+DEFINE_string 'database' 'syslog' 'database name' 'd'
+DEFINE_string 'user' 'rsyslog' 'database user' 'u'
+DEFINE_string 'password' 'rsyslog' 'database user' 'w'
+DEFINE_boolean 'reset' false 'reset database' 'r'
+
+FLAGS "$@" || exit $?
+eval set -- "$FLAGS_ARGV"
