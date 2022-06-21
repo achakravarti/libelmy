@@ -18,17 +18,42 @@
 # Creates tables and triggers and sequences if database exists
 # Deletes and recreates everything if reset
 
+
 setup_flags() {
     DEFINE_string 'host' '127.0.0.1' 'database host address' 'a'
     DEFINE_integer 'port' '5432' 'database port' 'p'
     DEFINE_string 'database' 'syslog' 'database name' 'd'
     DEFINE_string 'user' 'rsyslog' 'database user' 'u'
-    DEFINE_string 'password' 'rsyslog' 'database user' 'w'
+    DEFINE_string 'password' 'rsyslog' 'database user password' 'w'
+    DEFINE_string 'pgpassword' '' 'database postgres password' 'x'
     DEFINE_boolean 'reset' false 'reset database' 'r'
 
     FLAGS "$@" || exit $?
     eval set -- "$FLAGS_ARGV"
 }
+
+
+pg_cmd()
+{
+    PGPASSWORD="$FLAGS_pgpassword" psql \
+        -h "$FLAGS_host"                \
+        -p "$FLAGS_port"                \
+        -U postgres                     \
+        -tAqc "$1"
+}
+
+
+pg_file()
+{
+    PGPASSWORD=$FLAGS_password psql \
+        -h "$FLAGS_host"            \
+        -p "$FLAGS_port"            \
+        -d "$FLAGS_database"        \
+        -U "$FLAGS_user"            \
+        -tAqf init.sql
+}
+
+
 
 
 check_sudo_exists() {
@@ -62,8 +87,7 @@ check_postgres_running() {
 setup_db_user() {
     _sql="select 1 from pg_roles where rolname='$FLAGS_user'"
 
-    if ! psql -h "$FLAGS_host" -p "$FLAGS_port" -U postgres -tAc "$_sql" \
-        | grep -q 1; then
+    if ! pg_cmd "$_sql" | grep -q 1; then
         echo "User $FLAGS_user not found, creating..."
         create_db_user
     else
@@ -76,58 +100,48 @@ setup_db()
 {
     _sql="select 1 from pg_database where datname='$FLAGS_database'"
 
-    if ! psql -h "$FLAGS_host" -p "$FLAGS_port" -U postgres -tAc "$_sql" \
-        | grep -q 1; then
+    if ! pg_cmd "$_sql" | grep -q 1; then
         echo "Database $FLAGS_database not found, creating..."
         create_db
-
-        PGPASSWORD=$FLAGS_password psql \
-            -h "$FLAGS_host"            \
-            -p "$FLAGS_port"            \
-            -d "$FLAGS_database"        \
-            -tAf init.sql
     else
         echo "Database $FLAGS_database found, skipping..."
     fi
 }
 
 
-create_db_user() {
-    _pcmd="psql -h $FLAGS_host -p $FLAGS_port -U postgres -tAc"
+create_db()
+{
+    pg_cmd "create database $FLAGS_database;"
+    pg_cmd "grant all privileges on database $FLAGS_database to $FLAGS_user;"
+    pg_file init.sql
 
-    _sql="create database $FLAGS_database;"
-    "$_pcmd" "$_sql"
-
-    _sql="grant all privileges on $FLAGS_database to $FLAGS_user;"
-    "$_pcmd" "$_sql"
+    if rsyslogd -v >/dev/null 2>&1; then
+        sudo systemctl start rsyslog.service >/dev/null 2>&1
+    fi
 }
 
 
-create_db() {
-    _pcmd="psql -h $FLAGS_host -p $FLAGS_port -U postgres -tAc"
-
-    _sql="create user $FLAGS_user with password '$FLAGS_password';"
-    "$_pcmd" "$_sql"
-
-    _sql="alter role $FLAGS_user set client_encoding to 'utf8';"
-    "$_pcmd" "$_sql"
+create_db_user()
+{
+    pg_cmd "create user $FLAGS_user with password '$FLAGS_password';"
+    pg_cmd "alter role $FLAGS_user set client_encoding to 'utf8';"
 
     _sql="alter role $FLAGS_user set default_transaction_isolation"
     _sql="$_sql to 'read committed';"
-    "$_pcmd" "$_sql"
+    pg_cmd "$_sql"
 
-    _sql="alter role $FLAGS_user set timezone to 'UTC'"
-    "$_pcmd" "$_sql"
+    pg_cmd "alter role $FLAGS_user set timezone to 'UTC'"
 }
 
 
 drop_db()
 {
     if [ "$FLAGS_reset" -eq "$FLAGS_TRUE" ]; then
-        _pcmd="psql -h $FLAGS_host -p $FLAGS_port -U postgres -tAc"
-        _sql="drop database if exists $FLAGS_database;"
-        "$_pcmd" "$_sql" >/dev/null 2>&1
+        if systemctl is-active --quiet rsyslog.service; then
+            sudo systemctl stop rsyslog.service >/dev/null 2>&1
+        fi
 
+        pg_cmd "drop database if exists $FLAGS_database;"
         echo "Dropped database $FLAGS_database..."
     fi
 }
