@@ -80,6 +80,12 @@ setup_db()
         | grep -q 1; then
         echo "Database $FLAGS_database not found, creating..."
         create_db
+
+        PGPASSWORD=$FLAGS_password psql \
+            -h "$FLAGS_host"            \
+            -p "$FLAGS_port"            \
+            -d "$FLAGS_database"        \
+            -tAf init.sql
     else
         echo "Database $FLAGS_database found, skipping..."
     fi
