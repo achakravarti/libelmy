@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS systemevents (
     id                      SERIAL
     , customerid            BIGINT
-    , receivedat            TIMESTAMPTZ
-    , devicereportedtime    TIMESTAMPTZ
-    , facility              SMALLINT
-    , priority              SMALLINT
-    , fromhost              TEXT
-    , message               TEXT
+    , receivedat            TIMESTAMPTZ --
+    , devicereportedtime    TIMESTAMPTZ --
+    , facility              SMALLINT --
+    , priority              SMALLINT --
+    , fromhost              TEXT --
+    , message               TEXT --
     , ntseverity            INT
     , importance            INT
     , eventsource           TEXT
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS systemevents (
     , minusage              INT
     , maxusage              INT
     , infounitid            INT
-    , syslogtag             TEXT
+    , syslogtag             TEXT --
     , eventlogtype          TEXT
     , genericfilename       TEXT
     , systemid              INT
@@ -37,10 +37,10 @@ CREATE TABLE IF NOT EXISTS systemeventsproperties (
 
 
 CREATE TABLE IF NOT EXISTS facilities (
-       id               INT NOT NULL
+       id               SMALLINT NOT NULL
        , keyword        TEXT NOT NULL
        , PRIMARY KEY    (id)
-)
+);
 
 INSERT INTO facilities (id, keyword)
 VALUES
@@ -53,7 +53,7 @@ VALUES
         , (6, 'lpr')
         , (7, 'news')
         , (8, 'uucp')
-        , (9, 'cron'),
+        , (9, 'cron')
         , (10, 'authpriv')
         , (11, 'ftp')
         , (12, 'ntp')
@@ -71,12 +71,12 @@ VALUES
 
 
 CREATE TABLE IF NOT EXISTS severities (
-       id               INT NOT NULL
+       id               SMALLINT NOT NULL
        , keyword        TEXT NOT NULL
        , PRIMARY KEY    (id)
-)
+);
 
-INSERT INTO severities (id, keyword, serverity)
+INSERT INTO severities (id, keyword)
 VALUES
         (0, 'emerg')
         , (1, 'alert')
@@ -86,3 +86,77 @@ VALUES
         , (5, 'notice')
         , (6, 'info')
         , (7, 'debug');
+
+
+CREATE OR REPLACE FUNCTION count_logs()
+RETURNS INT
+LANGUAGE SQL AS
+$$
+    SELECT count(id)
+    FROM systemevents;
+$$;
+
+
+CREATE OR REPLACE FUNCTION list_all_logs()
+RETURNS TABLE (
+    id INT
+    , logged_at TIMESTAMPTZ
+    , facility_id SMALLINT
+    , facility_keyword TEXT
+    , severity_id SMALLINT
+    , severity_keyword TEXT
+    , hostname TEXT
+    , log_message TEXT
+    , application_tag TEXT
+) LANGUAGE SQL AS
+$$
+    SELECT
+        e.id
+        , e.receivedat
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.message
+        , e.syslogtag
+    FROM systemevents AS e
+    INNER JOIN facilities AS f ON e.facility = f.id
+    INNER JOIN severities AS s ON e.priority = s.id
+    ORDER BY e.receivedat DESC;
+$$;
+
+
+CREATE OR REPLACE FUNCTION list_logs_subset(
+    start_row   INT
+    , row_count INT
+    , sort_row  INT
+    , sort_asc  BOOLEAN
+)
+RETURNS TABLE (
+    id INT
+    , logged_at TIMESTAMPTZ
+    , facility_id SMALLINT
+    , facility_keyword TEXT
+    , severity_id SMALLINT
+    , severity_keyword TEXT
+    , hostname TEXT
+    , log_message TEXT
+    , application_tag TEXT
+) LANGUAGE SQL AS
+$$
+    SELECT
+        e.id
+        , e.receivedat
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.message
+        , e.syslogtag
+    FROM systemevents AS e
+    INNER JOIN facilities AS f ON e.facility = f.id
+    INNER JOIN severities AS s ON e.priority = s.id
+    ORDER BY e.receivedat DESC;
+$$;
