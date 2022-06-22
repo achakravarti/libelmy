@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS systemevents (
     , priority              SMALLINT
     , fromhost              TEXT
     , message               TEXT
-    , ntSeverity            INT
+    , ntseverity            INT
     , importance            INT
     , eventsource           TEXT
     , eventuser             TEXT
