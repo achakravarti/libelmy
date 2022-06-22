@@ -1,35 +1,35 @@
-CREATE TABLE IF NOT EXISTS SystemEvents
-(
-        ID serial not null primary key,
-        CustomerID bigint,
-        ReceivedAt timestamptz NULL,
-        DeviceReportedTime timestamptz NULL,
-        Facility smallint NULL,
-        Priority smallint NULL,
-        FromHost varchar(60) NULL,
-        Message text,
-        NTSeverity int NULL,
-        Importance int NULL,
-        EventSource varchar(60),
-        EventUser varchar(60) NULL,
-        EventCategory int NULL,
-        EventID int NULL,
-        EventBinaryData text NULL,
-        MaxAvailable int NULL,
-        CurrUsage int NULL,
-        MinUsage int NULL,
-        MaxUsage int NULL,
-        InfoUnitID int NULL ,
-        SysLogTag varchar(60),
-        EventLogType varchar(60),
-        GenericFileName VarChar(60),
-        SystemID int NULL
+CREATE TABLE IF NOT EXISTS systemevents (
+    id                      SERIAL
+    , customerid            BIGINT
+    , receivedat            TIMESTAMPTZ
+    , devicereportedtime    TIMESTAMPTZ
+    , facility              SMALLINT
+    , priority              SMALLINT
+    , fromhost              TEXT
+    , message               TEXT
+    , ntSeverity            INT
+    , importance            INT
+    , eventsource           TEXT
+    , eventuser             TEXT
+    , eventcategory         INT
+    , eventid               INT
+    , eventbinarydata       TEXT
+    , maxavailable          INT
+    , currusage             INT
+    , minusage              INT
+    , maxusage              INT
+    , infounitid            INT
+    , syslogtag             TEXT
+    , eventlogtype          TEXT
+    , genericfilename       TEXT
+    , systemid              INT
+    , PRIMARY KEY           (id)
 );
 
-CREATE TABLE IF NOT EXISTS SystemEventsProperties
-(
-        ID serial not null primary key,
-        SystemEventID int NULL ,
-        ParamName varchar(255) NULL ,
-        ParamValue text NULL
+
+CREATE TABLE IF NOT EXISTS systemeventsproperties (
+    id                  SERIAL
+    , systemeventid     INT
+    , paramname         TEXT
+    , paramvalue        TEXT
 );
