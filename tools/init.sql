@@ -151,13 +151,13 @@ $$
     SELECT
         e.id AS id
         , e.devicereportedtime AS logged_at AT TIME ZONE _timezone
-        , e.facility AS facility_id
-        , f.keyword AS facility_keyword
-        , e.priority AS severity_id
-        , s.keyword AS severity_keyword
-        , e.fromhost AS hostname
-        , e.message AS log_message
-        , e.syslogtag AS application_tag
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.message
+        , e.syslogtag
     FROM systemevents AS e
     INNER JOIN facilities AS f ON e.facility = f.id
     INNER JOIN severities AS s ON e.priority = s.id
