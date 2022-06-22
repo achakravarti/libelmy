@@ -112,7 +112,7 @@ RETURNS TABLE (
 $$
     SELECT
         e.id
-        , e.receivedat
+        , e.devicereportedtime
         , e.facility
         , f.keyword
         , e.priority
@@ -128,10 +128,10 @@ $$;
 
 
 CREATE OR REPLACE FUNCTION list_logs_subset(
-    start_row   INT
-    , row_count INT
-    , sort_row  INT
-    , sort_asc  BOOLEAN
+    _start_row      INT
+    , _row_count    INT
+    , _sort_row     INT
+    , _sort_asc     BOOLEAN
 )
 RETURNS TABLE (
     id INT
@@ -146,17 +146,56 @@ RETURNS TABLE (
 ) LANGUAGE SQL AS
 $$
     SELECT
-        e.id
-        , e.receivedat
-        , e.facility
-        , f.keyword
-        , e.priority
-        , s.keyword
-        , e.fromhost
-        , e.message
-        , e.syslogtag
+        e.id AS id
+        , e.devicereportedtime AS logged_at
+        , e.facility AS facility_id
+        , f.keyword AS facility_keyword
+        , e.priority AS severity_id
+        , s.keyword AS severity_keyword
+        , e.fromhost AS hostname
+        , e.message AS log_message
+        , e.syslogtag AS application_tag
     FROM systemevents AS e
     INNER JOIN facilities AS f ON e.facility = f.id
     INNER JOIN severities AS s ON e.priority = s.id
-    ORDER BY e.receivedat DESC;
+    ORDER BY
+          (CASE WHEN _sort_row = 0 AND _sort_asc = TRUE THEN e.id END) ASC
+          , (CASE WHEN _sort_row = 0 AND _sort_asc = FALSE THEN e.id END) DESC
+          , (CASE WHEN
+                _sort_row = 1 AND _sort_asc = TRUE
+             THEN e.devicereportedtime
+             END) ASC
+          , (CASE WHEN
+                _sort_row = 1 AND _sort_asc = FALSE
+             THEN e.devicereportedtime
+             END) DESC
+          , (CASE WHEN _sort_row = 2 AND _sort_asc = TRUE THEN e.facility END)
+            ASC
+          , (CASE WHEN _sort_row = 2 AND _sort_asc = FALSE THEN e.facility END)
+            DESC
+          , (CASE WHEN _sort_row = 3 AND _sort_asc = TRUE THEN f.keyword END)
+            ASC
+          , (CASE WHEN _sort_row = 3 AND _sort_asc = FALSE THEN f.keyword END)
+            DESC
+          , (CASE WHEN _sort_row = 4 AND _sort_asc = TRUE THEN e.priority END)
+            ASC
+          , (CASE WHEN _sort_row = 4 AND _sort_asc = FALSE THEN e.priority END)
+            DESC
+          , (CASE WHEN _sort_row = 5 AND _sort_asc = TRUE THEN s.keyword END)
+            ASC
+          , (CASE WHEN _sort_row = 5 AND _sort_asc = FALSE THEN s.keyword END)
+            DESC
+          , (CASE WHEN _sort_row = 6 AND _sort_asc = TRUE THEN e.fromhost END)
+            ASC
+          , (CASE WHEN _sort_row = 6 AND _sort_asc = FALSE THEN e.fromhost END)
+            DESC
+          , (CASE WHEN _sort_row = 7 AND _sort_asc = TRUE THEN e.message END)
+            ASC
+          , (CASE WHEN _sort_row = 7 AND _sort_asc = FALSE THEN e.message END)
+            DESC
+          , (CASE WHEN _sort_row = 8 AND _sort_asc = TRUE THEN e.syslogtag END)
+            ASC
+          , (CASE WHEN _sort_row = 8 AND _sort_asc = FALSE THEN e.syslogtag END)
+            DESC
+    LIMIT _row_count OFFSET _start_row - 1;
 $$;
