@@ -97,22 +97,24 @@ $$
 $$;
 
 
-CREATE OR REPLACE FUNCTION list_all_logs()
+CREATE OR REPLACE FUNCTION list_all_logs(
+    _timezone   TEXT
+)
 RETURNS TABLE (
     id INT
-    , logged_at TIMESTAMPTZ
-    , facility_id SMALLINT
-    , facility_keyword TEXT
-    , severity_id SMALLINT
-    , severity_keyword TEXT
-    , hostname TEXT
-    , log_message TEXT
-    , application_tag TEXT
+    , logged_at         TIMESTAMP
+    , facility_id       SMALLINT
+    , facility_keyword  TEXT
+    , severity_id       SMALLINT
+    , severity_keyword  TEXT
+    , hostname          TEXT
+    , log_message       TEXT
+    , application_tag   TEXT
 ) LANGUAGE SQL AS
 $$
     SELECT
         e.id
-        , e.devicereportedtime
+        , e.devicereportedtime AT TIME ZONE _timezone
         , e.facility
         , f.keyword
         , e.priority
@@ -132,22 +134,23 @@ CREATE OR REPLACE FUNCTION list_logs_subset(
     , _row_count    INT
     , _sort_row     INT
     , _sort_asc     BOOLEAN
+    , _timezone     TEXT
 )
 RETURNS TABLE (
     id INT
-    , logged_at TIMESTAMPTZ
-    , facility_id SMALLINT
-    , facility_keyword TEXT
-    , severity_id SMALLINT
-    , severity_keyword TEXT
-    , hostname TEXT
-    , log_message TEXT
-    , application_tag TEXT
+    , logged_at         TIMESTAMP
+    , facility_id       SMALLINT
+    , facility_keyword  TEXT
+    , severity_id       SMALLINT
+    , severity_keyword  TEXT
+    , hostname          TEXT
+    , log_message       TEXT
+    , application_tag   TEXT
 ) LANGUAGE SQL AS
 $$
     SELECT
         e.id AS id
-        , e.devicereportedtime AS logged_at
+        , e.devicereportedtime AS logged_at AT TIME ZONE _timezone
         , e.facility AS facility_id
         , f.keyword AS facility_keyword
         , e.priority AS severity_id
