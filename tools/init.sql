@@ -159,43 +159,43 @@ $$
     INNER JOIN facilities AS f ON e.facility = f.id
     INNER JOIN severities AS s ON e.priority = s.id
     ORDER BY
-          (CASE WHEN _sort_row = 0 AND _sort_asc = TRUE THEN e.id END) ASC
-          , (CASE WHEN _sort_row = 0 AND _sort_asc = FALSE THEN e.id END) DESC
+          (CASE WHEN _sort_row = 1 AND _sort_asc = TRUE THEN e.id END) ASC
+          , (CASE WHEN _sort_row = 1 AND _sort_asc = FALSE THEN e.id END) DESC
           , (CASE WHEN
-                _sort_row = 1 AND _sort_asc = TRUE
+                _sort_row = 2 AND _sort_asc = TRUE
              THEN e.devicereportedtime
              END) ASC
           , (CASE WHEN
-                _sort_row = 1 AND _sort_asc = FALSE
+                _sort_row = 2 AND _sort_asc = FALSE
              THEN e.devicereportedtime
              END) DESC
-          , (CASE WHEN _sort_row = 2 AND _sort_asc = TRUE THEN e.facility END)
+          , (CASE WHEN _sort_row = 3 AND _sort_asc = TRUE THEN e.facility END)
             ASC
-          , (CASE WHEN _sort_row = 2 AND _sort_asc = FALSE THEN e.facility END)
+          , (CASE WHEN _sort_row = 3 AND _sort_asc = FALSE THEN e.facility END)
             DESC
-          , (CASE WHEN _sort_row = 3 AND _sort_asc = TRUE THEN f.keyword END)
+          , (CASE WHEN _sort_row = 4 AND _sort_asc = TRUE THEN f.keyword END)
             ASC
-          , (CASE WHEN _sort_row = 3 AND _sort_asc = FALSE THEN f.keyword END)
+          , (CASE WHEN _sort_row = 4 AND _sort_asc = FALSE THEN f.keyword END)
             DESC
-          , (CASE WHEN _sort_row = 4 AND _sort_asc = TRUE THEN e.priority END)
+          , (CASE WHEN _sort_row = 5 AND _sort_asc = TRUE THEN e.priority END)
             ASC
-          , (CASE WHEN _sort_row = 4 AND _sort_asc = FALSE THEN e.priority END)
+          , (CASE WHEN _sort_row = 5 AND _sort_asc = FALSE THEN e.priority END)
             DESC
-          , (CASE WHEN _sort_row = 5 AND _sort_asc = TRUE THEN s.keyword END)
+          , (CASE WHEN _sort_row = 6 AND _sort_asc = TRUE THEN s.keyword END)
             ASC
-          , (CASE WHEN _sort_row = 5 AND _sort_asc = FALSE THEN s.keyword END)
+          , (CASE WHEN _sort_row = 6 AND _sort_asc = FALSE THEN s.keyword END)
             DESC
-          , (CASE WHEN _sort_row = 6 AND _sort_asc = TRUE THEN e.fromhost END)
+          , (CASE WHEN _sort_row = 7 AND _sort_asc = TRUE THEN e.fromhost END)
             ASC
-          , (CASE WHEN _sort_row = 6 AND _sort_asc = FALSE THEN e.fromhost END)
+          , (CASE WHEN _sort_row = 7 AND _sort_asc = FALSE THEN e.fromhost END)
             DESC
-          , (CASE WHEN _sort_row = 7 AND _sort_asc = TRUE THEN e.message END)
+          , (CASE WHEN _sort_row = 8 AND _sort_asc = TRUE THEN e.message END)
             ASC
-          , (CASE WHEN _sort_row = 7 AND _sort_asc = FALSE THEN e.message END)
+          , (CASE WHEN _sort_row = 8 AND _sort_asc = FALSE THEN e.message END)
             DESC
-          , (CASE WHEN _sort_row = 8 AND _sort_asc = TRUE THEN e.syslogtag END)
+          , (CASE WHEN _sort_row = 9 AND _sort_asc = TRUE THEN e.syslogtag END)
             ASC
-          , (CASE WHEN _sort_row = 8 AND _sort_asc = FALSE THEN e.syslogtag END)
+          , (CASE WHEN _sort_row = 9 AND _sort_asc = FALSE THEN e.syslogtag END)
             DESC
     LIMIT _row_count OFFSET _start_row - 1;
 $$;
