@@ -267,9 +267,25 @@ CREATE OR REPLACE FUNCTION trim_logs(
     _size_limit INT
     , _trim_percentage INT
 ) RETURNS INT
-LANGUAGE SQL AS
+LANGUAGE PLPGSQL AS
 $$
-    WITH deleted AS (
+DECLARE
+    _deleted INT;
+
+BEGIN
+    SELECT
+        CASE
+            WHEN (pg_relation_size('systemevents') >= _size_limit * 1024 * 1024)
+                THEN (
+                    SELECT count(*) * _trim_percentage / 100
+                    FROM systemevents
+                )
+            ELSE 0
+        END
+    INTO _deleted;
+
+    IF _deleted > 0
+    THEN
         DELETE FROM systemevents
         WHERE id IN (
             SELECT id
@@ -279,7 +295,9 @@ $$
                 SELECT count(*) * _trim_percentage / 100
                 FROM systemevents
             )
-        ) RETURNING *
-    ) SELECT count(*)
-      FROM deleted;
-$$
+        );
+    END IF;
+
+    RETURN _deleted;
+END
+$$;
