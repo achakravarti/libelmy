@@ -163,27 +163,27 @@ CREATE OR REPLACE FUNCTION list_all_logs(
     _timezone   TEXT
 )
 RETURNS TABLE (
-    id INT
+    event_at            TIMESTAMP
     , logged_at         TIMESTAMP
     , facility_id       SMALLINT
     , facility_keyword  TEXT
     , severity_id       SMALLINT
     , severity_keyword  TEXT
     , hostname          TEXT
-    , log_message       TEXT
     , application_tag   TEXT
+    , log_message       TEXT
 ) LANGUAGE SQL STABLE AS
 $$
     SELECT
-        e.id
-        , e.devicereportedtime AT TIME ZONE _timezone
+        e.devicereportedtime AT TIME ZONE _timezone
+        , e.receivedat AT TIME ZONE _timezone
         , e.facility
         , f.keyword
         , e.priority
         , s.keyword
         , e.fromhost
-        , e.message
         , e.syslogtag
+        , e.message
     FROM systemevents AS e
     INNER JOIN facilities AS f ON e.facility = f.id
     INNER JOIN severities AS s ON e.priority = s.id
@@ -191,6 +191,14 @@ $$
 $$;
 
 
+--
+-- _sort_row options:
+-- 1 event_at
+-- 2 severity_id
+-- 3 facility_id
+-- 4 hostname
+-- 5 tag
+-- 6 message
 CREATE OR REPLACE FUNCTION list_logs_subset(
     _start_row      INT
     , _row_count    INT
@@ -199,20 +207,20 @@ CREATE OR REPLACE FUNCTION list_logs_subset(
     , _timezone     TEXT
 )
 RETURNS TABLE (
-    id INT
+    event_at            TIMESTAMP
     , logged_at         TIMESTAMP
     , facility_id       SMALLINT
     , facility_keyword  TEXT
     , severity_id       SMALLINT
     , severity_keyword  TEXT
     , hostname          TEXT
-    , log_message       TEXT
     , application_tag   TEXT
+    , log_message       TEXT
 ) LANGUAGE SQL STABLE AS
 $$
     SELECT
-        e.id AS id
-        , e.devicereportedtime AT TIME ZONE _timezone
+        e.devicereportedtime AT TIME ZONE _timezone
+        , e.receivedat AT TIME ZONE _timezone
         , e.facility
         , f.keyword
         , e.priority
@@ -224,43 +232,33 @@ $$
     INNER JOIN facilities AS f ON e.facility = f.id
     INNER JOIN severities AS s ON e.priority = s.id
     ORDER BY
-          (CASE WHEN _sort_row = 1 AND _sort_asc = TRUE THEN e.id END) ASC
-          , (CASE WHEN _sort_row = 1 AND _sort_asc = FALSE THEN e.id END) DESC
-          , (CASE WHEN
-                _sort_row = 2 AND _sort_asc = TRUE
+          (CASE WHEN
+                _sort_row = 1 AND _sort_asc = TRUE
              THEN e.devicereportedtime
-             END) ASC
+           END) ASC
           , (CASE WHEN
-                _sort_row = 2 AND _sort_asc = FALSE
+                _sort_row = 1 AND _sort_asc = FALSE
              THEN e.devicereportedtime
              END) DESC
+          , (CASE WHEN _sort_row = 2 AND _sort_asc = TRUE THEN e.priority END)
+            ASC
+          , (CASE WHEN _sort_row = 2 AND _sort_asc = FALSE THEN e.priority END)
+            DESC
           , (CASE WHEN _sort_row = 3 AND _sort_asc = TRUE THEN e.facility END)
             ASC
           , (CASE WHEN _sort_row = 3 AND _sort_asc = FALSE THEN e.facility END)
             DESC
-          , (CASE WHEN _sort_row = 4 AND _sort_asc = TRUE THEN f.keyword END)
+          , (CASE WHEN _sort_row = 4 AND _sort_asc = TRUE THEN e.fromhost END)
             ASC
-          , (CASE WHEN _sort_row = 4 AND _sort_asc = FALSE THEN f.keyword END)
+          , (CASE WHEN _sort_row = 4 AND _sort_asc = FALSE THEN e.fromhost END)
             DESC
-          , (CASE WHEN _sort_row = 5 AND _sort_asc = TRUE THEN e.priority END)
+          , (CASE WHEN _sort_row = 5 AND _sort_asc = TRUE THEN e.syslogtag END)
             ASC
-          , (CASE WHEN _sort_row = 5 AND _sort_asc = FALSE THEN e.priority END)
+          , (CASE WHEN _sort_row = 5 AND _sort_asc = FALSE THEN e.syslogtag END)
             DESC
-          , (CASE WHEN _sort_row = 6 AND _sort_asc = TRUE THEN s.keyword END)
+          , (CASE WHEN _sort_row = 6 AND _sort_asc = TRUE THEN e.message END)
             ASC
-          , (CASE WHEN _sort_row = 6 AND _sort_asc = FALSE THEN s.keyword END)
-            DESC
-          , (CASE WHEN _sort_row = 7 AND _sort_asc = TRUE THEN e.fromhost END)
-            ASC
-          , (CASE WHEN _sort_row = 7 AND _sort_asc = FALSE THEN e.fromhost END)
-            DESC
-          , (CASE WHEN _sort_row = 8 AND _sort_asc = TRUE THEN e.message END)
-            ASC
-          , (CASE WHEN _sort_row = 8 AND _sort_asc = FALSE THEN e.message END)
-            DESC
-          , (CASE WHEN _sort_row = 9 AND _sort_asc = TRUE THEN e.syslogtag END)
-            ASC
-          , (CASE WHEN _sort_row = 9 AND _sort_asc = FALSE THEN e.syslogtag END)
+          , (CASE WHEN _sort_row = 6 AND _sort_asc = FALSE THEN e.message END)
             DESC
     LIMIT _row_count OFFSET _start_row - 1;
 $$;
