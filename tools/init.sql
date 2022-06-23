@@ -42,6 +42,15 @@ CREATE TABLE IF NOT EXISTS facilities (
        , PRIMARY KEY    (id)
 );
 
+/*
+CREATE TRIGGER tg_rotate_systemevents_table
+    AFTER INSERT
+    ON systemevents
+    FOR EACH STATEMENT
+    EXECUTE PROCEDURE rotate_systemevents_table();
+*/
+
+
 INSERT INTO facilities (id, keyword)
 VALUES
         (0, 'kern')
@@ -67,7 +76,8 @@ VALUES
         , (20, 'local4')
         , (21, 'local5')
         , (22, 'local6')
-        , (23, 'local7');
+        , (23, 'local7')
+ON CONFLICT DO NOTHING;
 
 
 CREATE TABLE IF NOT EXISTS severities (
@@ -85,15 +95,40 @@ VALUES
         , (4, 'warning')
         , (5, 'notice')
         , (6, 'info')
-        , (7, 'debug');
+        , (7, 'debug')
+ON CONFLICT DO NOTHING;
 
 
 CREATE OR REPLACE FUNCTION count_logs()
 RETURNS INT
-LANGUAGE SQL AS
+LANGUAGE SQL STABLE AS
 $$
     SELECT count(id)
     FROM systemevents;
+$$;
+
+
+CREATE OR REPLACE FUNCTION get_first_log_timestamp(
+    _timezone   TEXT
+) RETURNS TIMESTAMP
+LANGUAGE SQL STABLE AS
+$$
+    SELECT receivedat AT TIME ZONE _timezone
+    FROM systemevents
+    ORDER BY receivedat ASC
+    LIMIT 1;
+$$;
+
+
+CREATE OR REPLACE FUNCTION get_last_log_timestamp(
+    _timezone   TEXT
+) RETURNS TIMESTAMP
+LANGUAGE SQL STABLE AS
+$$
+    SELECT receivedat AT TIME ZONE _timezone
+    FROM systemevents
+    ORDER BY receivedat DESC
+    LIMIT 1;
 $$;
 
 
@@ -110,7 +145,7 @@ RETURNS TABLE (
     , hostname          TEXT
     , log_message       TEXT
     , application_tag   TEXT
-) LANGUAGE SQL AS
+) LANGUAGE SQL STABLE AS
 $$
     SELECT
         e.id
@@ -146,11 +181,11 @@ RETURNS TABLE (
     , hostname          TEXT
     , log_message       TEXT
     , application_tag   TEXT
-) LANGUAGE SQL AS
+) LANGUAGE SQL STABLE AS
 $$
     SELECT
         e.id AS id
-        , e.devicereportedtime AS logged_at AT TIME ZONE _timezone
+        , e.devicereportedtime AT TIME ZONE _timezone
         , e.facility
         , f.keyword
         , e.priority
