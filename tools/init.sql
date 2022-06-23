@@ -187,7 +187,7 @@ $$
     FROM systemevents AS e
     INNER JOIN facilities AS f ON e.facility = f.id
     INNER JOIN severities AS s ON e.priority = s.id
-    ORDER BY e.receivedat DESC;
+    ORDER BY e.devicereportedtime DESC;
 $$;
 
 
