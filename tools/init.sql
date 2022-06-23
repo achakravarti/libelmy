@@ -1,3 +1,6 @@
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+
 CREATE TABLE IF NOT EXISTS systemevents (
     id                      SERIAL
     , customerid            BIGINT
@@ -25,6 +28,30 @@ CREATE TABLE IF NOT EXISTS systemevents (
     , systemid              INT
     , PRIMARY KEY           (id)
 );
+
+CREATE INDEX idx_systemevents__receivedat
+       ON systemevents
+       USING BTREE (receivedat);
+
+CREATE INDEX idx_systemevents__facility
+       ON systemevents
+       USING BTREE (facility);
+
+CREATE INDEX idx_systemevents__priority
+       ON systemevents
+       USING BTREE (priority);
+
+CREATE INDEX idx_systemevents__fromhost
+       ON systemevents
+       USING GIN (fromhost GIN_TRGM_OPS);
+
+CREATE INDEX idx_systemevents__syslogtag
+       ON systemevents
+       USING GIN (syslogtag GIN_TRGM_OPS);
+
+CREATE INDEX idx_systemevents__message
+       ON systemevents
+       USING GIN (message GIN_TRGM_OPS);
 
 
 CREATE TABLE IF NOT EXISTS systemeventsproperties (
