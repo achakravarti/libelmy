@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS systemevents (
     , PRIMARY KEY           (id)
 );
 
-CREATE INDEX idx_systemevents__receivedat
+CREATE INDEX idx_systemevents__devicereportedtime
        ON systemevents
-       USING BTREE (receivedat);
+       USING BTREE (devicereportedtime);
 
 CREATE INDEX idx_systemevents__facility
        ON systemevents
