@@ -205,8 +205,7 @@ CREATE OR REPLACE FUNCTION list_logs_subset(
     , _sort_row     INT
     , _sort_asc     BOOLEAN
     , _timezone     TEXT
-)
-RETURNS TABLE (
+) RETURNS TABLE (
     event_at            TIMESTAMP
     , logged_at         TIMESTAMP
     , facility_id       SMALLINT
@@ -262,3 +261,25 @@ $$
             DESC
     LIMIT _row_count OFFSET _start_row - 1;
 $$;
+
+
+CREATE OR REPLACE FUNCTION trim_logs(
+    _size_limit INT
+    , _trim_percentage INT
+) RETURNS INT
+LANGUAGE SQL AS
+$$
+    WITH deleted AS (
+        DELETE FROM systemevents
+        WHERE id IN (
+            SELECT id
+            FROM systemevents
+            ORDER BY devicereportedtime DESC
+            LIMIT (
+                SELECT count(*) * _trim_percentage / 100
+                FROM systemevents
+            )
+        ) RETURNING *
+    ) SELECT count(*)
+      FROM deleted;
+$$
