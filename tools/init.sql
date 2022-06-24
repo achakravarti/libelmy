@@ -129,10 +129,10 @@ ON CONFLICT DO NOTHING;
 --
 
 
---                                                              %func:count_logs
+--                                                              %func:logs_count
 -- __NAME__
---      count_logs() - counts number of log entries
-CREATE OR REPLACE FUNCTION count_logs()
+--      logs_count() - counts number of log entries
+CREATE OR REPLACE FUNCTION logs_count()
 RETURNS INT
 LANGUAGE SQL STABLE AS
 $$
@@ -141,10 +141,10 @@ $$
 $$;
 
 
---                                                 %func:get_first_log_timestamp
+--                                                           %func:logs_ts_first
 -- __NAME__
---      get_first_log_timestamp() - gets timestamp of first log
-CREATE OR REPLACE FUNCTION get_first_log_timestamp(
+--      logs_ts_first() - gets timestamp of first log
+CREATE OR REPLACE FUNCTION logs_ts_first(
     _timezone   TEXT
 ) RETURNS TIMESTAMP
 LANGUAGE SQL STABLE AS
@@ -156,10 +156,10 @@ $$
 $$;
 
 
---                                                  %func:get_last_log_timestamp
+--                                                            %func:logs_ts_last
 -- __NAME__
---      get_last_log_timestamp() - gets timestamp of last log
-CREATE OR REPLACE FUNCTION get_last_log_timestamp(
+--      logs_ts_last() - gets timestamp of last log
+CREATE OR REPLACE FUNCTION logs_ts_last(
     _timezone   TEXT
 ) RETURNS TIMESTAMP
 LANGUAGE SQL STABLE AS
@@ -171,9 +171,9 @@ $$
 $$;
 
 
---                                                           %func:list_all_logs
+--                                                                %func:logs_all
 -- __NAME__
---      list_all_logs() - lists all logs
+--      logs_all() - lists all logs
 CREATE OR REPLACE FUNCTION list_all_logs(
     _timezone   TEXT
 )
@@ -206,15 +206,16 @@ $$
 $$;
 
 
---                                                        %func:list_logs_subset
+--                                                              %func:logs_paged
 -- __NAME__
---      list_logs_subset() - paginates logs
-CREATE OR REPLACE FUNCTION list_logs_subset(
-    _row_start   INT
-    , _row_count INT
-    , _sort_col TEXT
-    , _sort_dir TEXT
-    , _timezone TEXT
+--      logs_paged() - paginates all logs
+--
+CREATE OR REPLACE FUNCTION logs_paged(
+    _row_start      INT
+    , _row_count    INT
+    , _sort_col     TEXT
+    , _sort_dir     TEXT
+    , _timezone     TEXT
 ) RETURNS TABLE (
     event_at            TIMESTAMP
     , logged_at         TIMESTAMP
@@ -255,16 +256,17 @@ END
 $$;
 
 
---                                                    %func:filter_logs_facility
+--                                                           %func:logs_facility
 -- __NAME__
---      filter_logs_facility() - filters logs by facility
-CREATE OR REPLACE FUNCTION filter_logs_facility(
-    _filter      SMALLINT[]
-    , _row_start INT
-    , _row_count INT
-    , _sort_col TEXT
-    , _sort_dir TEXT
-    , _timezone TEXT
+--      logs_facility() - filters logs by facility
+--
+CREATE OR REPLACE FUNCTION logs_facility(
+    _filter         SMALLINT[]
+    , _row_start    INT
+    , _row_count    INT
+    , _sort_col     TEXT
+    , _sort_dir     TEXT
+    , _timezone     TEXT
 ) RETURNS TABLE (
     event_at            TIMESTAMP
     , logged_at         TIMESTAMP
@@ -307,16 +309,17 @@ END
 $$;
 
 
---                                                    %func:filter_logs_severity
+--                                                           %func:logs_severity
 -- __NAME__
---      filter_logs_severity() - filters logs by severity
-CREATE OR REPLACE FUNCTION filter_logs_severity(
-    _filter      SMALLINT[]
-    , _row_start INT
-    , _row_count INT
-    , _sort_col TEXT
-    , _sort_dir TEXT
-    , _timezone TEXT
+--      logs_severity() - filters logs by severity
+--
+CREATE OR REPLACE FUNCTION logs_severity(
+    _filter         SMALLINT[]
+    , _row_start    INT
+    , _row_count    INT
+    , _sort_col     TEXT
+    , _sort_dir     TEXT
+    , _timezone     TEXT
 ) RETURNS TABLE (
     event_at            TIMESTAMP
     , logged_at         TIMESTAMP
@@ -359,16 +362,17 @@ END
 $$;
 
 
---                                                    %func:filter_logs_hostname
+--                                                           %func:logs_hostname
 -- __NAME__
---      filter_logs_hostname() - filters logs by hostname
-CREATE OR REPLACE FUNCTION filter_logs_hostname(
-    _filter      TEXT
-    , _row_start INT
-    , _row_count INT
-    , _sort_col TEXT
-    , _sort_dir TEXT
-    , _timezone TEXT
+--      logs_hostname() - filters logs by hostname
+--
+CREATE OR REPLACE FUNCTION logs_hostname(
+    _filter         TEXT
+    , _row_start    INT
+    , _row_count    INT
+    , _sort_col     TEXT
+    , _sort_dir     TEXT
+    , _timezone     TEXT
 ) RETURNS TABLE (
     event_at            TIMESTAMP
     , logged_at         TIMESTAMP
@@ -414,13 +418,14 @@ $$;
 --                                                         %func:filter_logs_tag
 -- __NAME__
 --      filter_logs_tag() - filters logs by tag
-CREATE OR REPLACE FUNCTION filter_logs_tag(
-    _filter      TEXT
-    , _row_start INT
-    , _row_count INT
-    , _sort_col TEXT
-    , _sort_dir TEXT
-    , _timezone TEXT
+--
+CREATE OR REPLACE FUNCTION logs_tag(
+    _filter         TEXT
+    , _row_start    INT
+    , _row_count    INT
+    , _sort_col     TEXT
+    , _sort_dir     TEXT
+    , _timezone     TEXT
 ) RETURNS TABLE (
     event_at            TIMESTAMP
     , logged_at         TIMESTAMP
@@ -463,16 +468,17 @@ END
 $$;
 
 
---                                                     %func:filter_logs_message
+--                                                            %func:logs_message
 -- __NAME__
---      filter_logs_message() - filters logs by message
+--      logs_message() - filters logs by message
+--
 CREATE OR REPLACE FUNCTION filter_logs_message(
-    _filter      TEXT
-    , _row_start INT
-    , _row_count INT
-    , _sort_col TEXT
-    , _sort_dir TEXT
-    , _timezone TEXT
+    _filter         TEXT
+    , _row_start    INT
+    , _row_count    INT
+    , _sort_col     TEXT
+    , _sort_dir     TEXT
+    , _timezone     TEXT
 ) RETURNS TABLE (
     event_at            TIMESTAMP
     , logged_at         TIMESTAMP
