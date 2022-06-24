@@ -256,11 +256,11 @@ END
 $$;
 
 
---                                                           %func:logs_facility
+--                                                     %func:logs_facility_paged
 -- __NAME__
---      logs_facility() - filters logs by facility
+--      logs_facility_paged() - paginates logs by facility
 --
-CREATE OR REPLACE FUNCTION logs_facility(
+CREATE OR REPLACE FUNCTION logs_facility_paged(
     _filter         SMALLINT[]
     , _row_start    INT
     , _row_count    INT
@@ -309,11 +309,11 @@ END
 $$;
 
 
---                                                           %func:logs_severity
+--                                                     %func:logs_severity_paged
 -- __NAME__
---      logs_severity() - filters logs by severity
+--      logs_severity_paged() - paginates logs by severity
 --
-CREATE OR REPLACE FUNCTION logs_severity(
+CREATE OR REPLACE FUNCTION logs_severity_paged(
     _filter         SMALLINT[]
     , _row_start    INT
     , _row_count    INT
@@ -362,11 +362,11 @@ END
 $$;
 
 
---                                                           %func:logs_hostname
+--                                                     %func:logs_hostname_paged
 -- __NAME__
---      logs_hostname() - filters logs by hostname
+--      logs_hostname_paged() - paginates logs by hostname
 --
-CREATE OR REPLACE FUNCTION logs_hostname(
+CREATE OR REPLACE FUNCTION logs_hostname_paged(
     _filter         TEXT
     , _row_start    INT
     , _row_count    INT
@@ -415,11 +415,11 @@ END
 $$;
 
 
---                                                         %func:filter_logs_tag
+--                                                         %func:_logs_tag_paged
 -- __NAME__
---      filter_logs_tag() - filters logs by tag
+--      logs_tag_paged() - paginates logs by tag
 --
-CREATE OR REPLACE FUNCTION logs_tag(
+CREATE OR REPLACE FUNCTION logs_tag_paged(
     _filter         TEXT
     , _row_start    INT
     , _row_count    INT
@@ -468,11 +468,11 @@ END
 $$;
 
 
---                                                            %func:logs_message
+--                                                      %func:logs_message_paged
 -- __NAME__
---      logs_message() - filters logs by message
+--      logs_message_paged() - paginates logs by message
 --
-CREATE OR REPLACE FUNCTION filter_logs_message(
+CREATE OR REPLACE FUNCTION logs_message_paged(
     _filter         TEXT
     , _row_start    INT
     , _row_count    INT
