@@ -1,6 +1,11 @@
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 
+--
+-- TABLE DEFINITIONS
+--
+
+
 --                                                           %table:systemevents
 CREATE TABLE IF NOT EXISTS systemevents (
     id                      SERIAL
@@ -31,36 +36,26 @@ CREATE TABLE IF NOT EXISTS systemevents (
 );
 
 
---                                   %index:idx_systemevents__devicereportedtime
 CREATE INDEX idx_systemevents__devicereportedtime
        ON systemevents
        USING BTREE (devicereportedtime);
 
-
---                                             %index:idx_systemevents__facility
 CREATE INDEX idx_systemevents__facility
        ON systemevents
        USING BTREE (facility);
 
---                                             %index:idx_systemevents__priority
 CREATE INDEX idx_systemevents__priority
        ON systemevents
        USING BTREE (priority);
 
-
---                                             %index:idx_systemevents__fromhost
 CREATE INDEX idx_systemevents__fromhost
        ON systemevents
        USING GIN (fromhost GIN_TRGM_OPS);
 
-
---                                            %index:idx_systemevents__syslogtag
 CREATE INDEX idx_systemevents__syslogtag
        ON systemevents
        USING GIN (syslogtag GIN_TRGM_OPS);
 
-
---                                              %index:idx_systemevents__message
 CREATE INDEX idx_systemevents__message
        ON systemevents
        USING GIN (message GIN_TRGM_OPS);
@@ -132,6 +127,11 @@ VALUES
         , (6, 'info')
         , (7, 'debug')
 ON CONFLICT DO NOTHING;
+
+
+--
+-- FUNCTION DEFINITIONS
+--
 
 
 --                                                              %func:count_logs
