@@ -1,6 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 
+--                                                           %table:systemevents
 CREATE TABLE IF NOT EXISTS systemevents (
     id                      SERIAL
     , customerid            BIGINT
@@ -29,31 +30,43 @@ CREATE TABLE IF NOT EXISTS systemevents (
     , PRIMARY KEY           (id)
 );
 
+
+--                                   %index:idx_systemevents__devicereportedtime
 CREATE INDEX idx_systemevents__devicereportedtime
        ON systemevents
        USING BTREE (devicereportedtime);
 
+
+--                                             %index:idx_systemevents__facility
 CREATE INDEX idx_systemevents__facility
        ON systemevents
        USING BTREE (facility);
 
+--                                             %index:idx_systemevents__priority
 CREATE INDEX idx_systemevents__priority
        ON systemevents
        USING BTREE (priority);
 
+
+--                                             %index:idx_systemevents__fromhost
 CREATE INDEX idx_systemevents__fromhost
        ON systemevents
        USING GIN (fromhost GIN_TRGM_OPS);
 
+
+--                                            %index:idx_systemevents__syslogtag
 CREATE INDEX idx_systemevents__syslogtag
        ON systemevents
        USING GIN (syslogtag GIN_TRGM_OPS);
 
+
+--                                              %index:idx_systemevents__message
 CREATE INDEX idx_systemevents__message
        ON systemevents
        USING GIN (message GIN_TRGM_OPS);
 
 
+--                                                 %table:systemeventsproperties
 CREATE TABLE IF NOT EXISTS systemeventsproperties (
     id                  SERIAL
     , systemeventid     INT
@@ -63,19 +76,13 @@ CREATE TABLE IF NOT EXISTS systemeventsproperties (
 );
 
 
+--                                                             %table:facilities
 CREATE TABLE IF NOT EXISTS facilities (
        id               SMALLINT NOT NULL
        , keyword        TEXT NOT NULL
        , PRIMARY KEY    (id)
 );
 
-/*
-CREATE TRIGGER tg_rotate_systemevents_table
-    AFTER INSERT
-    ON systemevents
-    FOR EACH STATEMENT
-    EXECUTE PROCEDURE rotate_systemevents_table();
-*/
 
 
 INSERT INTO facilities (id, keyword)
@@ -107,6 +114,7 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 
+--                                                             %table:severities
 CREATE TABLE IF NOT EXISTS severities (
        id               SMALLINT NOT NULL
        , keyword        TEXT NOT NULL
@@ -126,6 +134,7 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 
+--                                                              %func:count_logs
 CREATE OR REPLACE FUNCTION count_logs()
 RETURNS INT
 LANGUAGE SQL STABLE AS
@@ -135,6 +144,7 @@ $$
 $$;
 
 
+--                                                 %func:get_first_log_timestamp
 CREATE OR REPLACE FUNCTION get_first_log_timestamp(
     _timezone   TEXT
 ) RETURNS TIMESTAMP
@@ -147,6 +157,7 @@ $$
 $$;
 
 
+--                                                  %func:get_last_log_timestamp
 CREATE OR REPLACE FUNCTION get_last_log_timestamp(
     _timezone   TEXT
 ) RETURNS TIMESTAMP
@@ -159,6 +170,7 @@ $$
 $$;
 
 
+--                                                           %func:list_all_logs
 CREATE OR REPLACE FUNCTION list_all_logs(
     _timezone   TEXT
 )
@@ -191,6 +203,7 @@ $$
 $$;
 
 
+--                                                        %func:list_logs_subset
 CREATE OR REPLACE FUNCTION list_logs_subset(
     _row_start   INT
     , _row_count INT
@@ -237,6 +250,7 @@ END
 $$;
 
 
+--                                                    %func:filter_logs_facility
 CREATE OR REPLACE FUNCTION filter_logs_facility(
     _filter      SMALLINT[]
     , _row_start INT
@@ -286,6 +300,7 @@ END
 $$;
 
 
+--                                                    %func:filter_logs_severity
 CREATE OR REPLACE FUNCTION filter_logs_severity(
     _filter      SMALLINT[]
     , _row_start INT
@@ -335,6 +350,7 @@ END
 $$;
 
 
+--                                                    %func:filter_logs_hostname
 CREATE OR REPLACE FUNCTION filter_logs_hostname(
     _filter      TEXT
     , _row_start INT
@@ -384,6 +400,7 @@ END
 $$;
 
 
+--                                                         %func:filter_logs_tag
 CREATE OR REPLACE FUNCTION filter_logs_tag(
     _filter      TEXT
     , _row_start INT
@@ -433,6 +450,7 @@ END
 $$;
 
 
+--                                                     %func:filter_logs_message
 CREATE OR REPLACE FUNCTION filter_logs_message(
     _filter      TEXT
     , _row_start INT
@@ -482,6 +500,7 @@ END
 $$;
 
 
+--                                                               %func:trim_logs
 CREATE OR REPLACE FUNCTION trim_logs(
     _size_limit INT
     , _trim_percentage INT
