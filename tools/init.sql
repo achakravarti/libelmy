@@ -64,18 +64,6 @@ CREATE INDEX idx_systemevents__message
        USING GIN (message GIN_TRGM_OPS);
 
 
---                                                 %table:systemeventsproperties
--- __NAME__
---      systemeventsproperties - holds system log properties
-CREATE TABLE IF NOT EXISTS systemeventsproperties (
-    id                  SERIAL
-    , systemeventid     INT
-    , paramname         TEXT
-    , paramvalue        TEXT
-    , PRIMARY KEY       (id)
-);
-
-
 --                                                             %table:facilities
 -- __NAME__
 --      facilities - defines syslog facilities

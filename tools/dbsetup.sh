@@ -141,7 +141,7 @@ drop_db()
             sudo systemctl stop rsyslog.service >/dev/null 2>&1
         fi
 
-        pg_cmd "drop database if exists $FLAGS_database;"
+        pg_cmd "DROP DATABASE IF EXISTS $FLAGS_database WITH (FORCE);"
         echo "Dropped database $FLAGS_database..."
     fi
 }
