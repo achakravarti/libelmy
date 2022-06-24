@@ -191,6 +191,51 @@ $$
 $$;
 
 
+CREATE OR REPLACE FUNCTION list_logs_subset2(
+    _row_start INT
+    , _row_count INT
+    , _sort_col TEXT
+    , _sort_dir TEXT
+    , _timezone TEXT
+) RETURNS TABLE (
+    event_at TIMESTAMP
+    , logged_at TIMESTAMP
+    , facility_id SMALLINT
+    , facility_keyword TEXT
+    , severity_id SMALLINT
+    , severity_keyword TEXT
+    , hostname TEXT
+    , tag TEXT
+    , message TEXT
+) LANGUAGE PLPGSQL STABLE AS
+$$
+BEGIN
+    RETURN QUERY EXECUTE format(
+        'SELECT
+            e.devicereportedtime AT TIME ZONE %L
+            , e.receivedat AT TIME ZONE %L
+            , e.facility
+            , f.keyword
+            , e.priority
+            , s.keyword
+            , e.fromhost
+            , e.syslogtag
+            , e.message
+        FROM systemevents AS e
+        INNER JOIN facilities AS f ON e.facility = f.id
+        INNER JOIN severities AS s ON e.priority = s.id
+        ORDER BY %I %s
+        LIMIT %s OFFSET %s'
+        , _timezone
+        , _timezone
+        , _sort_col
+        , _sort_dir
+        , _row_count
+        , _row_start
+    );
+END
+$$;
+
 --
 -- _sort_row options:
 -- 1 event_at
