@@ -7,6 +7,9 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 
 --                                                           %table:systemevents
+-- __NAME__
+--      systemevents - holds system logs
+--
 CREATE TABLE IF NOT EXISTS systemevents (
     id                      SERIAL
     , customerid            BIGINT
@@ -62,6 +65,8 @@ CREATE INDEX idx_systemevents__message
 
 
 --                                                 %table:systemeventsproperties
+-- __NAME__
+--      systemeventsproperties - holds system log properties
 CREATE TABLE IF NOT EXISTS systemeventsproperties (
     id                  SERIAL
     , systemeventid     INT
@@ -72,13 +77,13 @@ CREATE TABLE IF NOT EXISTS systemeventsproperties (
 
 
 --                                                             %table:facilities
+-- __NAME__
+--      facilities - defines syslog facilities
 CREATE TABLE IF NOT EXISTS facilities (
        id               SMALLINT NOT NULL
        , keyword        TEXT NOT NULL
        , PRIMARY KEY    (id)
 );
-
-
 
 INSERT INTO facilities (id, keyword)
 VALUES
@@ -110,6 +115,8 @@ ON CONFLICT DO NOTHING;
 
 
 --                                                             %table:severities
+-- __NAME__
+--      severities - defines syslog severities
 CREATE TABLE IF NOT EXISTS severities (
        id               SMALLINT NOT NULL
        , keyword        TEXT NOT NULL
@@ -135,6 +142,8 @@ ON CONFLICT DO NOTHING;
 
 
 --                                                              %func:count_logs
+-- __NAME__
+--      count_logs() - counts number of log entries
 CREATE OR REPLACE FUNCTION count_logs()
 RETURNS INT
 LANGUAGE SQL STABLE AS
@@ -145,6 +154,8 @@ $$;
 
 
 --                                                 %func:get_first_log_timestamp
+-- __NAME__
+--      get_first_log_timestamp() - gets timestamp of first log
 CREATE OR REPLACE FUNCTION get_first_log_timestamp(
     _timezone   TEXT
 ) RETURNS TIMESTAMP
@@ -158,6 +169,8 @@ $$;
 
 
 --                                                  %func:get_last_log_timestamp
+-- __NAME__
+--      get_last_log_timestamp() - gets timestamp of last log
 CREATE OR REPLACE FUNCTION get_last_log_timestamp(
     _timezone   TEXT
 ) RETURNS TIMESTAMP
@@ -171,6 +184,8 @@ $$;
 
 
 --                                                           %func:list_all_logs
+-- __NAME__
+--      list_all_logs() - lists all logs
 CREATE OR REPLACE FUNCTION list_all_logs(
     _timezone   TEXT
 )
@@ -204,6 +219,8 @@ $$;
 
 
 --                                                        %func:list_logs_subset
+-- __NAME__
+--      list_logs_subset() - paginates logs
 CREATE OR REPLACE FUNCTION list_logs_subset(
     _row_start   INT
     , _row_count INT
@@ -251,6 +268,8 @@ $$;
 
 
 --                                                    %func:filter_logs_facility
+-- __NAME__
+--      filter_logs_facility() - filters logs by facility
 CREATE OR REPLACE FUNCTION filter_logs_facility(
     _filter      SMALLINT[]
     , _row_start INT
@@ -301,6 +320,8 @@ $$;
 
 
 --                                                    %func:filter_logs_severity
+-- __NAME__
+--      filter_logs_severity() - filters logs by severity
 CREATE OR REPLACE FUNCTION filter_logs_severity(
     _filter      SMALLINT[]
     , _row_start INT
@@ -351,6 +372,8 @@ $$;
 
 
 --                                                    %func:filter_logs_hostname
+-- __NAME__
+--      filter_logs_hostname() - filters logs by hostname
 CREATE OR REPLACE FUNCTION filter_logs_hostname(
     _filter      TEXT
     , _row_start INT
@@ -401,6 +424,8 @@ $$;
 
 
 --                                                         %func:filter_logs_tag
+-- __NAME__
+--      filter_logs_tag() - filters logs by tag
 CREATE OR REPLACE FUNCTION filter_logs_tag(
     _filter      TEXT
     , _row_start INT
@@ -451,6 +476,8 @@ $$;
 
 
 --                                                     %func:filter_logs_message
+-- __NAME__
+--      filter_logs_message() - filters logs by message
 CREATE OR REPLACE FUNCTION filter_logs_message(
     _filter      TEXT
     , _row_start INT
@@ -501,6 +528,8 @@ $$;
 
 
 --                                                               %func:trim_logs
+-- __NAME__
+--      trim_logs() - truncates logs
 CREATE OR REPLACE FUNCTION trim_logs(
     _size_limit INT
     , _trim_percentage INT
