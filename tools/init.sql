@@ -174,7 +174,8 @@ $$;
 --                                                                %func:logs_all
 -- __NAME__
 --      logs_all() - lists all logs
-CREATE OR REPLACE FUNCTION list_all_logs(
+--
+CREATE OR REPLACE FUNCTION logs_all(
     _timezone   TEXT
 )
 RETURNS TABLE (
@@ -206,11 +207,11 @@ $$
 $$;
 
 
---                                                              %func:logs_paged
+--                                                          %func:logs_all_paged
 -- __NAME__
---      logs_paged() - paginates all logs
+--      logs_all_paged() - paginates all logs
 --
-CREATE OR REPLACE FUNCTION logs_paged(
+CREATE OR REPLACE FUNCTION logs_all_paged(
     _row_start      INT
     , _row_count    INT
     , _sort_col     TEXT
@@ -253,6 +254,43 @@ BEGIN
         , _row_start
     );
 END
+$$;
+
+
+--                                                           %func:logs_facility
+-- __NAME__
+--      logs_facility() - filters logs by facility
+--
+CREATE OR REPLACE FUNCTION logs_facility(
+    _filter         SMALLINT[]
+    , _timezone     TEXT
+) RETURNS TABLE (
+    event_at            TIMESTAMP
+    , logged_at         TIMESTAMP
+    , facility_id       SMALLINT
+    , facility_keyword  TEXT
+    , severity_id       SMALLINT
+    , severity_keyword  TEXT
+    , hostname          TEXT
+    , application_tag   TEXT
+    , log_message       TEXT
+) LANGUAGE SQL STABLE AS
+$$
+    SELECT
+        e.devicereportedtime AT TIME ZONE _timezone
+        , e.receivedat AT TIME ZONE _timezone
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.syslogtag
+        , e.message
+    FROM systemevents AS e
+    INNER JOIN facilities AS f ON e.facility = f.id
+    INNER JOIN severities AS s ON e.priority = s.id
+    WHERE e.facility = ANY (_filter)
+    ORDER BY e.devicereportedtime DESC;
 $$;
 
 
@@ -309,6 +347,43 @@ END
 $$;
 
 
+--                                                           %func:logs_severity
+-- __NAME__
+--      logs_severity() - filters logs by severity
+--
+CREATE OR REPLACE FUNCTION logs_severity(
+    _filter         SMALLINT[]
+    , _timezone     TEXT
+) RETURNS TABLE (
+    event_at            TIMESTAMP
+    , logged_at         TIMESTAMP
+    , facility_id       SMALLINT
+    , facility_keyword  TEXT
+    , severity_id       SMALLINT
+    , severity_keyword  TEXT
+    , hostname          TEXT
+    , application_tag   TEXT
+    , log_message       TEXT
+) LANGUAGE SQL STABLE AS
+$$
+    SELECT
+        e.devicereportedtime AT TIME ZONE _timezone
+        , e.receivedat AT TIME ZONE _timezone
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.syslogtag
+        , e.message
+    FROM systemevents AS e
+    INNER JOIN facilities AS f ON e.facility = f.id
+    INNER JOIN severities AS s ON e.priority = s.id
+    WHERE e.priority = ANY (_filter)
+    ORDER BY e.devicereportedtime DESC;
+$$;
+
+
 --                                                     %func:logs_severity_paged
 -- __NAME__
 --      logs_severity_paged() - paginates logs by severity
@@ -359,6 +434,43 @@ BEGIN
         , _row_start
     );
 END
+$$;
+
+
+--                                                           %func:logs_hostname
+-- __NAME__
+--      logs_hostname() - filters logs by hostname
+--
+CREATE OR REPLACE FUNCTION logs_hostname(
+    _filter         TEXT
+    , _timezone     TEXT
+) RETURNS TABLE (
+    event_at            TIMESTAMP
+    , logged_at         TIMESTAMP
+    , facility_id       SMALLINT
+    , facility_keyword  TEXT
+    , severity_id       SMALLINT
+    , severity_keyword  TEXT
+    , hostname          TEXT
+    , application_tag   TEXT
+    , log_message       TEXT
+) LANGUAGE SQL STABLE AS
+$$
+    SELECT
+        e.devicereportedtime AT TIME ZONE _timezone
+        , e.receivedat AT TIME ZONE _timezone
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.syslogtag
+        , e.message
+    FROM systemevents AS e
+    INNER JOIN facilities AS f ON e.facility = f.id
+    INNER JOIN severities AS s ON e.priority = s.id
+    WHERE e.fromhost ILIKE '%' || _filter || '%'
+    ORDER BY e.devicereportedtime DESC;
 $$;
 
 
@@ -415,6 +527,43 @@ END
 $$;
 
 
+--                                                                %func:logs_tag
+-- __NAME__
+--      logs_tag() - filters logs by tag
+--
+CREATE OR REPLACE FUNCTION logs_tag(
+    _filter         TEXT
+    , _timezone     TEXT
+) RETURNS TABLE (
+    event_at            TIMESTAMP
+    , logged_at         TIMESTAMP
+    , facility_id       SMALLINT
+    , facility_keyword  TEXT
+    , severity_id       SMALLINT
+    , severity_keyword  TEXT
+    , hostname          TEXT
+    , application_tag   TEXT
+    , log_message       TEXT
+) LANGUAGE SQL STABLE AS
+$$
+    SELECT
+        e.devicereportedtime AT TIME ZONE _timezone
+        , e.receivedat AT TIME ZONE _timezone
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.syslogtag
+        , e.message
+    FROM systemevents AS e
+    INNER JOIN facilities AS f ON e.facility = f.id
+    INNER JOIN severities AS s ON e.priority = s.id
+    WHERE e.syslogtag ILIKE '%' || _filter || '%'
+    ORDER BY e.devicereportedtime DESC;
+$$;
+
+
 --                                                         %func:_logs_tag_paged
 -- __NAME__
 --      logs_tag_paged() - paginates logs by tag
@@ -465,6 +614,43 @@ BEGIN
         , _row_start
     );
 END
+$$;
+
+
+--                                                            %func:logs_message
+-- __NAME__
+--      logs_tag() - filters logs by message
+--
+CREATE OR REPLACE FUNCTION logs_message(
+    _filter         TEXT
+    , _timezone     TEXT
+) RETURNS TABLE (
+    event_at            TIMESTAMP
+    , logged_at         TIMESTAMP
+    , facility_id       SMALLINT
+    , facility_keyword  TEXT
+    , severity_id       SMALLINT
+    , severity_keyword  TEXT
+    , hostname          TEXT
+    , application_tag   TEXT
+    , log_message       TEXT
+) LANGUAGE SQL STABLE AS
+$$
+    SELECT
+        e.devicereportedtime AT TIME ZONE _timezone
+        , e.receivedat AT TIME ZONE _timezone
+        , e.facility
+        , f.keyword
+        , e.priority
+        , s.keyword
+        , e.fromhost
+        , e.syslogtag
+        , e.message
+    FROM systemevents AS e
+    INNER JOIN facilities AS f ON e.facility = f.id
+    INNER JOIN severities AS s ON e.priority = s.id
+    WHERE e.message ILIKE '%' || _filter || '%'
+    ORDER BY e.devicereportedtime DESC;
 $$;
 
 
@@ -521,10 +707,11 @@ END
 $$;
 
 
---                                                               %func:trim_logs
+--                                                           %func:logs_truncate
 -- __NAME__
---      trim_logs() - truncates logs
-CREATE OR REPLACE FUNCTION trim_logs(
+--      logs_truncate() - truncates logs
+--
+CREATE OR REPLACE FUNCTION logs_truncate(
     _size_limit INT
     , _trim_percentage INT
 ) RETURNS INT
