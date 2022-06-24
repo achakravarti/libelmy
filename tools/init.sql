@@ -10,12 +10,12 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE TABLE IF NOT EXISTS systemevents (
     id                      SERIAL
     , customerid            BIGINT
-    , receivedat            TIMESTAMPTZ --
-    , devicereportedtime    TIMESTAMPTZ --
-    , facility              SMALLINT --
-    , priority              SMALLINT --
-    , fromhost              TEXT --
-    , message               TEXT --
+    , receivedat            TIMESTAMPTZ
+    , devicereportedtime    TIMESTAMPTZ
+    , facility              SMALLINT
+    , priority              SMALLINT
+    , fromhost              TEXT
+    , message               TEXT
     , ntseverity            INT
     , importance            INT
     , eventsource           TEXT
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS systemevents (
     , minusage              INT
     , maxusage              INT
     , infounitid            INT
-    , syslogtag             TEXT --
+    , syslogtag             TEXT
     , eventlogtype          TEXT
     , genericfilename       TEXT
     , systemid              INT
