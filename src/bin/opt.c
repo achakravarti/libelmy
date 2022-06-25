@@ -150,7 +150,7 @@ int opt_proc(int argc, char **argv)
 
         if (s.facility && !s.paged) {
                 if (!argv[optind] || !argv[optind + 1]) {
-                        fprintf(stderr, "build/elmy: option requires an argument -- facility\n");
+                        fprintf(stderr, "%s: option requires an argument -- facility\n", argv[0]);
                         misc_help();
                         return EXIT_FAILURE;
                 }
@@ -160,7 +160,7 @@ int opt_proc(int argc, char **argv)
 
         if (s.facility && s.paged) {
                 if (!argv[optind] || !argv[optind + 1]) {
-                        fprintf(stderr, "build/elmy: option requires an argument -- facility\n");
+                        fprintf(stderr, "%s: option requires an argument -- facility\n", argv[0]);
                         misc_help();
                         return EXIT_FAILURE;
                 }
