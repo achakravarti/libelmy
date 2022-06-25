@@ -1,3 +1,13 @@
+#include "all.c"
+#include "facility.c"
+#include "hostname.c"
+#include "message.c"
+#include "meta.c"
+#include "misc.c"
+#include "severity.c"
+#include "tag.c"
+
+
 #include <getopt.h>
 #include <stdlib.h>
 
@@ -17,5 +27,22 @@ void opt_parse(int argc, char **argv)
 
                 if (o == -1)
                         break;
+
+                switch (o) {
+                case 'h':
+                        misc_help();
+                        break;
+
+                case 'v':
+                        misc_version();
+                        break;
+
+                case '?':
+                        misc_help();
+                        break;
+
+                default:
+                        break;
+                }
         }
 }
