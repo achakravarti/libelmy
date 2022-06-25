@@ -133,20 +133,31 @@ int opt_proc(int argc, char **argv)
                 return EXIT_FAILURE;
         }
 
-        if (s.help)
+        if (argc > 2
+            && (s.help || s.version || s.count || s.initial || s.last)) {
+                fprintf(stderr, "%s: invalid argument combination\n", argv[0]);
                 misc_help();
+                return EXIT_FAILURE;
+        }
 
-        if (s.version)
+        if (s.help) {
+                misc_help();
+                return EXIT_SUCCESS;
+        }
+
+        if (s.version) {
                 misc_version();
+                return EXIT_SUCCESS;
+        }
 
         if (s.count)
-                meta_count();
+                return meta_count();
 
         if (s.initial)
-                meta_initial();
+                return meta_initial();
 
         if (s.last)
-                meta_last();
+                return meta_last();
 
         if (s.all && !s.paged)
                 all();
