@@ -30,6 +30,7 @@ struct opt_select {
 };
 
 
+// https://www.freebsd.org/cgi/man.cgi?getopt_long(3)
 void opt_parse(int argc, char **argv, struct opt_select *sel)
 {
         struct option opts[] = {
@@ -114,6 +115,9 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
                         break;
                 }
         }
+
+        argc -= optind;
+        argv += optind;
 }
 
 // https://stackoverflow.com/questions/18079340/u
