@@ -4,7 +4,7 @@
 
 ``` C
 
-enmy elmy_sortcol {
+enum elmy_sortcol {
     ELMY_SORTCOL_TS,
     ELMY_SORTCOL_FACILITY,
     ELMY_SORTCOL_SEVERITY,
@@ -65,3 +65,15 @@ elmy_logs_t *elmy_logs_message_paged(const char *tz)
 
 ```
 
+elmy -c --count
+elmy -i --initial
+elmy -l --last
+elmy -a --all
+elmy -f --facility=1,2,5
+elmy -s --severity=0,3
+elmy -h --hostname
+elmy -t --tag
+elmy -m --message
+elmy -p --paged
+elmy -h --help
+elmy -v --version
