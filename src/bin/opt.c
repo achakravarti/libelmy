@@ -37,11 +37,11 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
                 {"initial", no_argument, NULL, 'i'},
                 {"last", no_argument, NULL, 'l'},
                 {"all", no_argument, NULL, 'a'},
-                {"facility", no_argument, NULL, 'f'},
-                {"severity", no_argument, NULL, 's'},
-                {"hostname", no_argument, NULL, 'n'},
-                {"tag", no_argument, NULL, 't'},
-                {"message", no_argument, NULL, 'm'},
+                {"facility", required_argument, NULL, 'f'},
+                {"severity", required_argument, NULL, 's'},
+                {"hostname", required_argument, NULL, 'n'},
+                {"tag", required_argument, NULL, 't'},
+                {"message", required_argument, NULL, 'm'},
                 {"paged", no_argument, NULL, 'p'},
                 {"help", no_argument, NULL, 'h'},
                 {"version", no_argument, NULL, 'v'},
@@ -149,22 +149,10 @@ int opt_proc(int argc, char **argv)
                 all_paged();
 
         if (s.facility && !s.paged) {
-                if (!argv[optind] || !argv[optind + 1]) {
-                        fprintf(stderr, "%s: option requires an argument -- facility\n", argv[0]);
-                        misc_help();
-                        return EXIT_FAILURE;
-                }
-
                 facility();
         }
 
         if (s.facility && s.paged) {
-                if (!argv[optind] || !argv[optind + 1]) {
-                        fprintf(stderr, "%s: option requires an argument -- facility\n", argv[0]);
-                        misc_help();
-                        return EXIT_FAILURE;
-                }
-
                 facility_paged();
         }
 
