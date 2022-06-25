@@ -8,13 +8,33 @@
 #include "tag.c"
 
 
-#include <getopt.h>
+#include <stdbool.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 
-void opt_parse(int argc, char **argv)
+struct opt_select {
+        bool count;
+        bool initial;
+        bool last;
+        bool all;
+        bool facility;
+        bool severity;
+        bool hostname;
+        bool tag;
+        bool message;
+        bool paged;
+        bool help;
+        bool version;
+};
+
+
+void opt_parse(int argc, char **argv, struct opt_select *sel)
 {
         struct option opts[] = {
+                {"count", no_argument, NULL, 'c'},
+                {"initial", no_argument, NULL, 'i'},
+                {"last", no_argument, NULL, 'l'},
                 {"help", no_argument, NULL, 'h'},
                 {"version", no_argument, NULL, 'v'},
                 { 0 }
@@ -30,31 +50,89 @@ void opt_parse(int argc, char **argv)
 
                 switch (o) {
                 case 'c':
-                        meta_count();
-                        return;
+                        sel->count = true;
+                        break;
 
                 case 'i':
-                        meta_initial();
-                        return;
+                        sel->initial = true;
+                        break;
 
                 case 'l':
-                        meta_last();
-                        return;
+                        sel->last = true;
+                        break;
 
                 case 'h':
-                        misc_help();
-                        return;
+                        sel->help = true;
+                        break;
 
                 case 'v':
-                        misc_version();
-                        return;
+                        sel->version = true;
+                        break;
 
                 case '?':
-                        misc_help();
-                        return;
+                        sel->help = true;
+                        break;
 
                 default:
-                        return;
+                        break;
                 }
         }
+}
+
+
+void opt_proc(int argc, char **argv)
+{
+        struct opt_select s = (struct opt_select) { false };
+        opt_parse(argc, argv, &s);
+
+        if (s.help)
+                misc_help();
+
+        if (s.version)
+                misc_version();
+
+        if (s.count)
+                meta_count();
+
+        if (s.initial)
+                meta_initial();
+
+        if (s.last)
+                meta_last();
+
+        if (s.all && !s.paged)
+                all();
+
+        if (s.all && s.paged)
+                all_paged();
+
+        if (s.facility && !s.paged)
+                facility();
+
+        if (s.facility && s.paged)
+                facility_paged();
+
+        if (s.severity && !s.paged)
+                severity();
+
+        if (s.severity && s.paged)
+                severity_paged();
+
+        if (s.hostname && !s.paged)
+                hostname();
+
+        if (s.hostname && s.paged)
+                hostname_paged();
+
+        if (s.tag && !s.paged)
+                tag();
+
+        if (s.tag && s.paged)
+                tag_paged();
+
+        if (s.message && !s.paged)
+                tag();
+
+        if (s.message && s.paged)
+                message_paged();
 }
