@@ -26,6 +26,7 @@ struct opt_select {
         bool paged;
         bool help;
         bool version;
+        bool error;
 };
 
 
@@ -70,7 +71,7 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
                         break;
 
                 case '?':
-                        sel->help = true;
+                        sel->error = true;
                         break;
 
                 default:
@@ -80,10 +81,15 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
 }
 
 
-void opt_proc(int argc, char **argv)
+int opt_proc(int argc, char **argv)
 {
         struct opt_select s = (struct opt_select) { false };
         opt_parse(argc, argv, &s);
+
+        if (s.error) {
+                misc_help();
+                return EXIT_FAILURE;
+        }
 
         if (s.help)
                 misc_help();
@@ -135,4 +141,6 @@ void opt_proc(int argc, char **argv)
 
         if (s.message && s.paged)
                 message_paged();
+
+        return EXIT_SUCCESS;
 }

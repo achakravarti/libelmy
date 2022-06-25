@@ -5,7 +5,5 @@
 
 int main(int argc, char **argv)
 {
-        opt_proc(argc, argv);
-
-        return EXIT_SUCCESS;
+        return opt_proc(argc, argv);
 }
