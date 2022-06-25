@@ -3,3 +3,6 @@ build/elmy: src/bin/main.c
 	gcc $^ -o $@
 
 bin: build/elmy
+
+clean:
+	rm -rf build
