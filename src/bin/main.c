@@ -4,6 +4,7 @@
 #include "message.c"
 #include "meta.c"
 #include "misc.c"
+#include "opt.c"
 #include "severity.c"
 #include "tag.c"
 
@@ -12,5 +13,7 @@
 
 int main(int argc, char **argv)
 {
+        opt_parse(argc, argv);
+
         return EXIT_SUCCESS;
 }
