@@ -23,26 +23,38 @@ void opt_parse(int argc, char **argv)
         register int o;
 
         while (1) {
-                o = getopt_long(argc, argv, "hv", opts, 0);
+                o = getopt_long(argc, argv, "cilhv", opts, 0);
 
                 if (o == -1)
-                        break;
+                        return;
 
                 switch (o) {
+                case 'c':
+                        meta_count();
+                        return;
+
+                case 'i':
+                        meta_initial();
+                        return;
+
+                case 'l':
+                        meta_last();
+                        return;
+
                 case 'h':
                         misc_help();
-                        break;
+                        return;
 
                 case 'v':
                         misc_version();
-                        break;
+                        return;
 
                 case '?':
                         misc_help();
-                        break;
+                        return;
 
                 default:
-                        break;
+                        return;
                 }
         }
 }
