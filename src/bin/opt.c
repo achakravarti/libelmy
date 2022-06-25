@@ -36,6 +36,13 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
                 {"count", no_argument, NULL, 'c'},
                 {"initial", no_argument, NULL, 'i'},
                 {"last", no_argument, NULL, 'l'},
+                {"all", no_argument, NULL, 'a'},
+                {"facility", no_argument, NULL, 'f'},
+                {"severity", no_argument, NULL, 's'},
+                {"hostname", no_argument, NULL, 'n'},
+                {"tag", no_argument, NULL, 't'},
+                {"message", no_argument, NULL, 'm'},
+                {"paged", no_argument, NULL, 'p'},
                 {"help", no_argument, NULL, 'h'},
                 {"version", no_argument, NULL, 'v'},
                 { 0 }
@@ -44,7 +51,7 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
         register int o;
 
         while (1) {
-                o = getopt_long(argc, argv, "cilhv", opts, 0);
+                o = getopt_long(argc, argv, "cilafsntmphv", opts, 0);
 
                 if (o == -1)
                         return;
@@ -75,6 +82,7 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
                         break;
 
                 default:
+                        sel->error = true;
                         break;
                 }
         }
