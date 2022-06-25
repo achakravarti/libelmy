@@ -51,7 +51,7 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
         register int o;
 
         while (1) {
-                o = getopt_long(argc, argv, "cilafsntmphv", opts, 0);
+                o = getopt_long(argc, argv, "cilaf:s:n:t:m:phv", opts, NULL);
 
                 if (o == -1)
                         return;
@@ -67,6 +67,34 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
 
                 case 'l':
                         sel->last = true;
+                        break;
+
+                case 'a':
+                        sel->all = true;
+                        break;
+
+                case 'f':
+                        sel->facility = true;
+                        break;
+
+                case 's':
+                        sel->severity = true;
+                        break;
+
+                case 'n':
+                        sel->hostname = true;
+                        break;
+
+                case 't':
+                        sel->tag = true;
+                        break;
+
+                case 'm':
+                        sel->message = true;
+                        break;
+
+                case 'p':
+                        sel->message = true;
                         break;
 
                 case 'h':
@@ -88,7 +116,7 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
         }
 }
 
-
+// https://stackoverflow.com/questions/18079340/u
 int opt_proc(int argc, char **argv)
 {
         struct opt_select s = (struct opt_select) { false };
@@ -120,35 +148,57 @@ int opt_proc(int argc, char **argv)
         if (s.all && s.paged)
                 all_paged();
 
-        if (s.facility && !s.paged)
+        if (s.facility && !s.paged) {
+                if (!argv[optind] || !argv[optind + 1]) {
+                        fprintf(stderr, "build/elmy: option requires an argument -- facility\n");
+                        misc_help();
+                        return EXIT_FAILURE;
+                }
+
                 facility();
+        }
 
-        if (s.facility && s.paged)
+        if (s.facility && s.paged) {
+                if (!argv[optind] || !argv[optind + 1]) {
+                        fprintf(stderr, "build/elmy: option requires an argument -- facility\n");
+                        misc_help();
+                        return EXIT_FAILURE;
+                }
+
                 facility_paged();
+        }
 
-        if (s.severity && !s.paged)
+        if (s.severity && !s.paged) {
                 severity();
+        }
 
-        if (s.severity && s.paged)
+        if (s.severity && s.paged) {
                 severity_paged();
+        }
 
-        if (s.hostname && !s.paged)
+        if (s.hostname && !s.paged) {
                 hostname();
+        }
 
-        if (s.hostname && s.paged)
+        if (s.hostname && s.paged) {
                 hostname_paged();
+        }
 
-        if (s.tag && !s.paged)
+        if (s.tag && !s.paged) {
                 tag();
+        }
 
-        if (s.tag && s.paged)
+        if (s.tag && s.paged) {
                 tag_paged();
+        }
 
-        if (s.message && !s.paged)
+        if (s.message && !s.paged) {
                 tag();
+        }
 
-        if (s.message && s.paged)
+        if (s.message && s.paged) {
                 message_paged();
+        }
 
         return EXIT_SUCCESS;
 }
