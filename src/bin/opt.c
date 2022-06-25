@@ -31,6 +31,7 @@ struct opt_select {
 
 
 // ^[0-7](,\s?[0-7]){0,7}$
+// ^\b([0-9]|1[0-9]|2[0123])\b(,\s?\b([0-9]|1[0-9]|2[0123])\b{0,23}$
 // https://www.freebsd.org/cgi/man.cgi?getopt_long(3)
 void opt_parse(int argc, char **argv, struct opt_select *sel)
 {
