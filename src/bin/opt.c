@@ -30,6 +30,7 @@ struct opt_select {
 };
 
 
+// ^[0-7](,\s?[0-7]){0,7}$
 // https://www.freebsd.org/cgi/man.cgi?getopt_long(3)
 void opt_parse(int argc, char **argv, struct opt_select *sel)
 {
