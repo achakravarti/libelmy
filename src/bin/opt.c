@@ -148,37 +148,44 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
         argv += optind;
 }
 
+
+bool opt_check(int argc, char **argv, const struct opt_data *data)
+{
+        if (data->error) {
+                misc_help();
+                return false;
+        }
+
+        if (argc > 3)
+                goto combo_error;
+
+        if (argc == 3 && !data->paged
+            && (data->all || data->facility || data->severity || data->hostname
+                || data->tag || data->message))
+                goto combo_error;
+
+        if (argc > 2
+            && (data->help || data->version || data->count || data->initial
+                || data->last))
+                goto combo_error;
+
+        return true;
+
+combo_error:
+        fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
+        misc_help();
+        return false;
+}
+
+
 // https://stackoverflow.com/questions/18079340/u
 int opt_proc(int argc, char **argv)
 {
         struct opt_data d = (struct opt_data) { 0 };
         opt_parse(argc, argv, &d);
 
-        if (d.error) {
-                misc_help();
+        if (!opt_check(argc, argv, &d))
                 return EXIT_FAILURE;
-        }
-
-        if (argc > 3) {
-                fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
-                misc_help();
-                return EXIT_FAILURE;
-        }
-
-        if (argc == 3 && !d.paged
-            && (d.all || d.facility || d.severity || d.hostname || d.tag
-                || d.message)) {
-                fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
-                misc_help();
-                return EXIT_FAILURE;
-        }
-
-        if (argc > 2
-            && (d.help || d.version || d.count || d.initial || d.last)) {
-                fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
-                misc_help();
-                return EXIT_FAILURE;
-        }
 
         if (d.help) {
                 misc_help();
