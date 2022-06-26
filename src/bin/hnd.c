@@ -107,7 +107,10 @@ int misc_help(void)
 
 int misc_version(void)
 {
-        printf("-v (--version) handled\n");
+        printf("(lib)elmy 0.0.1 -- easy log monitoring\n"
+               "Copyright (c) 2022 Abhishek Chakravarti\n"
+               "Released under the BSD 2-Clause License\n");
+
         return EXIT_SUCCESS;
 }
 
