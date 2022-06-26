@@ -1,4 +1,4 @@
-build/elmy: src/bin/main.c
+build/elmy: src/bin/main.c src/lib/rule.c
 	mkdir -p build
 	gcc $^ -o $@
 

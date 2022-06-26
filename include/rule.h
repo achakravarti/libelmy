@@ -7,7 +7,7 @@
 
 
 extern bool
-elmy_rule_count(const char *, size_t *, cy_utf8_t **);
+elmy_rule_count(size_t *, cy_utf8_t **);
 
 extern bool
 elmy_rule_first(const char *, cy_utf8_t **, cy_utf8_t **);
