@@ -179,15 +179,11 @@ int opt_proc(int argc, char **argv)
         if (!opt_check(argc, argv, &d))
                 return EXIT_FAILURE;
 
-        if (d.help) {
-                misc_help();
-                return EXIT_SUCCESS;
-        }
+        if (d.help)
+                return misc_help();
 
-        if (d.version) {
-                misc_version();
-                return EXIT_SUCCESS;
-        }
+        if (d.version)
+                return misc_version();
 
         if (d.count)
                 return meta_count();

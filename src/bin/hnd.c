@@ -13,8 +13,8 @@ static int message_paged(const char *);
 static int meta_count(void);
 static int meta_initial(void);
 static int meta_last(void);
-static void misc_help(void);
-static void misc_version(void);
+static int misc_help(void);
+static int misc_version(void);
 static int severity(const char *);
 static int severity_paged(const char *);
 static int tag(const char *);
@@ -98,15 +98,17 @@ int meta_last(void)
 }
 
 
-void misc_help(void)
+int misc_help(void)
 {
         printf("-h (--help) handled\n");
+        return EXIT_SUCCESS;
 }
 
 
-void misc_version(void)
+int misc_version(void)
 {
         printf("-v (--version) handled\n");
+        return EXIT_SUCCESS;
 }
 
 
