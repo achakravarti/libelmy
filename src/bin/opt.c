@@ -1,12 +1,4 @@
-#include "all.c"
-#include "facility.c"
-#include "hostname.c"
-#include "message.c"
-#include "meta.c"
-#include "misc.c"
-#include "severity.c"
-#include "tag.c"
-
+#include "hnd.c"
 
 #include <stdbool.h>
 #include <stdlib.h>
