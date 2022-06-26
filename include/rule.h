@@ -87,3 +87,10 @@ extern elmy_logs_t *elmy_rule_tag_exec(const elmy_rule_tag_t *);
 
 
 typedef struct elmy_rule_message__ elmy_rule_message_t;
+
+extern elmy_rule_message_t *elmy_rule_message_new(const char *, const struct elmy_page *, const char *);
+extern void elmy_rule_message_t_free__(elmy_rule_message_t **);
+extern elmy_rule_message_t *elmy_rule_message_copy(const elmy_rule_message_t *);
+extern elmy_rule_message_t *elmy_rule_message_clone(const elmy_rule_message_t *);
+extern bool elmy_rule_message_valid(const elmy_rule_message_t *);
+extern elmy_logs_t *elmy_rule_message_exec(const elmy_rule_message_t *);
