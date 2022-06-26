@@ -100,7 +100,14 @@ int meta_last(void)
 
 int misc_help(void)
 {
-        printf("-h (--help) handled\n");
+        printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
+               "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
+               "\t\t[-h,--hostname string [-p,--paged]]"
+               " [-s,--severity csv [-p,--paged]]\n"
+               "\t\t[-m,--message string [-p,--paged]]"
+               " [-t,--tag string [-p,--paged]]\n"
+               "\t[-h,--help] [-v,--version]\n");
+
         return EXIT_SUCCESS;
 }
 
