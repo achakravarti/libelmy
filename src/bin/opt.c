@@ -35,6 +35,8 @@ struct opt_select {
 // https://www.freebsd.org/cgi/man.cgi?getopt_long(3)
 void opt_parse(int argc, char **argv, struct opt_select *sel)
 {
+        printf("ARGC = %d\n", argc);
+
         struct option opts[] = {
                 {"count", no_argument, NULL, 'c'},
                 {"initial", no_argument, NULL, 'i'},
@@ -133,9 +135,23 @@ int opt_proc(int argc, char **argv)
                 return EXIT_FAILURE;
         }
 
+        if (argc > 3) {
+                fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
+                misc_help();
+                return EXIT_FAILURE;
+        }
+
+        if (argc == 3 && !s.paged
+            && (s.all || s.facility || s.severity || s.hostname || s.tag
+                || s.message)) {
+                fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
+                misc_help();
+                return EXIT_FAILURE;
+        }
+
         if (argc > 2
             && (s.help || s.version || s.count || s.initial || s.last)) {
-                fprintf(stderr, "%s: invalid argument combination\n", argv[0]);
+                fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
                 misc_help();
                 return EXIT_FAILURE;
         }
@@ -159,51 +175,23 @@ int opt_proc(int argc, char **argv)
         if (s.last)
                 return meta_last();
 
-        if (s.all && !s.paged)
-                all();
+        if (s.all)
+                return s.paged ? all_paged() : all();
 
-        if (s.all && s.paged)
-                all_paged();
+        if (s.facility)
+                return s.paged ? facility_paged() : facility();
 
-        if (s.facility && !s.paged) {
-                facility();
-        }
+        if (s.severity)
+                return s.paged ? severity_paged() : severity();
 
-        if (s.facility && s.paged) {
-                facility_paged();
-        }
+        if (s.hostname)
+                return s.paged ? hostname_paged() : hostname();
 
-        if (s.severity && !s.paged) {
-                severity();
-        }
+        if (s.tag)
+                return s.paged ? tag_paged() : tag();
 
-        if (s.severity && s.paged) {
-                severity_paged();
-        }
-
-        if (s.hostname && !s.paged) {
-                hostname();
-        }
-
-        if (s.hostname && s.paged) {
-                hostname_paged();
-        }
-
-        if (s.tag && !s.paged) {
-                tag();
-        }
-
-        if (s.tag && s.paged) {
-                tag_paged();
-        }
-
-        if (s.message && !s.paged) {
-                tag();
-        }
-
-        if (s.message && s.paged) {
-                message_paged();
-        }
+        if (s.message)
+                return s.paged ? message_paged() : message();
 
         return EXIT_SUCCESS;
 }

@@ -1,19 +1,22 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 
-static void all(void);
-static void all_paged(void);
+static int all(void);
+static int all_paged(void);
 
 
-void
+int
 all(void)
 {
         printf("-a (--all) handled\n");
+        return EXIT_SUCCESS;
 }
 
 
-void
+int
 all_paged(void)
 {
         printf("-a -p (--all --paged) handled\n");
+        return EXIT_SUCCESS;
 }

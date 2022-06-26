@@ -1,19 +1,20 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 
-static void tag(void);
-static void tag_paged(void);
+static int tag(void);
+static int tag_paged(void);
 
 
-void
-tag(void)
+int tag(void)
 {
         printf("-t (--tag) handled\n");
+        return EXIT_SUCCESS;
 }
 
 
-void
-tag_paged(void)
+int tag_paged(void)
 {
         printf("-t -p (--tag --paged) handled\n");
+        return EXIT_SUCCESS;
 }

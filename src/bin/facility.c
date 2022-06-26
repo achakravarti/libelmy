@@ -1,19 +1,20 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 
-static void facility(void);
-static void facility_paged(void);
+static int facility(void);
+static int facility_paged(void);
 
 
-void
-facility(void)
+int facility(void)
 {
         printf("-f (--facility) handled\n");
+        return EXIT_SUCCESS;
 }
 
 
-void
-facility_paged(void)
+int facility_paged(void)
 {
         printf("-f -p (--facility --paged) handled\n");
+        return EXIT_SUCCESS;
 }
