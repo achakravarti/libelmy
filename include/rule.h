@@ -37,4 +37,4 @@ elmy_rule_tag(const char *, const struct elmy_page *, const char *,
 
 extern bool
 elmy_rule_message(const char *, const struct elmy_page *, const char *,
-              elmy_logs_t **, cy_utf8_t **);
+                  elmy_logs_t **, cy_utf8_t **);
