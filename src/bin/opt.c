@@ -144,7 +144,7 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
 bool opt_check(int argc, char **argv, const struct opt_data *data)
 {
         if (data->error) {
-                misc_help();
+                hnd_help();
                 return false;
         }
 
@@ -165,7 +165,7 @@ bool opt_check(int argc, char **argv, const struct opt_data *data)
 
 combo_error:
         fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
-        misc_help();
+        hnd_help();
         return false;
 }
 
@@ -180,41 +180,41 @@ int opt_proc(int argc, char **argv)
                 return EXIT_FAILURE;
 
         if (d.help)
-                return misc_help();
+                return hnd_help();
 
         if (d.version)
-                return misc_version();
+                return hnd_version();
 
         if (d.count)
-                return meta_count();
+                return hnd_count();
 
         if (d.initial)
-                return meta_initial();
+                return hnd_initial();
 
         if (d.last)
-                return meta_last();
+                return hnd_last();
 
         if (d.all)
-                return d.paged ? all_paged() : all();
+                return d.paged ? hnd_all_paged() : hnd_all();
 
         if (d.facility)
-                return d.paged ? facility_paged(d.facility_arg)
-                               : facility(d.facility_arg);
+                return d.paged ? hnd_facility_paged(d.facility_arg)
+                               : hnd_facility(d.facility_arg);
 
         if (d.severity)
-                return d.paged ? severity_paged(d.severity_arg)
-                               : severity(d.severity_arg);
+                return d.paged ? hnd_severity_paged(d.severity_arg)
+                               : hnd_severity(d.severity_arg);
 
         if (d.hostname)
-                return d.paged ? hostname_paged(d.hostname_arg)
-                               : hostname(d.hostname_arg);
+                return d.paged ? hnd_hostname_paged(d.hostname_arg)
+                               : hnd_hostname(d.hostname_arg);
 
         if (d.tag)
-                return d.paged ? tag_paged(d.tag_arg) : tag(d.tag_arg);
+                return d.paged ? hnd_tag_paged(d.tag_arg) : hnd_tag(d.tag_arg);
 
         if (d.message)
-                return d.paged ? message_paged(d.message_arg)
-                               : message(d.message_arg);
+                return d.paged ? hnd_message_paged(d.message_arg)
+                               : hnd_message(d.message_arg);
 
         // TEMPORARY CODE
         free(d.facility_arg);
