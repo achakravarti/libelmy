@@ -2,19 +2,19 @@
 #include <stdlib.h>
 
 
-static int message(void);
-static int message_paged(void);
+static int message(const char *);
+static int message_paged(const char *);
 
 
-int message(void)
+int message(const char *arg)
 {
-        printf("-m (--message) handled\n");
+        printf("message = %s\n", arg);
         return EXIT_SUCCESS;
 }
 
 
-int message_paged(void)
+int message_paged(const char *arg)
 {
-        printf("-m -p (--message --paged) handled\n");
+        printf("message = %s\n", arg);
         return EXIT_SUCCESS;
 }

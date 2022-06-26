@@ -2,19 +2,19 @@
 #include <stdlib.h>
 
 
-static int hostname(void);
-static int hostname_paged(void);
+static int hostname(const char *);
+static int hostname_paged(const char *);
 
 
-int hostname(void)
+int hostname(const char *arg)
 {
-        printf("-n (--hostname) handled\n");
+        printf("hostname = %s\n", arg);
         return EXIT_SUCCESS;
 }
 
 
-int hostname_paged(void)
+int hostname_paged(const char *arg)
 {
-        printf("-n -p (--hostname --paged) handled\n");
+        printf("hostname = %s\n", arg);
         return EXIT_SUCCESS;
 }

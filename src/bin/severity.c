@@ -2,17 +2,19 @@
 #include <stdlib.h>
 
 
-static int severity(void);
-static int severity_paged(void);
+static int severity(const char *);
+static int severity_paged(const char *);
 
 
-int severity(void)
+int severity(const char *arg)
 {
-        printf("-s (--severity) handled\n");
+        printf("severity = %s\n", arg);
+        return EXIT_SUCCESS;
 }
 
 
-int severity_paged(void)
+int severity_paged(const char *arg)
 {
-        printf("-s -p (--severity --paged) handled\n");
+        printf("severity = %s\n", arg);
+        return EXIT_SUCCESS;
 }

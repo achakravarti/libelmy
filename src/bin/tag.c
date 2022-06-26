@@ -2,19 +2,19 @@
 #include <stdlib.h>
 
 
-static int tag(void);
-static int tag_paged(void);
+static int tag(const char *);
+static int tag_paged(const char *);
 
 
-int tag(void)
+int tag(const char *arg)
 {
-        printf("-t (--tag) handled\n");
+        printf("tag = %s\n", arg);
         return EXIT_SUCCESS;
 }
 
 
-int tag_paged(void)
+int tag_paged(const char *arg)
 {
-        printf("-t -p (--tag --paged) handled\n");
+        printf("tag = %s\n", arg);
         return EXIT_SUCCESS;
 }

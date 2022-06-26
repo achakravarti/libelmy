@@ -10,10 +10,11 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <getopt.h>
 
 
-struct opt_select {
+struct opt_data {
         bool count;
         bool initial;
         bool last;
@@ -27,13 +28,33 @@ struct opt_select {
         bool help;
         bool version;
         bool error;
+        char *facility_arg;
+        char *severity_arg;
+        char *hostname_arg;
+        char *tag_arg;
+        char *message_arg;
 };
 
+
+// TEMPORARY UNTIL CHRYSALID INSTALLED
+char *opt_arg(void)
+{
+        size_t len = optarg ? strlen(optarg) : 0;
+        char *bfr = malloc(len + 1);
+
+        if (!bfr)
+                abort();
+
+        strcpy(bfr, optarg);
+        bfr[len] = '\0';
+
+        return bfr;
+}
 
 // ^[0-7](,\s?[0-7]){0,7}$
 // ^\b([0-9]|1[0-9]|2[0123])\b(,\s?\b([0-9]|1[0-9]|2[0123])\b{0,23}$
 // https://www.freebsd.org/cgi/man.cgi?getopt_long(3)
-void opt_parse(int argc, char **argv, struct opt_select *sel)
+void opt_parse(int argc, char **argv, struct opt_data *data)
 {
         struct option opts[] = {
                 {"count", no_argument, NULL, 'c'},
@@ -61,59 +82,64 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
 
                 switch (o) {
                 case 'c':
-                        sel->count = true;
+                        data->count = true;
                         break;
 
                 case 'i':
-                        sel->initial = true;
+                        data->initial = true;
                         break;
 
                 case 'l':
-                        sel->last = true;
+                        data->last = true;
                         break;
 
                 case 'a':
-                        sel->all = true;
+                        data->all = true;
                         break;
 
                 case 'f':
-                        sel->facility = true;
+                        data->facility = true;
+                        data->facility_arg = opt_arg();
                         break;
 
                 case 's':
-                        sel->severity = true;
+                        data->severity = true;
+                        data->severity_arg = opt_arg();
                         break;
 
                 case 'n':
-                        sel->hostname = true;
+                        data->hostname = true;
+                        data->hostname_arg = opt_arg();
                         break;
 
                 case 't':
-                        sel->tag = true;
+                        data->tag = true;
+                        data->tag_arg = opt_arg();
                         break;
 
                 case 'm':
-                        sel->message = true;
+                        data->message = true;
+                        data->message_arg = opt_arg();
                         break;
 
                 case 'p':
-                        sel->paged = true;
+                        data->paged = true;
                         break;
 
                 case 'h':
-                        sel->help = true;
+                        data->help = true;
                         break;
 
                 case 'v':
-                        sel->version = true;
+                        data->version = true;
                         break;
 
                 case '?':
-                        sel->error = true;
+                        data->error = true;
                         break;
 
                 default:
-                        sel->error = true;
+                        data->error = true;
                         break;
                 }
         }
@@ -125,10 +151,10 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
 // https://stackoverflow.com/questions/18079340/u
 int opt_proc(int argc, char **argv)
 {
-        struct opt_select s = (struct opt_select) { false };
-        opt_parse(argc, argv, &s);
+        struct opt_data d = (struct opt_data) { 0 };
+        opt_parse(argc, argv, &d);
 
-        if (s.error) {
+        if (d.error) {
                 misc_help();
                 return EXIT_FAILURE;
         }
@@ -139,57 +165,68 @@ int opt_proc(int argc, char **argv)
                 return EXIT_FAILURE;
         }
 
-        if (argc == 3 && !s.paged
-            && (s.all || s.facility || s.severity || s.hostname || s.tag
-                || s.message)) {
+        if (argc == 3 && !d.paged
+            && (d.all || d.facility || d.severity || d.hostname || d.tag
+                || d.message)) {
                 fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
                 misc_help();
                 return EXIT_FAILURE;
         }
 
         if (argc > 2
-            && (s.help || s.version || s.count || s.initial || s.last)) {
+            && (d.help || d.version || d.count || d.initial || d.last)) {
                 fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
                 misc_help();
                 return EXIT_FAILURE;
         }
 
-        if (s.help) {
+        if (d.help) {
                 misc_help();
                 return EXIT_SUCCESS;
         }
 
-        if (s.version) {
+        if (d.version) {
                 misc_version();
                 return EXIT_SUCCESS;
         }
 
-        if (s.count)
+        if (d.count)
                 return meta_count();
 
-        if (s.initial)
+        if (d.initial)
                 return meta_initial();
 
-        if (s.last)
+        if (d.last)
                 return meta_last();
 
-        if (s.all)
-                return s.paged ? all_paged() : all();
+        if (d.all)
+                return d.paged ? all_paged() : all();
 
-        if (s.facility)
-                return s.paged ? facility_paged() : facility();
+        if (d.facility)
+                return d.paged ? facility_paged(d.facility_arg)
+                               : facility(d.facility_arg);
 
-        if (s.severity)
-                return s.paged ? severity_paged() : severity();
+        if (d.severity)
+                return d.paged ? severity_paged(d.severity_arg)
+                               : severity(d.severity_arg);
 
-        if (s.hostname)
-                return s.paged ? hostname_paged() : hostname();
+        if (d.hostname)
+                return d.paged ? hostname_paged(d.hostname_arg)
+                               : hostname(d.hostname_arg);
 
-        if (s.tag)
-                return s.paged ? tag_paged() : tag();
+        if (d.tag)
+                return d.paged ? tag_paged(d.tag_arg) : tag(d.tag_arg);
 
-        if (s.message)
-                return s.paged ? message_paged() : message();
+        if (d.message)
+                return d.paged ? message_paged(d.message_arg)
+                               : message(d.message_arg);
+
+        // TEMPORARY CODE
+        free(d.facility_arg);
+        free(d.severity_arg);
+        free(d.hostname_arg);
+        free(d.tag_arg);
+        free(d.message_arg);
 
         return EXIT_SUCCESS;
 }

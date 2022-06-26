@@ -2,19 +2,19 @@
 #include <stdlib.h>
 
 
-static int facility(void);
-static int facility_paged(void);
+static int facility(const char *);
+static int facility_paged(const char *);
 
 
-int facility(void)
+int facility(const char *arg)
 {
-        printf("-f (--facility) handled\n");
+        printf("facility = %s\n", arg);
         return EXIT_SUCCESS;
 }
 
 
-int facility_paged(void)
+int facility_paged(const char *arg)
 {
-        printf("-f -p (--facility --paged) handled\n");
+        printf("facility = %s\n", arg);
         return EXIT_SUCCESS;
 }
