@@ -102,7 +102,7 @@ int misc_help(void)
 {
         printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
                "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
-               "\t\t[-h,--hostname string [-p,--paged]]"
+               "\t\t[-n,--hostname string [-p,--paged]]"
                " [-s,--severity csv [-p,--paged]]\n"
                "\t\t[-m,--message string [-p,--paged]]"
                " [-t,--tag string [-p,--paged]]\n"
