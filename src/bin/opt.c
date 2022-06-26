@@ -35,8 +35,6 @@ struct opt_select {
 // https://www.freebsd.org/cgi/man.cgi?getopt_long(3)
 void opt_parse(int argc, char **argv, struct opt_select *sel)
 {
-        printf("ARGC = %d\n", argc);
-
         struct option opts[] = {
                 {"count", no_argument, NULL, 'c'},
                 {"initial", no_argument, NULL, 'i'},
@@ -99,7 +97,7 @@ void opt_parse(int argc, char **argv, struct opt_select *sel)
                         break;
 
                 case 'p':
-                        sel->message = true;
+                        sel->paged = true;
                         break;
 
                 case 'h':
