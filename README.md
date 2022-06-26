@@ -71,9 +71,9 @@ elmy -l --last
 elmy -a --all
 elmy -f --facility=1,2,5
 elmy -s --severity=0,3
-elmy -h --hostname
-elmy -t --tag
-elmy -m --message
+elmy -h --hostname=hyper
+elmy -t --tag=myapp
+elmy -m --message=config error
 elmy -p --paged
 elmy -h --help
 elmy -v --version
