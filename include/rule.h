@@ -5,7 +5,7 @@
 #include "log.h"
 #include "page.h"
 
-#include "../../libchrysalid/include/utf8.h"
+#include <libchrysalid/utf8.h>
 
 #include <stddef.h>
 

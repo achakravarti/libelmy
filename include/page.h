@@ -2,7 +2,7 @@
 #ifndef __LIBELMY_INCLUDE_PAGE_H__
 #define __LIBELMY_INCLUDE_PAGE_H__
 
-#include "../../libchrysalid/include/ext.h"
+#include <libchrysalid/ext.h>
 
 #include <stdbool.h>
 #include <stddef.h>
