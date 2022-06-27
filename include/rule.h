@@ -1,9 +1,18 @@
+/* Header guard */
+#ifndef __LIBELMY_INCLUDE_RULE_H__
+#define __LIBELMY_INCLUDE_RULE_H__
+
 #include "log.h"
 #include "page.h"
 
 #include "../../libchrysalid/include/utf8.h"
 
 #include <stddef.h>
+
+/* C++ compatiblity */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 extern bool
@@ -38,3 +47,12 @@ elmy_rule_tag(const char *, const struct elmy_page *, const char *,
 extern bool
 elmy_rule_message(const char *, const struct elmy_page *, const char *,
                   elmy_logs_t **, cy_utf8_t **);
+
+
+/* C++ compatiblity */
+#ifdef __cplusplus
+}
+#endif
+
+/* Header guard */
+#endif /* !__LIBELMY_INCLUDE_RULE_H__ */

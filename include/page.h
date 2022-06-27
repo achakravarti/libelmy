@@ -1,7 +1,16 @@
+/* Header guard */
+#ifndef __LIBELMY_INCLUDE_PAGE_H__
+#define __LIBELMY_INCLUDE_PAGE_H__
+
 #include "../../libchrysalid/include/ext.h"
 
 #include <stdbool.h>
 #include <stddef.h>
+
+/* C++ compatiblity */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 enum elmy_sort {
@@ -20,3 +29,12 @@ struct elmy_page {
         enum elmy_sort  sort_col;
         bool            sort_asc;
 };
+
+
+/* C++ compatiblity */
+#ifdef __cplusplus
+}
+#endif
+
+/* Header guard */
+#endif /* !__LIBELMY_INCLUDE_PAGE_H__ */
