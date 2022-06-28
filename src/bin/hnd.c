@@ -84,13 +84,14 @@ int hnd_message_paged(const char *arg)
 int hnd_count(void)
 {
         size_t sz;
+        CY_AUTO(cy_utf8_t) *err = NULL;
 
-        if (elmy_rule_count(&sz, NULL)) {
+        if (elmy_rule_count(&sz, &err)) {
                 printf("size = %zu\n", sz);
                 return EXIT_SUCCESS;
         }
 
-        printf("-c (--count) failed!\n");
+        printf("-c (--count) failed: %s\n", err);
         return EXIT_FAILURE;
 }
 
@@ -98,13 +99,14 @@ int hnd_count(void)
 int hnd_initial(void)
 {
         CY_AUTO(cy_utf8_t) *res = NULL;
+        CY_AUTO(cy_utf8_t) *err = NULL;
 
-        if (elmy_rule_initial("asia/kolkata", &res, NULL)) {
+        if (elmy_rule_initial("asia/kolkata", &res, &err)) {
                 printf("%s\n", res);
                 return EXIT_SUCCESS;
         }
 
-        printf("-i (--initial) failed\n");
+        printf("-i (--initial) failed: %s\n", err);
         return EXIT_FAILURE;
 }
 
@@ -112,13 +114,14 @@ int hnd_initial(void)
 int hnd_last(void)
 {
         CY_AUTO(cy_utf8_t) *res = NULL;
+        CY_AUTO(cy_utf8_t) *err = NULL;
 
-        if (elmy_rule_last("asia/kolkata", &res, NULL)) {
+        if (elmy_rule_last("asia/kolkata", &res, &err)) {
                 printf("%s\n", res);
                 return EXIT_SUCCESS;
         }
 
-        printf("-l (--last) failed\n");
+        printf("-l (--last) failed: %s\n", err);
         return EXIT_FAILURE;
 }
 

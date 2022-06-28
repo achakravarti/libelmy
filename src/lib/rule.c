@@ -35,7 +35,10 @@ bool elmy_rule_count(size_t *res, cy_utf8_t **err)
         PGresult *r = PQexec(c, "SELECT * FROM logs_count();");
 
         if (PQresultStatus(r) != PGRES_TUPLES_OK) {
-                fprintf(stderr, "Failed to execute logs_count()\n");
+                if (err) {
+                        cy_utf8_free(err);
+                        *err = cy_utf8_new(PQerrorMessage(c));
+                }
 
                 PQclear(r);
                 PQfinish(c);
@@ -68,7 +71,10 @@ bool elmy_rule_initial(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
         PGresult *r = PQexecParams(c, sql, 1, NULL, params, NULL, NULL, 0);
 
         if (PQresultStatus(r) != PGRES_TUPLES_OK) {
-                fprintf(stderr, "Failed to execute logs_ts_first()\n");
+                if (err) {
+                        cy_utf8_free(err);
+                        *err = cy_utf8_new(PQerrorMessage(c));
+                }
 
                 PQclear(r);
                 PQfinish(c);
@@ -94,7 +100,10 @@ bool elmy_rule_last(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
         PGresult *r = PQexecParams(c, sql, 1, NULL, params, NULL, NULL, 0);
 
         if (PQresultStatus(r) != PGRES_TUPLES_OK) {
-                fprintf(stderr, "Failed to execute logs_ts_first()\n");
+                if (err) {
+                        cy_utf8_free(err);
+                        *err = cy_utf8_new(PQerrorMessage(c));
+                }
 
                 PQclear(r);
                 PQfinish(c);
