@@ -16,38 +16,42 @@ extern "C" {
 #endif
 
 
-extern bool
+#define ELMY_STATUS_OK 0
+#define ELMY_STATUS_FAIL 1
+
+
+extern int
 elmy_rule_count(size_t *, cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_initial(const char *, cy_utf8_t **, cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_last(const char *, cy_utf8_t **, cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_all(const char *, const struct elmy_page *, elmy_logs_t **,
               cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_facility(const char *, const struct elmy_page *,
                    enum cy_log_facility [], size_t, elmy_logs_t **,
                    cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_severity(const char *, const struct elmy_page *,
                    enum cy_log_severity [], size_t, elmy_logs_t **,
                    cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_hostname(const char *, const struct elmy_page *, const char *,
                    elmy_logs_t **, cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_tag(const char *, const struct elmy_page *, const char *,
               elmy_logs_t **, cy_utf8_t **);
 
-extern bool
+extern int
 elmy_rule_message(const char *, const struct elmy_page *, const char *,
                   elmy_logs_t **, cy_utf8_t **);
 
