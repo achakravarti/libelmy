@@ -4,7 +4,9 @@
 #include <libpq-fe.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 
 static PGconn *db_connect(void)
@@ -30,9 +32,24 @@ bool elmy_rule_count(size_t *res, cy_utf8_t **err)
         assert(res);
 
         PGconn *c = db_connect();
-        PQfinish(c);
+        PGresult *r = PQexec(c, "SELECT * FROM logs_count();");
 
-        return false;
+        if (PQresultStatus(r) != PGRES_TUPLES_OK) {
+                fprintf(stderr, "Failed to execute log_count()\n");
+                PQclear(r);
+                PQfinish(c);
+                return false;
+        }
+
+        *res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
+        if (*res == UINTMAX_MAX && errno == ERANGE) {
+                *res = 0;
+                PQfinish(c);
+                return false;
+        }
+
+        PQfinish(c);
+        return true;
 }
 
 

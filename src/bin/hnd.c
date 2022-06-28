@@ -82,11 +82,15 @@ int hnd_message_paged(const char *arg)
 int hnd_count(void)
 {
         size_t sz;
-        elmy_rule_count(&sz, NULL);
 
-        printf("-c (--count) handled\n");
+        if (elmy_rule_count(&sz, NULL)) {
+                printf("-c (--count) handled\n");
+                printf("size = %zu\n", sz);
+                return EXIT_SUCCESS;
+        }
 
-        return EXIT_SUCCESS;
+        printf("-c (--count) failed!\n");
+        return EXIT_FAILURE;
 }
 
 
