@@ -10,4 +10,5 @@ ELK (Elasticsearch Logstash Kibana).
 Can be used either as a shared library (with C/C++ clients) or as a binary (e.g.
 with Python glue code). The binary uses the shared libary. The shared library
 code is in the `include/` and `src/lib` directories, whereas the binary code is
-in the `src/bin` directory.
+in the `src/bin` directory. The database schema and setup scripts are available
+int the `tools` directory.
