@@ -5,6 +5,7 @@
 #include "log.h"
 #include "page.h"
 
+#include <libchrysalid/log.h>
 #include <libchrysalid/utf8.h>
 
 #include <stddef.h>
@@ -29,12 +30,14 @@ elmy_rule_all(const char *, const struct elmy_page *, elmy_logs_t **,
               cy_utf8_t **);
 
 extern bool
-elmy_rule_facility(const char *, const struct elmy_page *, int [], size_t,
-                   elmy_logs_t **, cy_utf8_t **);
+elmy_rule_facility(const char *, const struct elmy_page *,
+                   enum cy_log_facility [], size_t, elmy_logs_t **,
+                   cy_utf8_t **);
 
 extern bool
-elmy_rule_severity(const char *, const struct elmy_page *, int [], size_t,
-                   elmy_logs_t **, cy_utf8_t **);
+elmy_rule_severity(const char *, const struct elmy_page *,
+                   enum cy_log_severity [], size_t, elmy_logs_t **,
+                   cy_utf8_t **);
 
 extern bool
 elmy_rule_hostname(const char *, const struct elmy_page *, const char *,
