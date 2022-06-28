@@ -25,19 +25,27 @@ static PGconn *db_connect(void)
 }
 
 
-size_t elmy_rule_count(void)
+static PGresult *db_exec(PGconn *conn, const char *sql)
 {
-        PGconn *c = db_connect();
-        PGresult *r = PQexec(c, "SELECT * FROM logs_count();");
+        PGresult *r = PQexec(conn, sql);
 
         if (CY_UNLIKELY(PQresultStatus(r) != PGRES_TUPLES_OK)) {
-                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(c));
+                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(conn));
                 PQclear(r);
-                PQfinish(c);
+                PQfinish(conn);
                 elmy_error_dbqry(ELMY_ERROR_DBQRY, err);
         }
 
+        return r;
+}
+
+
+size_t elmy_rule_count(void)
+{
+        PGconn *c = db_connect();
+        PGresult *r = db_exec(c, "SELECT * FROM logs_count();");
         size_t res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
+
         PQclear(r);
         PQfinish(c);
 
