@@ -40,6 +40,23 @@ static PGresult *db_exec(PGconn *conn, const char *sql)
 }
 
 
+static PGresult *db_execp(PGconn *conn, const char *sql, const char *params[],
+                          size_t nparams)
+{
+        PGresult *r = PQexecParams(conn, sql, nparams, NULL, params, NULL, NULL,
+                                   0);
+
+        if (CY_UNLIKELY(PQresultStatus(r) != PGRES_TUPLES_OK)) {
+                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(conn));
+                PQclear(r);
+                PQfinish(conn);
+                elmy_error_dbqry(ELMY_ERROR_DBQRY, err);
+        }
+
+        return r;
+}
+
+
 size_t elmy_rule_count(void)
 {
         PGconn *c = db_connect();
@@ -53,61 +70,39 @@ size_t elmy_rule_count(void)
 }
 
 
-int elmy_rule_initial(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
+cy_utf8_t *elmy_rule_initial(const char *tz)
 {
         assert(tz && *tz);
-        assert(res && !*res);
-        assert(err);
+
+        const char *p[] = {tz};
+        const char *s = "SELECT * FROM logs_ts_first($1);";
 
         PGconn *c = db_connect();
-        const char *params[1] = {tz};
-        const char *sql = "SELECT * FROM logs_ts_first($1);";
-        PGresult *r = PQexecParams(c, sql, 1, NULL, params, NULL, NULL, 0);
-
-        if (PQresultStatus(r) != PGRES_TUPLES_OK) {
-                cy_utf8_free(err);
-                *err = cy_utf8_new(PQerrorMessage(c));
-
-                PQclear(r);
-                PQfinish(c);
-
-                return ELMY_STATUS_FAIL;
-        }
-
-        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
+        PGresult *r = db_execp(c, s, p, sizeof (p) / sizeof (*p));
+        cy_utf8_t *res = cy_utf8_new(PQgetvalue(r, 0, 0));
 
         PQclear(r);
         PQfinish(c);
-        return ELMY_STATUS_OK;
+
+        return res;
 }
 
 
-int elmy_rule_last(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
+cy_utf8_t *elmy_rule_last(const char *tz)
 {
         assert(tz && *tz);
-        assert(res && !*res);
-        assert(err);
+
+        const char *p[] = {tz};
+        const char *s = "SELECT * FROM logs_ts_last($1);";
 
         PGconn *c = db_connect();
-        const char *params[1] = {tz};
-        const char *sql = "SELECT * FROM logs_ts_last($1);";
-        PGresult *r = PQexecParams(c, sql, 1, NULL, params, NULL, NULL, 0);
-
-        if (PQresultStatus(r) != PGRES_TUPLES_OK) {
-                cy_utf8_free(err);
-                *err = cy_utf8_new(PQerrorMessage(c));
-
-                PQclear(r);
-                PQfinish(c);
-
-                return ELMY_STATUS_FAIL;
-        }
-
-        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
+        PGresult *r = db_execp(c, s, p, sizeof (p) / sizeof (*p));
+        cy_utf8_t *res = cy_utf8_new(PQgetvalue(r, 0, 0));
 
         PQclear(r);
         PQfinish(c);
-        return ELMY_STATUS_OK;
+
+        return res;
 }
 
 

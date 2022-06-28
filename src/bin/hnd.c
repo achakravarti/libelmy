@@ -90,33 +90,17 @@ int hnd_count(void)
 
 int hnd_initial(void)
 {
-        int rc;
-        CY_AUTO(cy_utf8_t) *res = NULL;
-        CY_AUTO(cy_utf8_t) *err = NULL;
-
-        if ((rc = elmy_rule_initial("asia/kolkata", &res, &err))) {
-                fprintf(stderr, "%s\n", err);
-                return rc;
-        }
-
-        printf("%s\n", res);
-        return rc;
+        CY_AUTO(cy_utf8_t) *r = elmy_rule_initial("asia/kolkata");
+        printf("%s\n", r);
+        return EXIT_SUCCESS;
 }
 
 
 int hnd_last(void)
 {
-        int rc;
-        CY_AUTO(cy_utf8_t) *res = NULL;
-        CY_AUTO(cy_utf8_t) *err = NULL;
-
-        if ((rc = elmy_rule_last("asia/kolkata", &res, &err))) {
-                fprintf(stderr, "%s\n", err);
-                return rc;
-        }
-
-        printf("%s\n", res);
-        return rc;
+        CY_AUTO(cy_utf8_t) *r = elmy_rule_last("asia/kolkata");
+        printf("%s\n", r);
+        return EXIT_SUCCESS;
 }
 
 
