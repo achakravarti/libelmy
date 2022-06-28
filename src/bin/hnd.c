@@ -1,5 +1,7 @@
 #include "../../include/rule.h"
 
+#include <libchrysalid/ext.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -96,8 +98,17 @@ int hnd_count(void)
 
 int hnd_initial(void)
 {
-        printf("-i (--initial) handled\n");
-        return EXIT_SUCCESS;
+        CY_AUTO(cy_utf8_t) *res = NULL;
+
+        if (elmy_rule_initial("asia/kolkata", &res, NULL)) {
+                printf("-i (--initial) failed\n");
+                printf("initial = %s\n", res);
+
+                return EXIT_SUCCESS;
+        }
+
+        printf("-i (--initial) failed\n");
+        return EXIT_FAILURE;
 }
 
 

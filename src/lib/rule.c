@@ -35,7 +35,8 @@ bool elmy_rule_count(size_t *res, cy_utf8_t **err)
         PGresult *r = PQexec(c, "SELECT * FROM logs_count();");
 
         if (PQresultStatus(r) != PGRES_TUPLES_OK) {
-                fprintf(stderr, "Failed to execute log_count()\n");
+                fprintf(stderr, "Failed to execute logs_count()\n");
+
                 PQclear(r);
                 PQfinish(c);
                 return false;
@@ -44,6 +45,7 @@ bool elmy_rule_count(size_t *res, cy_utf8_t **err)
         *res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
         if (*res == UINTMAX_MAX && errno == ERANGE) {
                 *res = 0;
+
                 PQfinish(c);
                 return false;
         }
@@ -53,15 +55,30 @@ bool elmy_rule_count(size_t *res, cy_utf8_t **err)
 }
 
 
-bool elmy_rule_first(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
+bool elmy_rule_initial(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
 {
+        assert(tz);
+        assert(*tz);
         assert(res);
         assert(!*res);
 
         PGconn *c = db_connect();
+        const char *params[1] = {tz};
+        const char *sql = "SELECT * FROM logs_ts_first($1);";
+        PGresult *r = PQexecParams(c, sql, 1, NULL, params, NULL, NULL, 0);
+
+        if (PQresultStatus(r) != PGRES_TUPLES_OK) {
+                fprintf(stderr, "Failed to execute logs_ts_first()\n");
+
+                PQclear(r);
+                PQfinish(c);
+                return false;
+        }
+
+        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
         PQfinish(c);
 
-        return false;
+        return true;
 }
 
 

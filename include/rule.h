@@ -20,7 +20,7 @@ extern bool
 elmy_rule_count(size_t *, cy_utf8_t **);
 
 extern bool
-elmy_rule_first(const char *, cy_utf8_t **, cy_utf8_t **);
+elmy_rule_initial(const char *, cy_utf8_t **, cy_utf8_t **);
 
 extern bool
 elmy_rule_last(const char *, cy_utf8_t **, cy_utf8_t **);
