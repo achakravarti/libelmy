@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdnoreturn.h>
 
 /* C++ compatiblity */
 #ifdef __cplusplus
@@ -18,12 +19,16 @@ extern "C" {
 #define ELMY_STATUS_FAIL 1
 
 enum elmy_error {
-        ELMY_ERROR_DBCONNECT = 1
+        ELMY_ERROR_DBCONN = 1,
+        ELMY_ERROR_DBQRY
 };
 
 
-extern CY_WEAK void
-elmy_error_dbconnect(enum elmy_error, const char *);
+extern CY_WEAK noreturn void
+elmy_error_dbconn(enum elmy_error, const char *);
+
+extern CY_WEAK noreturn void
+elmy_error_dbqry(enum elmy_error, const char *);
 
 
 /* C++ compatiblity */

@@ -17,8 +17,8 @@ extern "C" {
 #endif
 
 
-extern int
-elmy_rule_count(size_t *, cy_utf8_t **);
+extern size_t
+elmy_rule_count(void);
 
 extern int
 elmy_rule_initial(const char *, cy_utf8_t **, cy_utf8_t **);

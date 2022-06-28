@@ -83,18 +83,8 @@ int hnd_message_paged(const char *arg)
 
 int hnd_count(void)
 {
-        int rc;
-        size_t sz;
-        CY_AUTO(cy_utf8_t) *err = NULL;
-
-        if ((rc = elmy_rule_count(&sz, &err))) {
-                fprintf(stderr, "%s\n", err);
-                return rc;
-        }
-
-        printf("size = %zu\n", sz);
-        return rc;
-
+        printf("%zu\n", elmy_rule_count());
+        return EXIT_SUCCESS;
 }
 
 

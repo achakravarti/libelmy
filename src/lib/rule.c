@@ -1,6 +1,7 @@
 #include "../../include/error.h"
 #include "../../include/rule.h"
 
+#include <libchrysalid/ext.h>
 #include <libchrysalid/log.h>
 #include <libpq-fe.h>
 
@@ -12,42 +13,35 @@
 
 static PGconn *db_connect(void)
 {
-        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=yslog");
+        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
 
-        if (PQstatus(c) == CONNECTION_BAD) {
-                elmy_error_dbconnect(ELMY_ERROR_DBCONNECT, PQerrorMessage(c));
+        if (CY_UNLIKELY(PQstatus(c) == CONNECTION_BAD)) {
+                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(c));
                 PQfinish(c);
-                return NULL;
+                elmy_error_dbconn(ELMY_ERROR_DBCONN, err);
         }
 
         return c;
 }
 
 
-int elmy_rule_count(size_t *res, cy_utf8_t **err)
+size_t elmy_rule_count(void)
 {
-        assert(res);
-        assert(err);
-
         PGconn *c = db_connect();
         PGresult *r = PQexec(c, "SELECT * FROM logs_count();");
 
-        if (PQresultStatus(r) != PGRES_TUPLES_OK) {
-                cy_utf8_free(err);
-                *err = cy_utf8_new(PQerrorMessage(c));
-
+        if (CY_UNLIKELY(PQresultStatus(r) != PGRES_TUPLES_OK)) {
+                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(c));
                 PQclear(r);
                 PQfinish(c);
-
-                return ELMY_STATUS_FAIL;
+                elmy_error_dbqry(ELMY_ERROR_DBQRY, err);
         }
 
-        *res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
-
+        size_t res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
         PQclear(r);
         PQfinish(c);
 
-        return ELMY_STATUS_OK;
+        return res;
 }
 
 
