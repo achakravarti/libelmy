@@ -3,6 +3,7 @@
 #define __LIBELMY_INCLUDE_RULE_H__
 
 #include "log.h"
+#include "error.h"
 #include "page.h"
 
 #include <libchrysalid/log.h>
@@ -14,10 +15,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-#define ELMY_STATUS_OK 0
-#define ELMY_STATUS_FAIL 1
 
 
 extern int

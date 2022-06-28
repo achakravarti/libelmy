@@ -1,3 +1,4 @@
+#include "../../include/error.h"
 #include "../../include/rule.h"
 
 #include <libchrysalid/log.h>
@@ -11,16 +12,12 @@
 
 static PGconn *db_connect(void)
 {
-        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
+        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=yslog");
 
         if (PQstatus(c) == CONNECTION_BAD) {
-                const char *e = PQerrorMessage(c);
-
-                cy_log_err(e);
-                fprintf(stderr, "Failed to connect to database: %s\n", e);
-
+                elmy_error_dbconnect(ELMY_ERROR_DBCONNECT, PQerrorMessage(c));
                 PQfinish(c);
-                abort();
+                return NULL;
         }
 
         return c;
