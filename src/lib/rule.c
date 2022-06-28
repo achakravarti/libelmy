@@ -1,13 +1,36 @@
 #include "../../include/rule.h"
 
 #include <libchrysalid/log.h>
+#include <libpq-fe.h>
 
 #include <assert.h>
+#include <stdlib.h>
+
+
+static PGconn *db_connect(void)
+{
+        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
+
+        if (PQstatus(c) == CONNECTION_BAD) {
+                const char *e = PQerrorMessage(c);
+
+                cy_log_err(e);
+                fprintf(stderr, "Failed to connect to database: %s\n", e);
+
+                PQfinish(c);
+                abort();
+        }
+
+        return c;
+}
 
 
 bool elmy_rule_count(size_t *res, cy_utf8_t **err)
 {
         assert(res);
+
+        PGconn *c = db_connect();
+        PQfinish(c);
 
         return false;
 }

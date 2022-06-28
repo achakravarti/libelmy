@@ -1,3 +1,5 @@
+#include "../../include/rule.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -79,7 +81,11 @@ int hnd_message_paged(const char *arg)
 
 int hnd_count(void)
 {
+        size_t sz;
+        elmy_rule_count(&sz, NULL);
+
         printf("-c (--count) handled\n");
+
         return EXIT_SUCCESS;
 }
 
