@@ -46,10 +46,12 @@ bool elmy_rule_count(size_t *res, cy_utf8_t **err)
         if (*res == UINTMAX_MAX && errno == ERANGE) {
                 *res = 0;
 
+                PQclear(r);
                 PQfinish(c);
                 return false;
         }
 
+        PQclear(r);
         PQfinish(c);
         return true;
 }
@@ -76,8 +78,9 @@ bool elmy_rule_initial(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
         }
 
         *res = cy_utf8_new(PQgetvalue(r, 0, 0));
-        PQfinish(c);
 
+        PQclear(r);
+        PQfinish(c);
         return true;
 }
 
@@ -90,9 +93,23 @@ bool elmy_rule_last(const char *tz, cy_utf8_t **res, cy_utf8_t **err)
         assert(!*res);
 
         PGconn *c = db_connect();
-        PQfinish(c);
+        const char *params[1] = {tz};
+        const char *sql = "SELECT * FROM logs_ts_last($1);";
+        PGresult *r = PQexecParams(c, sql, 1, NULL, params, NULL, NULL, 0);
 
-        return false;
+        if (PQresultStatus(r) != PGRES_TUPLES_OK) {
+                fprintf(stderr, "Failed to execute logs_ts_first()\n");
+
+                PQclear(r);
+                PQfinish(c);
+                return false;
+        }
+
+        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
+
+        PQclear(r);
+        PQfinish(c);
+        return true;
 }
 
 

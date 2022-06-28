@@ -86,7 +86,6 @@ int hnd_count(void)
         size_t sz;
 
         if (elmy_rule_count(&sz, NULL)) {
-                printf("-c (--count) handled\n");
                 printf("size = %zu\n", sz);
                 return EXIT_SUCCESS;
         }
@@ -101,9 +100,7 @@ int hnd_initial(void)
         CY_AUTO(cy_utf8_t) *res = NULL;
 
         if (elmy_rule_initial("asia/kolkata", &res, NULL)) {
-                printf("-i (--initial) failed\n");
-                printf("initial = %s\n", res);
-
+                printf("%s\n", res);
                 return EXIT_SUCCESS;
         }
 
@@ -114,8 +111,15 @@ int hnd_initial(void)
 
 int hnd_last(void)
 {
-        printf("-l (--last) handled\n");
-        return EXIT_SUCCESS;
+        CY_AUTO(cy_utf8_t) *res = NULL;
+
+        if (elmy_rule_last("asia/kolkata", &res, NULL)) {
+                printf("%s\n", res);
+                return EXIT_SUCCESS;
+        }
+
+        printf("-l (--last) failed\n");
+        return EXIT_FAILURE;
 }
 
 
