@@ -17,7 +17,7 @@ enum elmy_log_format {
         ELMY_LOG_FORMAT_DEFAULT,
         ELMY_LOG_FORMAT_CSV,
         ELMY_LOG_FORMAT_CSV_HDR,
-        EMLY_LOG_FORMAT_JSON
+        ELMY_LOG_FORMAT_JSON
 };
 
 
@@ -31,8 +31,8 @@ elmy_log_copy(const elmy_log_t *);
 extern CY_HOT CY_SAFE elmy_log_t *
 elmy_log_clone(const elmy_log_t *);
 
-extern CY_HOT elmy_log_t *
-elmy_log_t_free__(const elmy_log_t *);
+extern CY_HOT void
+elmy_log_t_free__(elmy_log_t **);
 
 #define emly_log_free(ctx)  \
 emly_log_t_free__(ctx)
