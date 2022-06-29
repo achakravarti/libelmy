@@ -134,17 +134,29 @@ cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
 {
         assert(ctx != NULL);
 
-        if (fmt == ELMY_LOG_FORMAT_CSV) {
-                return cy_utf8_new_empty();
+        const char *f;
+
+        switch (fmt) {
+        case ELMY_LOG_FORMAT_CSV:
+                f = "%s,%s,%d,%d,%s,%s,%s\n";
+                break;
+
+        case ELMY_LOG_FORMAT_CSV_HDR:
+                f = "log_timestamp,event_timestamp,facility,severity,hostname,"
+                    "tag,message\n%s,%s,%d,%d,%s,%s,%s\n";
+                break;
+
+        case ELMY_LOG_FORMAT_JSON:
+                f = "{log_timestamp:%s,event_timestamp:%s,facility:%s,"
+                    "severity:%s,hostname:%s,tag:%s,message:%s}\n";
+                break;
+
+        default:
+                f = "{log_timestamp:%s,event_timestamp:%s,facility:%s,"
+                    "severity:%s,hostname:%s,tag:%s,message:%s}\n";
         }
 
-        if (fmt == ELMY_LOG_FORMAT_CSV_HDR) {
-                return cy_utf8_new_empty();
-        }
-
-        if (fmt == ELMY_LOG_FORMAT_JSON) {
-                return cy_utf8_new_empty();
-        }
-
-        return cy_utf8_new_empty();
+        return cy_utf8_new_fmt(f, ctx->ts, ctx->evts, ctx->facility,
+                               ctx->severity, ctx->hostname, ctx->tag,
+                               ctx->message);
 }
