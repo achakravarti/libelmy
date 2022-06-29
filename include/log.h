@@ -32,9 +32,6 @@ extern CY_HOT CY_SAFE elmy_log_t *
 elmy_log_clone(const elmy_log_t *);
 
 extern CY_HOT elmy_log_t *
-elmy_log_clone(const elmy_log_t *);
-
-extern CY_HOT elmy_log_t *
 elmy_log_t_free__(const elmy_log_t *);
 
 #define emly_log_free(ctx)  \
@@ -62,7 +59,7 @@ extern CY_SAFE const cy_utf8_t *
 elmy_log_message(const elmy_log_t *);
 
 extern CY_RSAFE cy_utf8_t *
-elmy_log_print(enum elmy_log_format);
+elmy_log_print(const elmy_log_t *, enum elmy_log_format);
 
 
 /* C++ compatiblity */
