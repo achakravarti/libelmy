@@ -34,8 +34,8 @@ elmy_log_clone(const elmy_log_t *);
 extern CY_HOT void
 elmy_log_t_free__(elmy_log_t **);
 
-#define emly_log_free(ctx)  \
-emly_log_t_free__(ctx)
+#define elmy_log_free(ctx)  \
+elmy_log_t_free__(ctx)
 
 extern CY_SAFE const cy_utf8_t *
 elmy_log_ts(const elmy_log_t *);
