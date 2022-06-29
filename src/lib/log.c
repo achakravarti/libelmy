@@ -135,15 +135,16 @@ cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
         assert(ctx != NULL);
 
         if (fmt == ELMY_LOG_FORMAT_CSV) {
-
+                return cy_utf8_new_empty();
         }
 
         if (fmt == ELMY_LOG_FORMAT_CSV_HDR) {
-
+                return cy_utf8_new_empty();
         }
 
         if (fmt == ELMY_LOG_FORMAT_JSON) {
-
+                return cy_utf8_new_empty();
         }
 
+        return cy_utf8_new_empty();
 }
