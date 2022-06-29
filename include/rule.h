@@ -2,7 +2,7 @@
 #ifndef __LIBELMY_INCLUDE_RULE_H__
 #define __LIBELMY_INCLUDE_RULE_H__
 
-#include "log.h"
+#include "logs.h"
 #include "error.h"
 #include "page.h"
 
