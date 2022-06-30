@@ -2,8 +2,10 @@
 
 #include <libchrysalid/hptr.h>
 #include <libchrysalid/utf8.h>
+#include <libpq-fe.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -21,6 +23,32 @@ elmy_logs_t *elmy_logs_new(size_t len)
         elmy_logs_t *ctx = cy_hptr_new(sizeof *ctx);
         ctx->len = len;
         ctx->items = cy_hptr_new(sizeof (elmy_log_t *) * len);
+
+        return ctx;
+}
+
+
+elmy_logs_t *elmy_logs_parse__(void *res)
+{
+        assert(res != NULL);
+
+        PGresult *r = (PGresult *) res;
+
+        register size_t len = PQntuples(r);
+        elmy_logs_t *ctx = elmy_logs_new(len);
+
+        elmy_log_t *log;
+        for (register size_t i = 0; i < len; i++) {
+                log = elmy_log_new(PQgetvalue(r, i, 1), PQgetvalue(r, i, 0),
+                                   strtoumax(PQgetvalue(r, i, 2), NULL, 10),
+                                   PQgetvalue(r, i, 3),
+                                   strtoumax(PQgetvalue(r, i, 4), NULL, 10),
+                                   PQgetvalue(r, i, 5), PQgetvalue(r, i, 6),
+                                   PQgetvalue(r, i, 7), PQgetvalue(r, i, 8));
+
+                elmy_logs_set(ctx, i, log);
+                elmy_log_free(&log);
+        }
 
         return ctx;
 }

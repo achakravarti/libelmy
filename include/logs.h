@@ -28,6 +28,9 @@ extern CY_HOT CY_SAFE elmy_logs_t *
 elmy_logs_new(size_t);
 
 extern CY_HOT CY_SAFE elmy_logs_t *
+elmy_logs_parse__(void *);
+
+extern CY_HOT CY_SAFE elmy_logs_t *
 elmy_logs_copy(const elmy_logs_t *);
 
 extern CY_SAFE elmy_logs_t *
