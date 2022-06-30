@@ -82,6 +82,15 @@ void elmy_log_t_free__(elmy_log_t **ctx)
 }
 
 
+size_t elmy_log_sz(const elmy_log_t *ctx)
+{
+        return cy_hptr_sz((const cy_hptr_t *) ctx)
+               + cy_utf8_sz(ctx->facility_kw) + cy_utf8_sz(ctx->severity_kw)
+               + cy_utf8_sz(ctx->hostname) + cy_utf8_sz(ctx->tag)
+               + cy_utf8_sz(ctx->message);
+}
+
+
 const cy_utf8_t *elmy_log_ts(const elmy_log_t *ctx)
 {
         assert(ctx != NULL);
@@ -162,24 +171,23 @@ cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
 
         switch (fmt) {
         case ELMY_LOG_FORMAT_CSV:
-                f = "%s,%s,%d,%s,%d,%s,%s,%s,%s\n";
+                f = "%s,%s,%d,%s,%d,%s,%s,%s,%s";
                 break;
 
         case ELMY_LOG_FORMAT_CSV_HDR:
                 f = "log_ts,event_ts,facility,facility_kw,severity,severity_kw,"
-                    "hostname,tag,message\n%s,%s,%d,%s,%d,%s,%s,%s,%s\n";
+                    "hostname,tag,message\n%s,%s,%d,%s,%d,%s,%s,%s,%s";
                 break;
 
         case ELMY_LOG_FORMAT_JSON:
                 f = "{log_ts:%s,event_ts:%s,facility:%s,facility_kw:%s,"
-                    "severity:%s,severity_kw:%s,hostname:%s,tag:%s,message:%s}"
-                    "\n";
+                    "severity:%s,severity_kw:%s,hostname:%s,tag:%s,message:%s}";
                 break;
 
         default:
                 f = "log_ts = %s, event_ts = %s, facility = %d,"
                     " facility_kw = %s, severity = %d, severity_kw = %s,"
-                    " hostname = %s, tag = %s, message = %s\n";
+                    " hostname = %s, tag = %s, message = %s";
         }
 
         return cy_utf8_new_fmt(f, ctx->ts, ctx->evts, ctx->facility,

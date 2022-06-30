@@ -1,9 +1,11 @@
 #include "../../include/logs.h"
 
 #include <libchrysalid/hptr.h>
+#include <libchrysalid/utf8.h>
 
 #include <assert.h>
-#include <libchrysalid/utf8.h>
+#include <malloc.h>
+#include <string.h>
 
 
 struct elmy_logs__ {
@@ -85,5 +87,58 @@ cy_utf8_t *elmy_logs_print(const elmy_logs_t *ctx, enum elmy_logs_format fmt)
 {
         assert(ctx != NULL);
 
-        return cy_utf8_new_empty();
+        register size_t sz = 0;
+        for (register size_t i = 0; i < ctx->len; i++)
+                sz += elmy_log_sz(ctx->items[i]);
+
+        sz *= 2;
+        char *bfr = cy_hptr_new(sz);
+
+        register enum elmy_log_format f;
+        register const char *sfx;
+        register size_t sfx_len;
+        switch (fmt) {
+                case ELMY_LOGS_FORMAT_CSV:
+                        f = ELMY_LOG_FORMAT_CSV;
+                        sfx = "\n";
+                        sfx_len = 1;
+                        break;
+
+                case ELMY_LOGS_FORMAT_CSV_HDR:
+                        f = ELMY_LOG_FORMAT_CSV;
+                        sfx = "\n";
+                        sfx_len = 1;
+                        break;
+
+                case ELMY_LOGS_FORMAT_JSON:
+                        f = ELMY_LOG_FORMAT_JSON;
+                        sfx = ",\n";
+                        sfx_len = 2;
+                        break;
+
+                default:
+                        f = ELMY_LOG_FORMAT_DEFAULT;
+                        sfx = "\n";
+                        sfx_len = 1;
+                        break;
+        }
+
+        register char *b = bfr;
+        register size_t len;
+        cy_utf8_t *str;
+        for (register size_t i = 0; i < ctx->len; i++) {
+                str = elmy_log_print(ctx->items[i], f);
+                len = strlen(str);
+                strncpy(b, str, len);
+
+                if (i < ctx->len - 1)
+                        strncpy(b + len, sfx, sfx_len);
+
+                b += (len + sfx_len);
+                cy_utf8_free(&str);
+        }
+
+        str = cy_utf8_new(bfr);
+        cy_hptr_free((cy_hptr_t **) &bfr);
+        return str;
 }

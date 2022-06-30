@@ -20,7 +20,7 @@ enum elmy_logs_format {
         ELMY_LOGS_FORMAT_DEFAULT,
         ELMY_LOGS_FORMAT_CSV,
         ELMY_LOGS_FORMAT_CSV_HDR,
-        EMLY_LOGS_FORMAT_JSON
+        ELMY_LOGS_FORMAT_JSON
 };
 
 

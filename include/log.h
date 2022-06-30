@@ -38,6 +38,9 @@ elmy_log_t_free__(elmy_log_t **);
 #define elmy_log_free(ctx)  \
 elmy_log_t_free__(ctx)
 
+extern CY_HOT CY_PSAFE size_t
+elmy_log_sz(const elmy_log_t *);
+
 extern CY_SAFE const cy_utf8_t *
 elmy_log_ts(const elmy_log_t *);
 
