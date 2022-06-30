@@ -84,10 +84,12 @@ void elmy_log_t_free__(elmy_log_t **ctx)
 
 size_t elmy_log_sz(const elmy_log_t *ctx)
 {
+        const size_t enum_sz = ctx->facility < 10 ? 2 : 3;
+
         return cy_hptr_sz((const cy_hptr_t *) ctx)
                + cy_utf8_sz(ctx->facility_kw) + cy_utf8_sz(ctx->severity_kw)
                + cy_utf8_sz(ctx->hostname) + cy_utf8_sz(ctx->tag)
-               + cy_utf8_sz(ctx->message);
+               + cy_utf8_sz(ctx->message) + enum_sz;
 }
 
 

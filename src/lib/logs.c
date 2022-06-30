@@ -11,6 +11,7 @@
 
 
 struct elmy_logs__ {
+        size_t        sz;
         size_t        len;
         elmy_log_t  **items;
 };
@@ -46,8 +47,12 @@ elmy_logs_t *elmy_logs_parse__(void *res)
                                    PQgetvalue(r, i, 5), PQgetvalue(r, i, 6),
                                    PQgetvalue(r, i, 7), PQgetvalue(r, i, 8));
 
-                elmy_logs_set(ctx, i, log);
-                elmy_log_free(&log);
+                ctx->items[i] = log;
+                ctx->sz += (PQgetlength(r, i, 0) + PQgetlength(r, i, 1)
+                           + PQgetlength(r, i, 2) + PQgetlength(r, i, 3)
+                           + PQgetlength(r, i ,4) + PQgetlength(r, i, 5)
+                           + PQgetlength(r, i, 6) + PQgetlength(r, i, 6)
+                           + PQgetlength(r, i, 7) + PQgetlength(r, i, 8));
         }
 
         return ctx;
@@ -106,8 +111,13 @@ void elmy_logs_set(elmy_logs_t *ctx, size_t idx, const elmy_log_t *val)
         assert(ctx != NULL);
         assert(val != NULL);
 
-        elmy_log_free(&ctx->items[idx]);
+        if (CY_LIKELY(ctx->items[idx])) {
+                ctx->sz -= elmy_log_sz(ctx->items[idx]);
+                elmy_log_free(&ctx->items[idx]);
+        }
+
         ctx->items[idx] = elmy_log_copy(val);
+        ctx->sz += elmy_log_sz(val);
 }
 
 
@@ -115,12 +125,7 @@ cy_utf8_t *elmy_logs_print(const elmy_logs_t *ctx, enum elmy_logs_format fmt)
 {
         assert(ctx != NULL);
 
-        register size_t sz = 0;
-        for (register size_t i = 0; i < ctx->len; i++)
-                sz += elmy_log_sz(ctx->items[i]);
-
-        sz *= 2;
-        char *bfr = cy_hptr_new(sz);
+        char *bfr = cy_hptr_new(ctx->sz * 2);
 
         register enum elmy_log_format f;
         register const char *sfx;
