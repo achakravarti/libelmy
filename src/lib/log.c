@@ -182,8 +182,10 @@ cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
                 break;
 
         case ELMY_LOG_FORMAT_JSON:
-                f = "{log_ts:%s,event_ts:%s,facility:%d,facility_kw:%s,"
-                    "severity:%d,severity_kw:%s,hostname:%s,tag:%s,message:%s}";
+                f = "{\"log_ts\":\"%s\",\"event_ts\":\"%s\",\"facility\":%d,"
+                    "\"facility_kw\":\"%s\",\"severity\":%d,"
+                    "\"severity_kw\":\"%s\",\"hostname\":\"%s\",\"tag\":\"%s\","
+                    "\"message\":\"%s\"}";
                 break;
 
         default:

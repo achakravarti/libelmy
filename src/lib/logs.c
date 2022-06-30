@@ -128,25 +128,30 @@ cy_utf8_t *elmy_logs_print(const elmy_logs_t *ctx, enum elmy_logs_format fmt)
         char *bfr = cy_hptr_new(ctx->sz * 2);
 
         register enum elmy_log_format f;
-        register const char *sfx;
-        register size_t sfx_len;
+        register char *sfx = "\n";
+        register char *hdr = "";
+        register char *ftr = "";
+        register size_t sfx_len = 1;
+        register size_t hdr_len = 0;
+        register size_t ftr_len = 0;
+
         switch (fmt) {
                 case ELMY_LOGS_FORMAT_CSV:
                         f = ELMY_LOG_FORMAT_CSV;
-                        sfx = "\n";
-                        sfx_len = 1;
                         break;
 
                 case ELMY_LOGS_FORMAT_CSV_HDR:
                         f = ELMY_LOG_FORMAT_CSV;
-                        sfx = "\n";
-                        sfx_len = 1;
                         break;
 
                 case ELMY_LOGS_FORMAT_JSON:
                         f = ELMY_LOG_FORMAT_JSON;
                         sfx = ",\n";
                         sfx_len = 2;
+                        hdr = "[";
+                        hdr_len = 1;
+                        ftr = "]";
+                        ftr_len = 1;
                         break;
 
                 default:
@@ -156,7 +161,9 @@ cy_utf8_t *elmy_logs_print(const elmy_logs_t *ctx, enum elmy_logs_format fmt)
                         break;
         }
 
-        register char *b = bfr;
+        strncpy(bfr, hdr, hdr_len);
+        register char *b = bfr + hdr_len;
+
         register size_t len;
         cy_utf8_t *str;
         for (register size_t i = 0; i < ctx->len; i++) {
@@ -164,14 +171,19 @@ cy_utf8_t *elmy_logs_print(const elmy_logs_t *ctx, enum elmy_logs_format fmt)
                 len = strlen(str);
                 strncpy(b, str, len);
 
-                if (i < ctx->len - 1)
+                if (i < ctx->len - 1) {
                         strncpy(b + len, sfx, sfx_len);
+                        b += (len + sfx_len);
+                } else {
+                        b += len;
+                }
 
-                b += (len + sfx_len);
                 cy_utf8_free(&str);
         }
 
+        strncpy(b, ftr, ftr_len);
         str = cy_utf8_new(bfr);
+
         cy_hptr_free((cy_hptr_t **) &bfr);
         return str;
 }
