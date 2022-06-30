@@ -27,7 +27,9 @@ static int hnd_tag_paged(const char *);
 
 int hnd_all(void)
 {
-        printf("-a (--all) handled\n");
+        CY_AUTO(elmy_logs_t) *r = elmy_rule_all("asia/kolkata", NULL);
+        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_CSV);
+        printf("%s\n", s);
         return EXIT_SUCCESS;
 }
 
