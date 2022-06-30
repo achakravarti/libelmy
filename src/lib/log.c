@@ -8,6 +8,8 @@
 struct elmy_log__ {
         enum cy_log_facility    facility;
         enum cy_log_severity    severity;
+        cy_utf8_t               *facility_kw;
+        cy_utf8_t               *severity_kw;
         cy_utf8_t               *ts;
         cy_utf8_t               *evts;
         cy_utf8_t               *hostname;
@@ -17,9 +19,10 @@ struct elmy_log__ {
 
 
 elmy_log_t *elmy_log_new(const char *ts, const char *evts,
-                         enum cy_log_facility facility,
-                         enum cy_log_severity severity, const char *hostname,
-                         const char *tag, const char *message)
+                         enum cy_log_facility facility, const char *facility_kw,
+                         enum cy_log_severity severity, const char *severity_kw,
+                         const char *hostname, const char *tag,
+                         const char *message)
 {
         assert(ts != NULL && *ts != '\0');
         assert(evts != NULL && *evts != '\0');
@@ -31,6 +34,8 @@ elmy_log_t *elmy_log_new(const char *ts, const char *evts,
         ctx->severity = severity;
         ctx->ts = cy_utf8_new(ts);
         ctx->evts = cy_utf8_new(evts);
+        ctx->facility_kw = cy_utf8_new(facility_kw);
+        ctx->severity_kw = cy_utf8_new(severity_kw);
         ctx->hostname = cy_utf8_new(hostname);
         ctx->tag = cy_utf8_new(tag);
         ctx->message = cy_utf8_new(message);
@@ -51,8 +56,9 @@ elmy_log_t *elmy_log_clone(const elmy_log_t *ctx)
 {
         assert(ctx != NULL);
 
-        return elmy_log_new(ctx->ts, ctx->evts, ctx->facility, ctx->severity,
-                            ctx->hostname, ctx->tag, ctx->message);
+        return elmy_log_new(ctx->ts, ctx->evts, ctx->facility, ctx->facility_kw,
+                            ctx->severity, ctx->severity_kw, ctx->hostname,
+                            ctx->tag, ctx->message);
 }
 
 
@@ -64,6 +70,8 @@ void elmy_log_t_free__(elmy_log_t **ctx)
                 if (cy_hptr_refc((const cy_hptr_t *) l) == 1) {
                         cy_utf8_free(&l->ts);
                         cy_utf8_free(&l->evts);
+                        cy_utf8_free(&l->facility_kw);
+                        cy_utf8_free(&l->severity_kw);
                         cy_utf8_free(&l->hostname);
                         cy_utf8_free(&l->tag);
                         cy_utf8_free(&l->message);
