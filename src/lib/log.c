@@ -162,25 +162,28 @@ cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
 
         switch (fmt) {
         case ELMY_LOG_FORMAT_CSV:
-                f = "%s,%s,%d,%d,%s,%s,%s\n";
+                f = "%s,%s,%d,%s,%d,%s,%s,%s,%s\n";
                 break;
 
         case ELMY_LOG_FORMAT_CSV_HDR:
-                f = "log_timestamp,event_timestamp,facility,severity,hostname,"
-                    "tag,message\n%s,%s,%d,%d,%s,%s,%s\n";
+                f = "log_ts,event_ts,facility,facility_kw,severity,severity_kw,"
+                    "hostname,tag,message\n%s,%s,%d,%s,%d,%s,%s,%s,%s\n";
                 break;
 
         case ELMY_LOG_FORMAT_JSON:
-                f = "{log_timestamp:%s,event_timestamp:%s,facility:%s,"
-                    "severity:%s,hostname:%s,tag:%s,message:%s}\n";
+                f = "{log_ts:%s,event_ts:%s,facility:%s,facility_kw:%s,"
+                    "severity:%s,severity_kw:%s,hostname:%s,tag:%s,message:%s}"
+                    "\n";
                 break;
 
         default:
-                f = "{log_timestamp:%s,event_timestamp:%s,facility:%s,"
-                    "severity:%s,hostname:%s,tag:%s,message:%s}\n";
+                f = "log_ts = %s, event_ts = %s, facility = %d,"
+                    " facility_kw = %s, severity = %d, severity_kw = %s,"
+                    " hostname = %s, tag = %s, message = %s\n";
         }
 
         return cy_utf8_new_fmt(f, ctx->ts, ctx->evts, ctx->facility,
-                               ctx->severity, ctx->hostname, ctx->tag,
-                               ctx->message);
+                               ctx->facility_kw, ctx->severity,
+                               ctx->severity_kw, ctx->hostname,
+                               ctx->tag, ctx->message);
 }
