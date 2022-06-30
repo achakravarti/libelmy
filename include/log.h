@@ -47,13 +47,13 @@ elmy_log_ts_event(const elmy_log_t *);
 extern CY_PSAFE enum cy_log_facility
 elmy_log_facility(const elmy_log_t *);
 
-extern CY_SAFE cy_utf8_t *
+extern CY_SAFE const cy_utf8_t *
 elmy_log_facility_kw(const elmy_log_t *);
 
 extern CY_PSAFE enum cy_log_severity
 elmy_log_severity(const elmy_log_t *);
 
-extern CY_SAFE cy_utf8_t *
+extern CY_SAFE const cy_utf8_t *
 elmy_log_severity_kw(const elmy_log_t *);
 
 extern CY_SAFE const cy_utf8_t *

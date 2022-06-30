@@ -106,11 +106,27 @@ enum cy_log_facility elmy_log_facility(const elmy_log_t *ctx)
 }
 
 
+const cy_utf8_t *elmy_log_facility_kw(const elmy_log_t *ctx)
+{
+        assert(ctx != NULL);
+
+        return ctx->facility_kw;
+}
+
+
 enum cy_log_severity elmy_log_severity(const elmy_log_t *ctx)
 {
         assert(ctx != NULL);
 
         return ctx->severity;
+}
+
+
+const cy_utf8_t *elmy_log_severity_kw(const elmy_log_t *ctx)
+{
+        assert(ctx != NULL);
+
+        return ctx->severity_kw;
 }
 
 
