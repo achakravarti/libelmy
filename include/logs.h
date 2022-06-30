@@ -43,7 +43,7 @@ extern CY_SAFE const elmy_log_t *
 elmy_logs_get(const elmy_logs_t *, size_t);
 
 extern CY_PSAFE void
-elmy_log_set(elmy_logs_t *, size_t, const elmy_log_t *);
+elmy_logs_set(elmy_logs_t *, size_t, const elmy_log_t *);
 
 extern CY_SAFE cy_utf8_t *
 elmy_logs_print(const elmy_logs_t *, enum elmy_logs_format);

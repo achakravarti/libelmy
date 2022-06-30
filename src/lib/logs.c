@@ -73,7 +73,7 @@ const elmy_log_t *elmy_logs_get(const elmy_logs_t *ctx, size_t idx)
 }
 
 
-void elmy_log_set(elmy_logs_t *ctx, size_t idx, const elmy_log_t *val)
+void elmy_logs_set(elmy_logs_t *ctx, size_t idx, const elmy_log_t *val)
 {
         assert(ctx != NULL);
         assert(val != NULL);

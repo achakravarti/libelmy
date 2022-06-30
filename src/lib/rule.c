@@ -106,17 +106,36 @@ cy_utf8_t *elmy_rule_last(const char *tz)
 }
 
 
-int elmy_rule_all(const char *tz, const struct elmy_page *pg, elmy_logs_t **res,
-                  cy_utf8_t **err)
+elmy_logs_t *elmy_rule_all(const char *tz, const struct elmy_page *pg)
 {
-        assert(tz && *tz);
-        assert(res && !*res);
-        assert(err);
+        assert(tz != NULL && *tz != '\0');
+
+        (void) pg;
+        const char *p[] = {tz};
+        const char *s = "SELECT * FROM logs_all($1);";
 
         PGconn *c = db_connect();
+        PGresult *r = db_execp(c, s, p, sizeof (p) / sizeof (*p));
+        register size_t len = PQntuples(r);
+        elmy_logs_t *res = elmy_logs_new(len);
+
+        elmy_log_t *log;
+        for (register size_t i = 0; i < len; i++) {
+                log = elmy_log_new(PQgetvalue(r, i, 1), PQgetvalue(r, i, 0),
+                                   strtoumax(PQgetvalue(r, i, 2), NULL, 10),
+                                   PQgetvalue(r, i, 3),
+                                   strtoumax(PQgetvalue(r, i, 4), NULL, 10),
+                                   PQgetvalue(r, i, 5), PQgetvalue(r, i, 6),
+                                   PQgetvalue(r, i, 7), PQgetvalue(r, i, 8));
+
+                elmy_logs_set(res, i, log);
+                elmy_log_free(&log);
+        }
+
+        PQclear(r);
         PQfinish(c);
 
-        return ELMY_STATUS_FAIL;
+        return res;
 }
 
 

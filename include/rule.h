@@ -26,9 +26,8 @@ elmy_rule_initial(const char *);
 extern CY_PSAFE cy_utf8_t *
 elmy_rule_last(const char *);
 
-extern int
-elmy_rule_all(const char *, const struct elmy_page *, elmy_logs_t **,
-              cy_utf8_t **);
+extern CY_SAFE elmy_logs_t *
+elmy_rule_all(const char *, const struct elmy_page *);
 
 extern int
 elmy_rule_facility(const char *, const struct elmy_page *,
