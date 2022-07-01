@@ -45,7 +45,7 @@ int hnd_all_paged(void)
         };
 
         CY_AUTO(elmy_logs_t) *r = elmy_rule_all_paged("asia/kolkata", &pg);
-        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_DEFAULT);
+        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_JSON);
         printf("%s\n", s);
 
         return EXIT_SUCCESS;
