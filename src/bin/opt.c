@@ -1,5 +1,7 @@
 #include "hnd.c"
 
+#include <libchrysalid/utf8.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,28 +22,13 @@ struct opt_data {
         bool help;
         bool version;
         bool error;
-        char *facility_arg;
-        char *severity_arg;
-        char *hostname_arg;
-        char *tag_arg;
-        char *message_arg;
+        cy_utf8_t *facility_arg;
+        cy_utf8_t *severity_arg;
+        cy_utf8_t *hostname_arg;
+        cy_utf8_t *tag_arg;
+        cy_utf8_t *message_arg;
 };
 
-
-// TEMPORARY UNTIL CHRYSALID INSTALLED
-char *opt_arg(void)
-{
-        size_t len = optarg ? strlen(optarg) : 0;
-        char *bfr = malloc(len + 1);
-
-        if (!bfr)
-                abort();
-
-        strcpy(bfr, optarg);
-        bfr[len] = '\0';
-
-        return bfr;
-}
 
 // ^[0-7](,\s?[0-7]){0,7}$
 // ^\b([0-9]|1[0-9]|2[0123])\b(,\s?\b([0-9]|1[0-9]|2[0123])\b{0,23}$
@@ -91,27 +78,27 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
 
                 case 'f':
                         data->facility = true;
-                        data->facility_arg = opt_arg();
+                        data->facility_arg = cy_utf8_new(optarg);
                         break;
 
                 case 's':
                         data->severity = true;
-                        data->severity_arg = opt_arg();
+                        data->severity_arg = cy_utf8_new(optarg);
                         break;
 
                 case 'n':
                         data->hostname = true;
-                        data->hostname_arg = opt_arg();
+                        data->hostname_arg = cy_utf8_new(optarg);
                         break;
 
                 case 't':
                         data->tag = true;
-                        data->tag_arg = opt_arg();
+                        data->tag_arg = cy_utf8_new(optarg);
                         break;
 
                 case 'm':
                         data->message = true;
-                        data->message_arg = opt_arg();
+                        data->message_arg = cy_utf8_new(optarg);
                         break;
 
                 case 'p':
@@ -216,12 +203,11 @@ int opt_proc(int argc, char **argv)
                 return d.paged ? hnd_message_paged(d.message_arg)
                                : hnd_message(d.message_arg);
 
-        // TEMPORARY CODE
-        free(d.facility_arg);
-        free(d.severity_arg);
-        free(d.hostname_arg);
-        free(d.tag_arg);
-        free(d.message_arg);
+        cy_utf8_free(&d.facility_arg);
+        cy_utf8_free(&d.severity_arg);
+        cy_utf8_free(&d.hostname_arg);
+        cy_utf8_free(&d.tag_arg);
+        cy_utf8_free(&d.message_arg);
 
         return EXIT_SUCCESS;
 }

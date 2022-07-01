@@ -1,3 +1,7 @@
+#include "../../include/rule.h"
+
+#include <libchrysalid/ext.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,14 +27,27 @@ static int hnd_tag_paged(const char *);
 
 int hnd_all(void)
 {
-        printf("-a (--all) handled\n");
+        CY_AUTO(elmy_logs_t) *r = elmy_rule_all("asia/kolkata");
+        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_JSON);
+        printf("%s\n", s);
+
         return EXIT_SUCCESS;
 }
 
 
 int hnd_all_paged(void)
 {
-        printf("-a -p (--all --paged) handled\n");
+        struct elmy_page pg = {
+                .row_start = 1,
+                .row_count = 25,
+                .sort_col = ELMY_SORT_TS_EVENT,
+                .sort_asc = false
+        };
+
+        CY_AUTO(elmy_logs_t) *r = elmy_rule_all_paged("asia/kolkata", &pg);
+        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_JSON);
+        printf("%s\n", s);
+
         return EXIT_SUCCESS;
 }
 
@@ -79,21 +96,23 @@ int hnd_message_paged(const char *arg)
 
 int hnd_count(void)
 {
-        printf("-c (--count) handled\n");
+        printf("%zu\n", elmy_rule_count());
         return EXIT_SUCCESS;
 }
 
 
 int hnd_initial(void)
 {
-        printf("-i (--initial) handled\n");
+        CY_AUTO(cy_utf8_t) *r = elmy_rule_initial("asia/kolkata");
+        printf("%s\n", r);
         return EXIT_SUCCESS;
 }
 
 
 int hnd_last(void)
 {
-        printf("-l (--last) handled\n");
+        CY_AUTO(cy_utf8_t) *r = elmy_rule_last("asia/kolkata");
+        printf("%s\n", r);
         return EXIT_SUCCESS;
 }
 
