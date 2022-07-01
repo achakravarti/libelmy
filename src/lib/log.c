@@ -194,8 +194,20 @@ cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
                     " hostname = %s, tag = %s, message = %s";
         }
 
-        return cy_utf8_new_fmt(f, ctx->ts, ctx->evts, ctx->facility,
-                               ctx->facility_kw, ctx->severity,
-                               ctx->severity_kw, ctx->hostname,
-                               ctx->tag, ctx->message);
+        if (fmt != ELMY_LOG_FORMAT_JSON)
+                return cy_utf8_new_fmt(f, ctx->ts, ctx->evts, ctx->facility,
+                                       ctx->facility_kw, ctx->severity,
+                                       ctx->severity_kw, ctx->hostname,
+                                       ctx->tag, ctx->message);
+
+        CY_AUTO(cy_utf8_t) *ts = cy_utf8_escape_json(ctx->ts);
+        CY_AUTO(cy_utf8_t) *evts = cy_utf8_escape_json(ctx->evts);
+        CY_AUTO(cy_utf8_t) *fkw = cy_utf8_escape_json(ctx->facility_kw);
+        CY_AUTO(cy_utf8_t) *skw = cy_utf8_escape_json(ctx->severity_kw);
+        CY_AUTO(cy_utf8_t) *hn = cy_utf8_escape_json(ctx->hostname);
+        CY_AUTO(cy_utf8_t) *tag = cy_utf8_escape_json(ctx->tag);
+        CY_AUTO(cy_utf8_t) *msg = cy_utf8_escape_json(ctx->message);
+
+        return cy_utf8_new_fmt(f, ts, evts, ctx->facility, fkw, ctx->severity,
+                               skw, hn, tag, msg);
 }
