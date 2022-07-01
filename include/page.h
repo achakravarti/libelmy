@@ -15,6 +15,7 @@ extern "C" {
 
 enum elmy_sort {
         ELMY_SORT_TS = 1,
+        ELMY_SORT_TS_EVENT,
         ELMY_SORT_FACILITY,
         ELMY_SORT_SEVERITY,
         ELMY_SORT_HOSTNAME,

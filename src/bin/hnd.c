@@ -27,16 +27,27 @@ static int hnd_tag_paged(const char *);
 
 int hnd_all(void)
 {
-        CY_AUTO(elmy_logs_t) *r = elmy_rule_all("asia/kolkata", NULL);
+        CY_AUTO(elmy_logs_t) *r = elmy_rule_all("asia/kolkata");
         CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_JSON);
         printf("%s\n", s);
+
         return EXIT_SUCCESS;
 }
 
 
 int hnd_all_paged(void)
 {
-        printf("-a -p (--all --paged) handled\n");
+        struct elmy_page pg = {
+                .row_start = 1,
+                .row_count = 25,
+                .sort_col = ELMY_SORT_TS_EVENT,
+                .sort_asc = false
+        };
+
+        CY_AUTO(elmy_logs_t) *r = elmy_rule_all_paged("asia/kolkata", &pg);
+        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_DEFAULT);
+        printf("%s\n", s);
+
         return EXIT_SUCCESS;
 }
 
