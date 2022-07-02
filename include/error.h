@@ -27,7 +27,7 @@ enum elmy_error {
 
 
 enum elmy_status {
-        ELMY_STATUS_OK,
+        //ELMY_STATUS_OK,
         ELMY_STATUS_ERR_DBCONN,
         ELMY_STATUS_ERR_DBQRY
 };
@@ -59,11 +59,11 @@ elmy_error_t_free__(ctx)
 extern CY_PSAFE enum elmy_status
 elmy_error_status(const elmy_error_t *);
 
-extern CY_SAFE cy_utf8_t *
-elmy_error_msg(const elmy_error_t *);
+extern CY_SAFE const cy_utf8_t *
+elmy_error_rule(const elmy_error_t *);
 
-extern CY_SAFE cy_utf8_t *
-elmy_error_msg_inner(const elmy_error_t *);
+extern CY_SAFE const cy_utf8_t *
+elmy_error_msg(const elmy_error_t *);
 
 extern CY_SAFE cy_utf8_t *
 elmy_error_str(const elmy_error_t *);
