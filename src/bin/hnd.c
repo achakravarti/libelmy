@@ -1,6 +1,6 @@
 #include "../../include/rule.h"
 
-#include <libchrysalid/ext.h>
+#include <libchrysalid/include/ext.h>
 
 #include <stdio.h>
 #include <stdlib.h>

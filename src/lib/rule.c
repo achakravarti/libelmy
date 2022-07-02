@@ -1,9 +1,9 @@
 #include "../../include/error.h"
 #include "../../include/rule.h"
 
-#include <libchrysalid/ext.h>
-#include <libchrysalid/hptr.h>
-#include <libchrysalid/log.h>
+#include <libchrysalid/include/ext.h>
+#include <libchrysalid/include/hptr.h>
+#include <libchrysalid/include/log.h>
 #include <libpq-fe.h>
 
 #include <assert.h>

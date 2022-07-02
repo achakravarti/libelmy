@@ -2,10 +2,10 @@
 #ifndef __LIBELMY_INCLUDE_ERROR_H__
 #define __LIBELMY_INCLUDE_ERROR_H__
 
-#include <libchrysalid/ext.h>
-#include <libchrysalid/json.h>
-#include <libchrysalid/log.h>
-#include <libchrysalid/utf8.h>
+#include <libchrysalid/include/ext.h>
+#include <libchrysalid/include/json.h>
+#include <libchrysalid/include/log.h>
+#include <libchrysalid/include/utf8.h>
 
 #include <stdio.h>
 #include <stdlib.h>

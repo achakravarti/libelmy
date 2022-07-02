@@ -1,6 +1,6 @@
 #include "../../include/log.h"
 
-#include <libchrysalid/hptr.h>
+#include <libchrysalid/include/hptr.h>
 
 #include <assert.h>
 

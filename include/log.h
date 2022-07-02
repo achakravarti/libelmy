@@ -2,8 +2,8 @@
 #ifndef __LIBELMY_INCLUDE_LOG_H__
 #define __LIBELMY_INCLUDE_LOG_H__
 
-#include <libchrysalid/log.h>
-#include <libchrysalid/utf8.h>
+#include <libchrysalid/include/log.h>
+#include <libchrysalid/include/utf8.h>
 
 /* C++ compatiblity */
 #ifdef __cplusplus
