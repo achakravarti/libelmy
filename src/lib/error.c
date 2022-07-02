@@ -29,19 +29,26 @@ struct elmy_error__ {
 elmy_error_t *elmy_error_new(enum elmy_status status, const char *msg,
                              const char *imsg)
 {
-        return 0;
+        assert(msg != NULL && *msg != '\0');
+        assert(imsg != NULL && *imsg != '\0');
+
+        return NULL;
 }
 
 
 elmy_error_t *elmy_error_copy(const elmy_error_t *ctx)
 {
-        return 0;
+        assert(ctx != NULL);
+
+        return NULL;
 }
 
 
 elmy_error_t *elmy_error_clone(const elmy_error_t *ctx)
 {
-        return 0;
+        assert(ctx != NULL);
+
+        return NULL;
 }
 
 
@@ -52,29 +59,39 @@ void elmy_error_t_free__(elmy_error_t **ctx)
 
 enum elmy_status elmy_error_status(const elmy_error_t *ctx)
 {
+        assert(ctx != NULL);
+
         return 0;
 }
 
 
 cy_utf8_t *elmy_error_msg(const elmy_error_t *ctx)
 {
-        return 0;
+        assert(ctx != NULL);
+
+        return NULL;
 }
 
 
 cy_utf8_t *elmy_error_msg_inner(const elmy_error_t *ctx)
 {
-        return 0;
+        assert(ctx != NULL);
+
+        return NULL;
 }
 
 
 cy_utf8_t *elmy_error_str(const elmy_error_t *ctx)
 {
-        return 0;
+        assert(ctx != NULL);
+
+        return NULL;
 }
 
 
 cy_json_t *elmy_error_json(const elmy_error_t *ctx)
 {
-        return 0;
+        assert(ctx != NULL);
+
+        return NULL;
 }
