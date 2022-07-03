@@ -2,8 +2,9 @@
 
 #include <libchrysalid/include/hptr.h>
 #include <libchrysalid/include/utf8.h>
-
 #include <libpq-fe.h>
+
+#include <string.h>
 
 
 typedef struct {
@@ -20,21 +21,21 @@ static CY_SAFE db_t *
 db_new(const char *, const char *);
 
 static void
-db_t_free__(db_t **ctx);
+db_t_free__(db_t **);
 
 #define db_free(ctx) db_t_free__(ctx)
 
 static CY_PSAFE enum elmy_status
-db_exec(const db_t *ctx);
+db_exec(db_t *);
 
 static CY_PSAFE enum elmy_status
-db_exec_param(const db_t *ctx, const char *params[]);
+db_exec_param(db_t *, const char *[]);
 
 static CY_PSAFE PGresult *
-db_result(const db_t *ctx);
+db_result(const db_t *);
 
 static CY_SAFE elmy_error_t *
-db_error(const db_t *ctx);
+db_error(const db_t *);
 
 
 db_t *db_new(const char *rule, const char *sql)
@@ -71,4 +72,54 @@ void db_t_free__(db_t **ctx)
 
                 cy_hptr_free((cy_hptr_t **) ctx);
         }
+}
+
+enum elmy_status db_exec(db_t *ctx)
+{
+        ctx->res = PQexec(ctx->conn, ctx->sql);
+
+        if (CY_UNLIKELY(PQresultStatus(ctx->res) != PGRES_TUPLES_OK)) {
+                ctx->status = ELMY_STATUS_ERR_DBQRY;
+                ctx->err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, ctx->rule,
+                                          PQerrorMessage(ctx->conn));
+                return ELMY_STATUS_ERR_DBQRY;
+        }
+
+        return ELMY_STATUS_OK;
+}
+
+
+enum elmy_status db_exec_param(db_t *ctx, const char *params[])
+{
+        register size_t nparams = 0;
+        register char *s = ctx->sql;
+
+        while ((s = strstr(s, "$"))) {
+                s++;
+                nparams++;
+        }
+
+        ctx->res = PQexecParams(ctx->conn, ctx->sql, nparams, NULL, params,
+                                NULL, NULL, 0);
+
+        if (CY_UNLIKELY(PQresultStatus(ctx->res) != PGRES_TUPLES_OK)) {
+                ctx->status = ELMY_STATUS_ERR_DBQRY;
+                ctx->err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, ctx->rule,
+                                          PQerrorMessage(ctx->conn));
+                return ELMY_STATUS_ERR_DBQRY;
+        }
+
+        return ELMY_STATUS_OK;
+}
+
+
+PGresult *db_result(const db_t *ctx)
+{
+        return ctx->res;
+}
+
+
+elmy_error_t *db_error(const db_t *ctx)
+{
+        return elmy_error_copy(ctx->err);
 }
