@@ -58,36 +58,7 @@ static char *sort_val(size_t val)
 }
 
 
-static PGconn *db_connect(void)
-{
-        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
-
-        if (CY_UNLIKELY(PQstatus(c) == CONNECTION_BAD)) {
-                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(c));
-                PQfinish(c);
-                elmy_error_dbconn(ELMY_ERROR_DBCONN, err);
-        }
-
-        return c;
-}
-
-
-static PGresult *db_exec(PGconn *conn, const char *sql)
-{
-        PGresult *r = PQexec(conn, sql);
-
-        if (CY_UNLIKELY(PQresultStatus(r) != PGRES_TUPLES_OK)) {
-                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(conn));
-                PQclear(r);
-                PQfinish(conn);
-                elmy_error_dbqry(ELMY_ERROR_DBQRY, err);
-        }
-
-        return r;
-}
-
-
-static PGconn *db_connect2(const char *rule, elmy_error_t **err)
+static PGconn *db_connect(const char *rule, elmy_error_t **err)
 {
         PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
 
@@ -102,8 +73,8 @@ static PGconn *db_connect2(const char *rule, elmy_error_t **err)
 }
 
 
-static PGresult *db_exec2(PGconn *conn, const char *sql, const char *rule,
-                          elmy_error_t **err)
+static PGresult *db_exec(PGconn *conn, const char *sql, const char *rule,
+                         elmy_error_t **err)
 {
         PGresult *r = PQexec(conn, sql);
 
@@ -120,23 +91,6 @@ static PGresult *db_exec2(PGconn *conn, const char *sql, const char *rule,
 
 
 static PGresult *db_execp(PGconn *conn, const char *sql, const char *params[],
-                          size_t nparams)
-{
-        PGresult *r = PQexecParams(conn, sql, nparams, NULL, params, NULL, NULL,
-                                   0);
-
-        if (CY_UNLIKELY(PQresultStatus(r) != PGRES_TUPLES_OK)) {
-                CY_AUTO(cy_utf8_t) *err = cy_utf8_new(PQerrorMessage(conn));
-                PQclear(r);
-                PQfinish(conn);
-                elmy_error_dbqry(ELMY_ERROR_DBQRY, err);
-        }
-
-        return r;
-}
-
-
-static PGresult *db_execp2(PGconn *conn, const char *sql, const char *params[],
                           size_t nparams, const char *rule, elmy_error_t **err)
 {
         PGresult *r = PQexecParams(conn, sql, nparams, NULL, params, NULL, NULL,
@@ -162,13 +116,13 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
         const char *sql = "SELECT * FROM logs_count();";
         const char *rule = "count";
 
-        PGconn *c = db_connect2(rule, err);
+        PGconn *c = db_connect(rule, err);
         if (CY_UNLIKELY(!c)) {
                 *res = 0;
                 return elmy_error_status(*err);
         }
 
-        PGresult *r = db_exec2(c, sql, rule, err);
+        PGresult *r = db_exec(c, sql, rule, err);
         if (CY_UNLIKELY(!r)) {
                 *res = 0;
                 return elmy_error_status(*err);
@@ -194,13 +148,13 @@ enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
         const char *params[] = {tz};
         const size_t nparams = 1;
 
-        PGconn *c = db_connect2(rule, err);
+        PGconn *c = db_connect(rule, err);
         if (CY_UNLIKELY(!c)) {
                 *res = cy_utf8_new_empty();
                 return elmy_error_status(*err);
         }
 
-        PGresult *r = db_execp2(c, sql, params, nparams, rule, err);
+        PGresult *r = db_execp(c, sql, params, nparams, rule, err);
         if (CY_UNLIKELY(!r)) {
                 *res = cy_utf8_new_empty();
                 return elmy_error_status(*err);
@@ -226,13 +180,13 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
         const char *params[] = {tz};
         const size_t nparams = 1;
 
-        PGconn *c = db_connect2(rule, err);
+        PGconn *c = db_connect(rule, err);
         if (CY_UNLIKELY(!c)) {
                 *res = cy_utf8_new_empty();
                 return elmy_error_status(*err);
         }
 
-        PGresult *r = db_execp2(c, sql, params, nparams, rule, err);
+        PGresult *r = db_execp(c, sql, params, nparams, rule, err);
         if (CY_UNLIKELY(!r)) {
                 *res = cy_utf8_new_empty();
                 return elmy_error_status(*err);
@@ -255,7 +209,7 @@ enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
         assert(err != NULL && *err == NULL);
 
         const char *rule = "all";
-        PGconn *conn = db_connect2(rule, err);
+        PGconn *conn = db_connect(rule, err);
         if (CY_UNLIKELY(!conn)) {
                 *res = NULL;
                 return elmy_error_status(*err);
@@ -265,7 +219,7 @@ enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
                 const char *params[] = {tz};
                 const char *sql = "SELECT * FROM logs_all($1);";
 
-                PGresult *r = db_execp2(conn, sql, params, 1, rule, err);
+                PGresult *r = db_execp(conn, sql, params, 1, rule, err);
                 if (CY_UNLIKELY(!r)) {
                         *res = NULL;
                         return elmy_error_status(*err);
@@ -285,7 +239,7 @@ enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
         const char *params[] = {start, count, col, dir, tz};
         const char *sql = "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);";
 
-        PGresult *r = db_execp2(conn, sql, params, 5, rule, err);
+        PGresult *r = db_execp(conn, sql, params, 5, rule, err);
         if (CY_UNLIKELY(!r)) {
                 *res = NULL;
                 return elmy_error_status(*err);
@@ -309,9 +263,6 @@ int elmy_rule_facility(const char *tz, const struct elmy_page *pg,
         assert(res && !*res);
         assert(err);
 
-        PGconn *c = db_connect();
-        PQfinish(c);
-
         return ELMY_STATUS_FAIL;
 }
 
@@ -324,9 +275,6 @@ int elmy_rule_severity(const char *tz, const struct elmy_page *pg,
         assert(res && !*res);
         assert(err);
 
-        PGconn *c = db_connect();
-        PQfinish(c);
-
         return ELMY_STATUS_FAIL;
 }
 
@@ -337,9 +285,6 @@ int elmy_rule_hostname(const char *tz, const struct elmy_page *pg,
         assert(tz && *tz);
         assert(res && !*res);
         assert(err);
-
-        PGconn *c = db_connect();
-        PQfinish(c);
 
         return ELMY_STATUS_FAIL;
 }
@@ -352,9 +297,6 @@ int elmy_rule_tag(const char *tz, const struct elmy_page *pg,
         assert(res && !*res);
         assert(err);
 
-        PGconn *c = db_connect();
-        PQfinish(c);
-
         return ELMY_STATUS_FAIL;
 }
 
@@ -365,9 +307,6 @@ int elmy_rule_message(const char *tz, const struct elmy_page *pg,
         assert(tz && *tz);
         assert(res && !*res);
         assert(err);
-
-        PGconn *c = db_connect();
-        PQfinish(c);
 
         return ELMY_STATUS_FAIL;
 }
