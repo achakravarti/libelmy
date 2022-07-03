@@ -1,5 +1,6 @@
 #include "../../include/error.h"
 #include "../../include/rule.h"
+#include "db.c"
 
 #include <libchrysalid/include/ext.h>
 #include <libchrysalid/include/hptr.h>
@@ -73,23 +74,6 @@ static PGconn *db_connect(const char *rule, elmy_error_t **err)
 }
 
 
-static PGresult *db_exec(PGconn *conn, const char *sql, const char *rule,
-                         elmy_error_t **err)
-{
-        PGresult *r = PQexec(conn, sql);
-
-        if (CY_LIKELY(PQresultStatus(r) == PGRES_TUPLES_OK))
-                return r;
-
-        CY_AUTO(cy_utf8_t) *msg = cy_utf8_new(PQerrorMessage(conn));
-        *err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, rule, msg);
-        PQclear(r);
-        PQfinish(conn);
-
-        return NULL;
-}
-
-
 static PGresult *db_execp(PGconn *conn, const char *sql, const char *params[],
                           size_t nparams, const char *rule, elmy_error_t **err)
 {
@@ -115,23 +99,15 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 
         const char *sql = "SELECT * FROM logs_count();";
         const char *rule = "count";
+        CY_AUTO(db_t) *db = db_new(rule, sql);
 
-        PGconn *c = db_connect(rule, err);
-        if (CY_UNLIKELY(!c)) {
+        if (CY_UNLIKELY(db_exec(db))) {
                 *res = 0;
+                *err = db_error(db);
                 return elmy_error_status(*err);
         }
 
-        PGresult *r = db_exec(c, sql, rule, err);
-        if (CY_UNLIKELY(!r)) {
-                *res = 0;
-                return elmy_error_status(*err);
-        }
-
-        *res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
-        PQclear(r);
-        PQfinish(c);
-
+        *res = strtoumax(PQgetvalue(db_result(db), 0, 0), NULL, 10);
         return ELMY_STATUS_OK;
 }
 
