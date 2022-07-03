@@ -96,7 +96,15 @@ int hnd_message_paged(const char *arg)
 
 int hnd_count(void)
 {
-        printf("%zu\n", elmy_rule_count());
+        size_t res;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        if (CY_UNLIKELY(elmy_rule_count(&res, &err))) {
+                elmy_error_str(err);
+                return EXIT_FAILURE;
+        }
+
+        printf("%zu\n", res);
         return EXIT_SUCCESS;
 }
 

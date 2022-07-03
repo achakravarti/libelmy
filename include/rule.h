@@ -17,8 +17,8 @@ extern "C" {
 #endif
 
 
-extern size_t
-elmy_rule_count(void);
+extern enum elmy_status
+elmy_rule_count(size_t *, elmy_error_t **);
 
 extern CY_PSAFE cy_utf8_t *
 elmy_rule_initial(const char *);

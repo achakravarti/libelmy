@@ -86,6 +86,38 @@ static PGresult *db_exec(PGconn *conn, const char *sql)
 }
 
 
+static PGconn *db_connect2(const char *rule, elmy_error_t **err)
+{
+        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
+
+        if (CY_LIKELY(PQstatus(c) == CONNECTION_OK))
+                return c;
+
+        CY_AUTO(cy_utf8_t) *msg = cy_utf8_new(PQerrorMessage(c));
+        *err = elmy_error_new(ELMY_STATUS_ERR_DBCONN, rule, msg);
+        PQfinish(c);
+
+        return NULL;
+}
+
+
+static PGresult *db_exec2(PGconn *conn, const char *sql, const char *rule,
+                          elmy_error_t **err)
+{
+        PGresult *r = PQexec(conn, sql);
+
+        if (CY_LIKELY(PQresultStatus(r)) == PGRES_TUPLES_OK)
+                return r;
+
+        CY_AUTO(cy_utf8_t) *msg = cy_utf8_new(PQerrorMessage(conn));
+        *err = elmy_error_new(ELMY_STATUS_ERR_DBCONN, rule, msg);
+        PQclear(r);
+        PQfinish(conn);
+
+        return NULL;
+}
+
+
 static PGresult *db_execp(PGconn *conn, const char *sql, const char *params[],
                           size_t nparams)
 {
@@ -103,16 +135,28 @@ static PGresult *db_execp(PGconn *conn, const char *sql, const char *params[],
 }
 
 
-size_t elmy_rule_count(void)
+enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 {
-        PGconn *c = db_connect();
-        PGresult *r = db_exec(c, "SELECT * FROM logs_count();");
-        size_t res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
+        assert(res != NULL);
+        assert(err != NULL && *err == NULL);
 
+        PGconn *c = db_connect2("count", err);
+        if (CY_UNLIKELY(!c)) {
+                *res = 0;
+                return elmy_error_status(*err);
+        }
+
+        PGresult *r = db_exec(c, "SELECT * FROM logs_count();");
+        if (CY_UNLIKELY(!r)) {
+                *res = 0;
+                return elmy_error_status(*err);
+        }
+
+        *res = strtoumax(PQgetvalue(r, 0, 0), NULL, 10);
         PQclear(r);
         PQfinish(c);
 
-        return res;
+        return ELMY_STATUS_OK;
 }
 
 
