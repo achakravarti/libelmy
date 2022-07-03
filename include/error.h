@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 
-#define ELMY_STATUS_OK 0
+//#define ELMY_STATUS_OK 0
 #define ELMY_STATUS_FAIL 1
 
 enum elmy_error {
@@ -27,7 +27,7 @@ enum elmy_error {
 
 
 enum elmy_status {
-        //ELMY_STATUS_OK,
+        ELMY_STATUS_OK,
         ELMY_STATUS_ERR_DBCONN,
         ELMY_STATUS_ERR_DBQRY
 };
