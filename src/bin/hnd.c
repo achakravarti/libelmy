@@ -111,8 +111,15 @@ int hnd_count(void)
 
 int hnd_initial(void)
 {
-        CY_AUTO(cy_utf8_t) *r = elmy_rule_initial("asia/kolkata");
-        printf("%s\n", r);
+        CY_AUTO(cy_utf8_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        if (CY_UNLIKELY(elmy_rule_initial("asia/kolkata", &res, &err))) {
+                elmy_error_str(err);
+                return EXIT_FAILURE;
+        }
+
+        printf("%s\n", res);
         return EXIT_SUCCESS;
 }
 

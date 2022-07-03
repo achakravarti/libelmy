@@ -4,6 +4,7 @@
 #include <libchrysalid/include/ext.h>
 #include <libchrysalid/include/hptr.h>
 #include <libchrysalid/include/log.h>
+#include <libchrysalid/include/utf8.h>
 #include <libpq-fe.h>
 
 #include <assert.h>
@@ -106,11 +107,11 @@ static PGresult *db_exec2(PGconn *conn, const char *sql, const char *rule,
 {
         PGresult *r = PQexec(conn, sql);
 
-        if (CY_LIKELY(PQresultStatus(r)) == PGRES_TUPLES_OK)
+        if (CY_LIKELY(PQresultStatus(r) == PGRES_TUPLES_OK))
                 return r;
 
         CY_AUTO(cy_utf8_t) *msg = cy_utf8_new(PQerrorMessage(conn));
-        *err = elmy_error_new(ELMY_STATUS_ERR_DBCONN, rule, msg);
+        *err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, rule, msg);
         PQclear(r);
         PQfinish(conn);
 
@@ -135,18 +136,39 @@ static PGresult *db_execp(PGconn *conn, const char *sql, const char *params[],
 }
 
 
+static PGresult *db_execp2(PGconn *conn, const char *sql, const char *params[],
+                          size_t nparams, const char *rule, elmy_error_t **err)
+{
+        PGresult *r = PQexecParams(conn, sql, nparams, NULL, params, NULL, NULL,
+                                   0);
+
+        if (CY_LIKELY(PQresultStatus(r) == PGRES_TUPLES_OK))
+                return r;
+
+        CY_AUTO(cy_utf8_t) *msg = cy_utf8_new(PQerrorMessage(conn));
+        *err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, rule, msg);
+        PQclear(r);
+        PQfinish(conn);
+
+        return NULL;
+}
+
+
 enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 {
         assert(res != NULL);
         assert(err != NULL && *err == NULL);
 
-        PGconn *c = db_connect2("count", err);
+        const char *sql = "SELECT * FROM logs_count();";
+        const char *rule = "count";
+
+        PGconn *c = db_connect2(rule, err);
         if (CY_UNLIKELY(!c)) {
                 *res = 0;
                 return elmy_error_status(*err);
         }
 
-        PGresult *r = db_exec(c, "SELECT * FROM logs_count();");
+        PGresult *r = db_exec2(c, sql, rule, err);
         if (CY_UNLIKELY(!r)) {
                 *res = 0;
                 return elmy_error_status(*err);
@@ -160,21 +182,35 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 }
 
 
-cy_utf8_t *elmy_rule_initial(const char *tz)
+enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
+                                   elmy_error_t **err)
 {
         assert(tz != NULL && *tz != '\0');
+        assert(res != NULL && *res == NULL);
+        assert(err != NULL && *err == NULL);
 
-        const char *p[] = {tz};
-        const char *s = "SELECT * FROM logs_ts_first($1);";
+        const char *rule = "initial";
+        const char *sql = "SELECT * FROM logs_ts_first($1);";
+        const char *params[] = {tz};
+        const size_t nparams = 1;
 
-        PGconn *c = db_connect();
-        PGresult *r = db_execp(c, s, p, sizeof (p) / sizeof (*p));
-        cy_utf8_t *res = cy_utf8_new(PQgetvalue(r, 0, 0));
+        PGconn *c = db_connect2(rule, err);
+        if (CY_UNLIKELY(!c)) {
+                *res = cy_utf8_new_empty();
+                return elmy_error_status(*err);
+        }
 
+        PGresult *r = db_execp2(c, sql, params, nparams, rule, err);
+        if (CY_UNLIKELY(!r)) {
+                *res = cy_utf8_new_empty();
+                return elmy_error_status(*err);
+        }
+
+        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
         PQclear(r);
         PQfinish(c);
 
-        return res;
+        return ELMY_STATUS_OK;
 }
 
 
