@@ -246,46 +246,58 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
 }
 
 
-elmy_logs_t *elmy_rule_all(const char *tz)
+enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
+                               elmy_logs_t **res, elmy_error_t **err)
 {
         assert(tz != NULL && *tz != '\0');
+        assert(pg != NULL);
+        assert(res != NULL && *res == NULL);
+        assert(err != NULL && *err == NULL);
 
-        const char *p[] = {tz};
-        const char *s = "SELECT * FROM logs_all($1);";
+        const char *rule = "all";
+        PGconn *conn = db_connect2(rule, err);
+        if (CY_UNLIKELY(!conn)) {
+                *res = NULL;
+                return elmy_error_status(*err);
+        }
 
-        PGconn *c = db_connect();
-        PGresult *r = db_execp(c, s, p, sizeof (p) / sizeof (*p));
-        elmy_logs_t *res = elmy_logs_parse__(r);
+        if (CY_UNLIKELY(!pg->row_start || !pg->row_count)) {
+                const char *params[] = {tz};
+                const char *sql = "SELECT * FROM logs_all($1);";
 
-        PQclear(r);
-        PQfinish(c);
+                PGresult *r = db_execp2(conn, sql, params, 1, rule, err);
+                if (CY_UNLIKELY(!r)) {
+                        *res = NULL;
+                        return elmy_error_status(*err);
+                }
 
-        return res;
-}
+                *res = elmy_logs_parse__(r);
+                PQclear(r);
+                PQfinish(conn);
 
-
-elmy_logs_t *elmy_rule_all_paged(const char *tz, const struct elmy_page *pg)
-{
-        assert(tz != NULL && *tz != '\0');
-        assert(pg != NULL && pg->row_start > 0 && pg->row_count > 0);
+                return ELMY_STATUS_OK;
+        }
 
         const char *col = sort_col(pg->sort_col);
         const char *dir = pg->sort_asc ? "asc" : "desc";
         char *start = sort_val(pg->row_start);
         char *count = sort_val(pg->row_count);
-        const char *p[] = {start, count, col, dir, tz};
-        const char *s = "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);";
+        const char *params[] = {start, count, col, dir, tz};
+        const char *sql = "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);";
 
-        PGconn *c = db_connect();
-        PGresult *r = db_execp(c, s, p, sizeof (p) / sizeof (*p));
-        elmy_logs_t *res = elmy_logs_parse__(r);
+        PGresult *r = db_execp2(conn, sql, params, 5, rule, err);
+        if (CY_UNLIKELY(!r)) {
+                *res = NULL;
+                return elmy_error_status(*err);
+        }
 
-        PQclear(r);
-        PQfinish(c);
+        *res = elmy_logs_parse__(r);
         cy_hptr_free((cy_hptr_t **) &start);
         cy_hptr_free((cy_hptr_t **) &count);
+        PQclear(r);
+        PQfinish(conn);
 
-        return res;
+        return ELMY_STATUS_OK;
 }
 
 
