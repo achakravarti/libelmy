@@ -122,24 +122,15 @@ enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
         const char *rule = "initial";
         const char *sql = "SELECT * FROM logs_ts_first($1);";
         const char *params[] = {tz};
-        const size_t nparams = 1;
+        CY_AUTO(db_t) *db = db_new(rule, sql);
 
-        PGconn *c = db_connect(rule, err);
-        if (CY_UNLIKELY(!c)) {
+        if (CY_UNLIKELY(db_exec_param(db, params))) {
                 *res = cy_utf8_new_empty();
+                *err = db_error(db);
                 return elmy_error_status(*err);
         }
 
-        PGresult *r = db_execp(c, sql, params, nparams, rule, err);
-        if (CY_UNLIKELY(!r)) {
-                *res = cy_utf8_new_empty();
-                return elmy_error_status(*err);
-        }
-
-        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
-        PQclear(r);
-        PQfinish(c);
-
+        *res = cy_utf8_new(PQgetvalue(db_result(db), 0, 0));
         return ELMY_STATUS_OK;
 }
 
@@ -154,24 +145,15 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
         const char *rule = "initial";
         const char *sql = "SELECT * FROM logs_ts_last($1);";
         const char *params[] = {tz};
-        const size_t nparams = 1;
+        CY_AUTO(db_t) *db = db_new(rule, sql);
 
-        PGconn *c = db_connect(rule, err);
-        if (CY_UNLIKELY(!c)) {
+        if (CY_UNLIKELY(db_exec_param(db, params))) {
                 *res = cy_utf8_new_empty();
+                *err = db_error(db);
                 return elmy_error_status(*err);
         }
 
-        PGresult *r = db_execp(c, sql, params, nparams, rule, err);
-        if (CY_UNLIKELY(!r)) {
-                *res = cy_utf8_new_empty();
-                return elmy_error_status(*err);
-        }
-
-        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
-        PQclear(r);
-        PQfinish(c);
-
+        *res = cy_utf8_new(PQgetvalue(db_result(db), 0, 0));
         return ELMY_STATUS_OK;
 }
 
