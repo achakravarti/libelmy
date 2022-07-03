@@ -36,8 +36,8 @@ elmy_error_t *elmy_error_new(enum elmy_status status, const char *rule,
         assert(msg != NULL && *msg != '\0');
 
         elmy_error_t *ctx = cy_hptr_new(sizeof *ctx);
-        ctx->rule = cy_utf8_new_empty();
-        ctx->msg = cy_utf8_new_empty();
+        ctx->rule = cy_utf8_new(rule);
+        ctx->msg = cy_utf8_new(msg);
 
         return ctx;
 }
