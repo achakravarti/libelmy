@@ -167,26 +167,19 @@ enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
         assert(err != NULL && *err == NULL);
 
         const char *rule = "all";
-        PGconn *conn = db_connect(rule, err);
-        if (CY_UNLIKELY(!conn)) {
-                *res = NULL;
-                return elmy_error_status(*err);
-        }
 
         if (CY_UNLIKELY(!pg->row_start || !pg->row_count)) {
                 const char *params[] = {tz};
                 const char *sql = "SELECT * FROM logs_all($1);";
+                CY_AUTO(db_t) *db = db_new(rule, sql);
 
-                PGresult *r = db_execp(conn, sql, params, 1, rule, err);
-                if (CY_UNLIKELY(!r)) {
+                if (CY_UNLIKELY(db_exec_param(db, params))) {
                         *res = NULL;
+                        *err = db_error(db);
                         return elmy_error_status(*err);
                 }
 
-                *res = elmy_logs_parse__(r);
-                PQclear(r);
-                PQfinish(conn);
-
+                *res = elmy_logs_parse__(db_result(db));
                 return ELMY_STATUS_OK;
         }
 
@@ -196,18 +189,18 @@ enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
         char *count = sort_val(pg->row_count);
         const char *params[] = {start, count, col, dir, tz};
         const char *sql = "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);";
+        CY_AUTO(db_t) *db = db_new(rule, sql);
 
-        PGresult *r = db_execp(conn, sql, params, 5, rule, err);
-        if (CY_UNLIKELY(!r)) {
+        if (CY_UNLIKELY(db_exec_param(db, params))) {
                 *res = NULL;
+                *err = db_error(db);
                 return elmy_error_status(*err);
         }
 
-        *res = elmy_logs_parse__(r);
+
+        *res = elmy_logs_parse__(db_result(db));
         cy_hptr_free((cy_hptr_t **) &start);
         cy_hptr_free((cy_hptr_t **) &count);
-        PQclear(r);
-        PQfinish(conn);
 
         return ELMY_STATUS_OK;
 }
