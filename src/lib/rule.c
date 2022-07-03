@@ -1,6 +1,6 @@
 #include "../../include/error.h"
 #include "../../include/rule.h"
-#include "db.c"
+#include "db.h"
 
 #include <libchrysalid/include/ext.h>
 #include <libchrysalid/include/hptr.h>
@@ -56,39 +56,6 @@ static char *sort_val(size_t val)
         snprintf(bfr, sz, "%zu", val);
 
         return bfr;
-}
-
-
-static PGconn *db_connect(const char *rule, elmy_error_t **err)
-{
-        PGconn *c = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
-
-        if (CY_LIKELY(PQstatus(c) == CONNECTION_OK))
-                return c;
-
-        CY_AUTO(cy_utf8_t) *msg = cy_utf8_new(PQerrorMessage(c));
-        *err = elmy_error_new(ELMY_STATUS_ERR_DBCONN, rule, msg);
-        PQfinish(c);
-
-        return NULL;
-}
-
-
-static PGresult *db_execp(PGconn *conn, const char *sql, const char *params[],
-                          size_t nparams, const char *rule, elmy_error_t **err)
-{
-        PGresult *r = PQexecParams(conn, sql, nparams, NULL, params, NULL, NULL,
-                                   0);
-
-        if (CY_LIKELY(PQresultStatus(r) == PGRES_TUPLES_OK))
-                return r;
-
-        CY_AUTO(cy_utf8_t) *msg = cy_utf8_new(PQerrorMessage(conn));
-        *err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, rule, msg);
-        PQclear(r);
-        PQfinish(conn);
-
-        return NULL;
 }
 
 

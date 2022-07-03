@@ -1,41 +1,10 @@
-#include "../../include/error.h"
+#include "db.h"
 
 #include <libchrysalid/include/hptr.h>
 #include <libchrysalid/include/utf8.h>
 #include <libpq-fe.h>
 
 #include <string.h>
-
-
-typedef struct {
-        enum elmy_status     status;
-        elmy_error_t        *err;
-        PGconn              *conn;
-        PGresult            *res;
-        cy_utf8_t           *rule;
-        cy_utf8_t           *sql;
-} db_t;
-
-
-static CY_SAFE db_t *
-db_new(const char *, const char *);
-
-static void
-db_t_free__(db_t **);
-
-#define db_free(ctx) db_t_free__(ctx)
-
-static CY_PSAFE enum elmy_status
-db_exec(db_t *);
-
-static CY_PSAFE enum elmy_status
-db_exec_param(db_t *, const char *[]);
-
-static CY_PSAFE PGresult *
-db_result(const db_t *);
-
-static CY_SAFE elmy_error_t *
-db_error(const db_t *);
 
 
 db_t *db_new(const char *rule, const char *sql)
