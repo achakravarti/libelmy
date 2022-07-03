@@ -214,21 +214,35 @@ enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
 }
 
 
-cy_utf8_t *elmy_rule_last(const char *tz)
+enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
+                                elmy_error_t **err)
 {
         assert(tz != NULL && *tz != '\0');
+        assert(res != NULL && *res == NULL);
+        assert(err != NULL && *err == NULL);
 
-        const char *p[] = {tz};
-        const char *s = "SELECT * FROM logs_ts_last($1);";
+        const char *rule = "initial";
+        const char *sql = "SELECT * FROM logs_ts_last($1);";
+        const char *params[] = {tz};
+        const size_t nparams = 1;
 
-        PGconn *c = db_connect();
-        PGresult *r = db_execp(c, s, p, sizeof (p) / sizeof (*p));
-        cy_utf8_t *res = cy_utf8_new(PQgetvalue(r, 0, 0));
+        PGconn *c = db_connect2(rule, err);
+        if (CY_UNLIKELY(!c)) {
+                *res = cy_utf8_new_empty();
+                return elmy_error_status(*err);
+        }
 
+        PGresult *r = db_execp2(c, sql, params, nparams, rule, err);
+        if (CY_UNLIKELY(!r)) {
+                *res = cy_utf8_new_empty();
+                return elmy_error_status(*err);
+        }
+
+        *res = cy_utf8_new(PQgetvalue(r, 0, 0));
         PQclear(r);
         PQfinish(c);
 
-        return res;
+        return ELMY_STATUS_OK;
 }
 
 

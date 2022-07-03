@@ -101,7 +101,7 @@ int hnd_count(void)
 
         if (CY_UNLIKELY(elmy_rule_count(&res, &err))) {
                 elmy_error_str(err);
-                return EXIT_FAILURE;
+                return elmy_error_status(err);
         }
 
         printf("%zu\n", res);
@@ -116,7 +116,7 @@ int hnd_initial(void)
 
         if (CY_UNLIKELY(elmy_rule_initial("asia/kolkata", &res, &err))) {
                 elmy_error_str(err);
-                return EXIT_FAILURE;
+                return elmy_error_status(err);
         }
 
         printf("%s\n", res);
@@ -126,8 +126,15 @@ int hnd_initial(void)
 
 int hnd_last(void)
 {
-        CY_AUTO(cy_utf8_t) *r = elmy_rule_last("asia/kolkata");
-        printf("%s\n", r);
+        CY_AUTO(cy_utf8_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        if (CY_UNLIKELY(elmy_rule_last("asia/kolkata", &res, &err))) {
+                elmy_error_str(err);
+                return elmy_error_status(err);
+        }
+
+        printf("%s\n", res);
         return EXIT_SUCCESS;
 }
 

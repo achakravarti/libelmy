@@ -23,8 +23,8 @@ elmy_rule_count(size_t *, elmy_error_t **);
 extern CY_PSAFE enum elmy_status
 elmy_rule_initial(const char *, cy_utf8_t **, elmy_error_t **);
 
-extern CY_PSAFE cy_utf8_t *
-elmy_rule_last(const char *);
+extern CY_PSAFE enum elmy_status
+elmy_rule_last(const char *, cy_utf8_t **, elmy_error_t **);
 
 extern CY_SAFE elmy_logs_t *
 elmy_rule_all(const char *);
