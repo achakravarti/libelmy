@@ -27,17 +27,11 @@ static int hnd_tag_paged(const char *);
 
 int hnd_all(void)
 {
-        struct elmy_page pg = {
-                .row_start = 0,
-                .row_count = 0,
-                .sort_col = ELMY_SORT_TS_EVENT,
-                .sort_asc = false
-        };
-
+        CY_AUTO(elmy_page_t) *pg = elmy_page_new_disabled();
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
 
-        if (CY_UNLIKELY(elmy_rule_all("asia/kolkata", &pg, &res, &err))) {
+        if (CY_UNLIKELY(elmy_rule_all("asia/kolkata", pg, &res, &err))) {
                 elmy_error_str(err);
                 return elmy_error_status(err);
         }
@@ -50,17 +44,13 @@ int hnd_all(void)
 
 int hnd_all_paged(void)
 {
-        struct elmy_page pg = {
-                .row_start = 1,
-                .row_count = 25,
-                .sort_col = ELMY_SORT_TS_EVENT,
-                .sort_asc = false
-        };
+        CY_AUTO(elmy_page_t) *pg = elmy_page_new(1, 25, ELMY_SORT_TS_EVENT,
+                                                 false);
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
 
-        if (CY_UNLIKELY(elmy_rule_all("asia/kolkata", &pg, &res, &err))) {
+        if (CY_UNLIKELY(elmy_rule_all("asia/kolkata", pg, &res, &err))) {
                 elmy_error_str(err);
                 return elmy_error_status(err);
         }

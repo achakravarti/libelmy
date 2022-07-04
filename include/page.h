@@ -66,7 +66,7 @@ extern CY_SAFE const char *
 elmy_page_col(const elmy_page_t *);
 
 extern CY_SAFE const char *
-elmy_page_asc(const elmy_page_t *);
+elmy_page_dir(const elmy_page_t *);
 
 
 /* C++ compatiblity */

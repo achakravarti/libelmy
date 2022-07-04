@@ -27,8 +27,8 @@ extern CY_PSAFE enum elmy_status
 elmy_rule_last(const char *, cy_utf8_t **, elmy_error_t **);
 
 extern CY_PSAFE enum elmy_status
-elmy_rule_all(const char *, const struct elmy_page *, elmy_logs_t **,
-               elmy_error_t **err);
+elmy_rule_all(const char *, const elmy_page_t *, elmy_logs_t **,
+               elmy_error_t **);
 
 extern int
 elmy_rule_facility(const char *, const struct elmy_page *,

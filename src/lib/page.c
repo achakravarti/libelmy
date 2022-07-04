@@ -11,7 +11,7 @@ struct elmy_page__ {
         cy_utf8_t   *start;
         cy_utf8_t   *count;
         cy_utf8_t   *col;
-        cy_utf8_t   *asc;
+        cy_utf8_t   *dir;
 };
 
 
@@ -71,7 +71,7 @@ elmy_page_t *elmy_page_new(size_t start, size_t count, enum elmy_sort col,
         ctx->start = size_str(start);
         ctx->count = size_str(count);
         ctx->col = col_str(col);
-        ctx->asc = cy_utf8_new(asc ? "asc" : "desc");
+        ctx->dir = cy_utf8_new(asc ? "asc" : "desc");
 
         return ctx;
 }
@@ -83,7 +83,7 @@ elmy_page_t *elmy_page_new_disabled(void)
         ctx->start = cy_utf8_new_empty();
         ctx->count = cy_utf8_new_empty();
         ctx->col = cy_utf8_new_empty();
-        ctx->asc = cy_utf8_new_empty();
+        ctx->dir = cy_utf8_new_empty();
 
         return ctx;
 }
@@ -105,7 +105,7 @@ elmy_page_t *elmy_page_clone(const elmy_page_t *ctx)
         cp->start = cy_utf8_clone(ctx->start);
         cp->count = cy_utf8_clone(ctx->count);
         cp->col = cy_utf8_clone(ctx->col);
-        cp->asc = cy_utf8_clone(ctx->asc);
+        cp->dir = cy_utf8_clone(ctx->dir);
 
         return cp;
 }
@@ -120,7 +120,7 @@ void elmy_page_t_free__(elmy_page_t **ctx)
                         cy_utf8_free(&p->start);
                         cy_utf8_free(&p->count);
                         cy_utf8_free(&p->col);
-                        cy_utf8_free(&p->asc);
+                        cy_utf8_free(&p->dir);
                 }
 
                 cy_hptr_free((cy_hptr_t **) ctx);
@@ -160,9 +160,9 @@ const char *elmy_page_col(const elmy_page_t *ctx)
 }
 
 
-const char *elmy_page_asc(const elmy_page_t *ctx)
+const char *elmy_page_dir(const elmy_page_t *ctx)
 {
         assert(ctx != NULL);
 
-        return ctx->asc;
+        return ctx->dir;
 }

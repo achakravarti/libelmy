@@ -125,7 +125,7 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
 }
 
 
-enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
+enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
                                elmy_logs_t **res, elmy_error_t **err)
 {
         assert(tz != NULL && *tz != '\0');
@@ -133,42 +133,32 @@ enum elmy_status elmy_rule_all(const char *tz, const struct elmy_page *pg,
         assert(res != NULL && *res == NULL);
         assert(err != NULL && *err == NULL);
 
+
         const char *rule = "all";
+        const char *sql = elmy_page_disabled(pg)
+                          ? "SELECT * FROM logs_all($1)"
+                          : "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);";
+        CY_AUTO(db_t) *db = db_new("all", sql);
 
-        if (CY_UNLIKELY(!pg->row_start || !pg->row_count)) {
+        enum elmy_status rc;
+        if (elmy_page_disabled(pg)) {
                 const char *params[] = {tz};
-                const char *sql = "SELECT * FROM logs_all($1);";
-                CY_AUTO(db_t) *db = db_new(rule, sql);
-
-                if (CY_UNLIKELY(db_exec_param(db, params))) {
-                        *res = NULL;
-                        *err = db_error(db);
-                        return elmy_error_status(*err);
-                }
-
-                *res = elmy_logs_parse__(db_result(db));
-                return ELMY_STATUS_OK;
+                rc = db_exec_param(db, params);
+        } else {
+                const char *params[] = {
+                        elmy_page_start(pg), elmy_page_count(pg),
+                        elmy_page_col(pg), elmy_page_dir(pg), tz
+                };
+                rc = db_exec_param(db, params);
         }
 
-        const char *col = sort_col(pg->sort_col);
-        const char *dir = pg->sort_asc ? "asc" : "desc";
-        char *start = sort_val(pg->row_start);
-        char *count = sort_val(pg->row_count);
-        const char *params[] = {start, count, col, dir, tz};
-        const char *sql = "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);";
-        CY_AUTO(db_t) *db = db_new(rule, sql);
-
-        if (CY_UNLIKELY(db_exec_param(db, params))) {
+        if (CY_UNLIKELY(rc)) {
                 *res = NULL;
                 *err = db_error(db);
-                return elmy_error_status(*err);
+                return rc;
         }
 
-
         *res = elmy_logs_parse__(db_result(db));
-        cy_hptr_free((cy_hptr_t **) &start);
-        cy_hptr_free((cy_hptr_t **) &count);
-
         return ELMY_STATUS_OK;
 }
 
