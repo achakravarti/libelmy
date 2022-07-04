@@ -33,14 +33,16 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 
         CY_AUTO(db_t) *db = db_new(RULE_COUNT, SQL_COUNT);
 
-        if (CY_UNLIKELY(db_exec(db))) {
-                *res = 0;
-                *err = db_error(db);
-                return elmy_error_status(*err);
-        }
+        if (CY_UNLIKELY(db_exec(db)))
+                goto error;
 
         *res = strtoumax(PQgetvalue(db_result(db), 0, 0), NULL, 10);
         return ELMY_STATUS_OK;
+
+error:
+        *res = 0;
+        *err = db_error(db);
+        return elmy_error_status(*err);
 }
 
 
@@ -51,10 +53,9 @@ enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
         assert(res != NULL && *res == NULL);
         assert(err != NULL && *err == NULL);
 
-        const char *params[] = {tz};
         CY_AUTO(db_t) *db = db_new(RULE_INITIAL, SQL_INITIAL);
 
-        if (CY_UNLIKELY(db_exec_param(db, params))) {
+        if (CY_UNLIKELY(db_exec_param(db, (const char *[1]) {tz}))) {
                 *res = cy_utf8_new_empty();
                 *err = db_error(db);
                 return elmy_error_status(*err);
@@ -72,11 +73,9 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
         assert(res != NULL && *res == NULL);
         assert(err != NULL && *err == NULL);
 
-        const char *sql = "SELECT * FROM logs_ts_last($1);";
-        const char *params[] = {tz};
         CY_AUTO(db_t) *db = db_new(RULE_LAST, SQL_LAST);
 
-        if (CY_UNLIKELY(db_exec_param(db, params))) {
+        if (CY_UNLIKELY(db_exec_param(db, (const char *[1]) {tz}))) {
                 *res = cy_utf8_new_empty();
                 *err = db_error(db);
                 return elmy_error_status(*err);
@@ -95,30 +94,29 @@ enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
         assert(res != NULL && *res == NULL);
         assert(err != NULL && *err == NULL);
 
-
-        CY_AUTO(db_t) *db = db_new(RULE_ALL, elmy_page_disabled(pg)
-                                   ? SQL_ALL : SQL_ALL_PAGED);
-
+        CY_AUTO(db_t) *db;
         enum elmy_status rc;
+
         if (elmy_page_disabled(pg)) {
-                const char *params[] = {tz};
-                rc = db_exec_param(db, params);
+                db = db_new(RULE_ALL, SQL_ALL);
+                rc = db_exec_param(db, (const char *[1]) {tz});
         } else {
-                const char *params[] = {
-                        elmy_page_start(pg), elmy_page_count(pg),
-                        elmy_page_col(pg), elmy_page_dir(pg), tz
-                };
-                rc = db_exec_param(db, params);
+                const char *p[] = {elmy_page_start(pg), elmy_page_count(pg),
+                                   elmy_page_col(pg), elmy_page_dir(pg), tz};
+                db = db_new(RULE_ALL, SQL_ALL_PAGED);
+                rc = db_exec_param(db, p);
         }
 
-        if (CY_UNLIKELY(rc)) {
-                *res = NULL;
-                *err = db_error(db);
-                return rc;
-        }
+        if (CY_UNLIKELY(rc))
+                goto error;
 
         *res = elmy_logs_parse__(db_result(db));
         return ELMY_STATUS_OK;
+
+error:
+        *res = NULL;
+        *err = db_error(db);
+        return rc;
 }
 
 
