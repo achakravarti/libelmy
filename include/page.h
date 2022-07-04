@@ -53,6 +53,9 @@ elmy_page_t_free__(elmy_page_t **);
 #define elmy_page_free(ctx) \
 elmy_page_t_free__(ctx)
 
+extern CY_PSAFE bool
+elmy_page_disabled(const elmy_page_t *);
+
 extern CY_SAFE const char *
 elmy_page_start(const elmy_page_t *);
 
