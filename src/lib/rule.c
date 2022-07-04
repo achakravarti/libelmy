@@ -14,49 +14,16 @@
 #include <stdlib.h>
 
 
-static const char *sort_col(enum elmy_sort sort)
-{
-        switch (sort) {
-        case ELMY_SORT_TS:
-                return "receivedat";
-                break;
+#define RULE_COUNT      "count"
+#define RULE_INITIAL    "initial"
+#define RULE_LAST       "last"
+#define RULE_ALL        "all"
 
-        case ELMY_SORT_FACILITY:
-                return "facility";
-                break;
-
-        case ELMY_SORT_SEVERITY:
-                return "priority";
-                break;
-
-        case ELMY_SORT_HOSTNAME:
-                return "fromhost";
-                break;
-
-        case ELMY_SORT_TAG:
-                return "syslogtag";
-                break;
-
-        case ELMY_SORT_MESSAGE:
-                return "message";
-                break;
-
-        case ELMY_SORT_TS_EVENT:
-        default:
-                return "devicereportedtime";
-                break;
-        }
-}
-
-
-static char *sort_val(size_t val)
-{
-        size_t sz = snprintf(NULL, 0, "%zu", val) + 1;
-        char *bfr = cy_hptr_new(sz);
-        snprintf(bfr, sz, "%zu", val);
-
-        return bfr;
-}
+#define SQL_COUNT       "SELECT * FROM logs_count();"
+#define SQL_INITIAL     "SELECT * FROM logs_ts_first($1);"
+#define SQL_LAST        "SELECT * FROM logs_ts_last($1);"
+#define SQL_ALL         "SELECT * FROM logs_all($1);"
+#define SQL_ALL_PAGED   "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);"
 
 
 enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
@@ -64,9 +31,7 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
         assert(res != NULL);
         assert(err != NULL && *err == NULL);
 
-        const char *sql = "SELECT * FROM logs_count();";
-        const char *rule = "count";
-        CY_AUTO(db_t) *db = db_new(rule, sql);
+        CY_AUTO(db_t) *db = db_new(RULE_COUNT, SQL_COUNT);
 
         if (CY_UNLIKELY(db_exec(db))) {
                 *res = 0;
@@ -86,10 +51,8 @@ enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
         assert(res != NULL && *res == NULL);
         assert(err != NULL && *err == NULL);
 
-        const char *rule = "initial";
-        const char *sql = "SELECT * FROM logs_ts_first($1);";
         const char *params[] = {tz};
-        CY_AUTO(db_t) *db = db_new(rule, sql);
+        CY_AUTO(db_t) *db = db_new(RULE_INITIAL, SQL_INITIAL);
 
         if (CY_UNLIKELY(db_exec_param(db, params))) {
                 *res = cy_utf8_new_empty();
@@ -109,10 +72,9 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
         assert(res != NULL && *res == NULL);
         assert(err != NULL && *err == NULL);
 
-        const char *rule = "initial";
         const char *sql = "SELECT * FROM logs_ts_last($1);";
         const char *params[] = {tz};
-        CY_AUTO(db_t) *db = db_new(rule, sql);
+        CY_AUTO(db_t) *db = db_new(RULE_LAST, SQL_LAST);
 
         if (CY_UNLIKELY(db_exec_param(db, params))) {
                 *res = cy_utf8_new_empty();
@@ -134,11 +96,8 @@ enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
         assert(err != NULL && *err == NULL);
 
 
-        const char *rule = "all";
-        const char *sql = elmy_page_disabled(pg)
-                          ? "SELECT * FROM logs_all($1)"
-                          : "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);";
-        CY_AUTO(db_t) *db = db_new("all", sql);
+        CY_AUTO(db_t) *db = db_new(RULE_ALL, elmy_page_disabled(pg)
+                                   ? SQL_ALL : SQL_ALL_PAGED);
 
         enum elmy_status rc;
         if (elmy_page_disabled(pg)) {
