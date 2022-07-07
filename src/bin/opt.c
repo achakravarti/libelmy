@@ -206,8 +206,8 @@ int opt_proc(int argc, char **argv)
         struct opt_data d = (struct opt_data) { 0 };
         opt_parse(argc, argv, &d);
 
-        if (!opt_check(argc, argv, &d))
-                return EXIT_FAILURE;
+        /*if (!opt_check(argc, argv, &d))
+                return EXIT_FAILURE;*/
 
         if (d.help)
                 return hnd_help();
