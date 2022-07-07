@@ -32,7 +32,6 @@ struct opt_data {
         bool help;
         bool version;
         bool error;
-        bool rule;
         cy_utf8_t *facility_arg;
         cy_utf8_t *severity_arg;
         cy_utf8_t *hostname_arg;
@@ -42,7 +41,6 @@ struct opt_data {
         cy_utf8_t *sortdir_arg;
         cy_utf8_t *rowstart_arg;
         cy_utf8_t *rowcount_arg;
-        cy_utf8_t *rule_arg;
 };
 
 
@@ -62,7 +60,6 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
                 {"tag", required_argument, NULL, 't'},
                 {"message", required_argument, NULL, 'm'},
                 {"paged", no_argument, NULL, 'p'},
-                {"rule", required_argument, NULL, 'r'},
                 {"sort-col", required_argument, NULL, OPT_SORT_COL},
                 {"sort-dir", required_argument, NULL, OPT_SORT_DIR},
                 {"row-start", required_argument, NULL, OPT_ROW_START},
@@ -75,7 +72,7 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
         register int o;
 
         while (1) {
-                o = getopt_long(argc, argv, "r:cilaf:s:n:t:m:phv", opts, NULL);
+                o = getopt_long(argc, argv, "cilaf:s:n:t:m:phv", opts, NULL);
 
                 if (o == -1)
                         return;
@@ -124,11 +121,6 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
 
                 case 'p':
                         data->paged = true;
-                        break;
-
-                case 'r':
-                        data->rule = true;
-                        data->rule_arg = cy_utf8_new(optarg);
                         break;
 
                 case OPT_SORT_COL:
@@ -255,7 +247,6 @@ int opt_proc(int argc, char **argv)
         cy_utf8_free(&d.sortdir_arg);
         cy_utf8_free(&d.rowstart_arg);
         cy_utf8_free(&d.rowcount_arg);
-        cy_utf8_free(&d.rule_arg);
 
         return EXIT_SUCCESS;
 }
