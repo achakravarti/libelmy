@@ -8,6 +8,12 @@
 #include <getopt.h>
 
 
+#define OPT_SORT_COL 1000
+#define OPT_SORT_DIR 1001
+#define OPT_ROW_START 1002
+#define OPT_ROW_COUNT 1003
+
+
 struct opt_data {
         bool count;
         bool initial;
@@ -19,6 +25,10 @@ struct opt_data {
         bool tag;
         bool message;
         bool paged;
+        bool sortcol;
+        bool sortdir;
+        bool rowstart;
+        bool rowcount;
         bool help;
         bool version;
         bool error;
@@ -27,6 +37,10 @@ struct opt_data {
         cy_utf8_t *hostname_arg;
         cy_utf8_t *tag_arg;
         cy_utf8_t *message_arg;
+        cy_utf8_t *sortcol_arg;
+        cy_utf8_t *sortdir_arg;
+        cy_utf8_t *rowstart_arg;
+        cy_utf8_t *rowcount_arg;
 };
 
 
@@ -46,6 +60,10 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
                 {"tag", required_argument, NULL, 't'},
                 {"message", required_argument, NULL, 'm'},
                 {"paged", no_argument, NULL, 'p'},
+                {"sort-col", required_argument, NULL, OPT_SORT_COL},
+                {"sort-dir", required_argument, NULL, OPT_SORT_DIR},
+                {"row-start", required_argument, NULL, OPT_ROW_START},
+                {"row-count", required_argument, NULL, OPT_ROW_COUNT},
                 {"help", no_argument, NULL, 'h'},
                 {"version", no_argument, NULL, 'v'},
                 { 0 }
@@ -105,6 +123,26 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
                         data->paged = true;
                         break;
 
+                case OPT_SORT_COL:
+                        data->sortcol = true;
+                        data->sortcol_arg = cy_utf8_new(optarg);
+                        break;
+
+                case OPT_SORT_DIR:
+                        data->sortdir = true;
+                        data->sortdir_arg = cy_utf8_new(optarg);
+                        break;
+
+                case OPT_ROW_START:
+                        data->rowstart = true;
+                        data->rowcount_arg = cy_utf8_new(optarg);
+                        break;
+
+                case OPT_ROW_COUNT:
+                        data->rowcount = true;
+                        data->rowcount_arg = cy_utf8_new(optarg);
+                        break;
+
                 case 'h':
                         data->help = true;
                         break;
@@ -114,9 +152,6 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
                         break;
 
                 case '?':
-                        data->error = true;
-                        break;
-
                 default:
                         data->error = true;
                         break;
@@ -208,6 +243,10 @@ int opt_proc(int argc, char **argv)
         cy_utf8_free(&d.hostname_arg);
         cy_utf8_free(&d.tag_arg);
         cy_utf8_free(&d.message_arg);
+        cy_utf8_free(&d.sortcol_arg);
+        cy_utf8_free(&d.sortdir_arg);
+        cy_utf8_free(&d.rowstart_arg);
+        cy_utf8_free(&d.rowcount_arg);
 
         return EXIT_SUCCESS;
 }
