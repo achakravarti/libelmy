@@ -22,7 +22,7 @@ struct opt {
 };
 
 
-struct opt *opt_new(int argc, char *argv[])
+static struct opt *opt_new(int argc, char *argv[])
 {
         struct opt *ctx = cy_hptr_new(sizeof *ctx);
 
@@ -85,6 +85,22 @@ struct opt *opt_new(int argc, char *argv[])
         }
 
         return ctx;
+}
+
+static void opt_free(struct opt **ctx)
+{
+        struct opt *o;
+
+        if (CY_LIKELY(ctx && (o = *ctx))) {
+                cy_utf8_free(&o->timezone);
+                cy_utf8_free(&o->filter);
+                cy_utf8_free(&o->sortcol);
+                cy_utf8_free(&o->sortdir);
+                cy_utf8_free(&o->rowstart);
+                cy_utf8_free(&o->rowcount);
+        }
+
+        cy_hptr_free((cy_hptr_t **) ctx);
 }
 
 
