@@ -1,6 +1,6 @@
 #include "hnd.c"
 
-#include <libchrysalid/utf8.h>
+#include <libchrysalid/include/utf8.h>
 
 #include <stdbool.h>
 #include <stdlib.h>

@@ -1,6 +1,6 @@
 #include "../../include/rule.h"
 
-#include <libchrysalid/ext.h>
+#include <libchrysalid/include/ext.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,27 +27,36 @@ static int hnd_tag_paged(const char *);
 
 int hnd_all(void)
 {
-        CY_AUTO(elmy_logs_t) *r = elmy_rule_all("asia/kolkata");
-        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_JSON);
-        printf("%s\n", s);
+        CY_AUTO(elmy_page_t) *pg = elmy_page_new_disabled();
+        CY_AUTO(elmy_logs_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
 
+        if (CY_UNLIKELY(elmy_rule_all("asia/kolkata", pg, &res, &err))) {
+                elmy_error_str(err);
+                return elmy_error_status(err);
+        }
+
+        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(res, ELMY_LOGS_FORMAT_JSON);
+        printf("%s\n", s);
         return EXIT_SUCCESS;
 }
 
 
 int hnd_all_paged(void)
 {
-        struct elmy_page pg = {
-                .row_start = 1,
-                .row_count = 25,
-                .sort_col = ELMY_SORT_TS_EVENT,
-                .sort_asc = false
-        };
+        CY_AUTO(elmy_page_t) *pg = elmy_page_new(1, 25, ELMY_SORT_TS_EVENT,
+                                                 false);
 
-        CY_AUTO(elmy_logs_t) *r = elmy_rule_all_paged("asia/kolkata", &pg);
-        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(r, ELMY_LOGS_FORMAT_JSON);
+        CY_AUTO(elmy_logs_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        if (CY_UNLIKELY(elmy_rule_all("asia/kolkata", pg, &res, &err))) {
+                elmy_error_str(err);
+                return elmy_error_status(err);
+        }
+
+        CY_AUTO(cy_utf8_t) *s = elmy_logs_print(res, ELMY_LOGS_FORMAT_JSON);
         printf("%s\n", s);
-
         return EXIT_SUCCESS;
 }
 
@@ -96,23 +105,45 @@ int hnd_message_paged(const char *arg)
 
 int hnd_count(void)
 {
-        printf("%zu\n", elmy_rule_count());
+        size_t res;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        if (CY_UNLIKELY(elmy_rule_count(&res, &err))) {
+                elmy_error_str(err);
+                return elmy_error_status(err);
+        }
+
+        printf("%zu\n", res);
         return EXIT_SUCCESS;
 }
 
 
 int hnd_initial(void)
 {
-        CY_AUTO(cy_utf8_t) *r = elmy_rule_initial("asia/kolkata");
-        printf("%s\n", r);
+        CY_AUTO(cy_utf8_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        if (CY_UNLIKELY(elmy_rule_initial("asia/kolkata", &res, &err))) {
+                elmy_error_str(err);
+                return elmy_error_status(err);
+        }
+
+        printf("%s\n", res);
         return EXIT_SUCCESS;
 }
 
 
 int hnd_last(void)
 {
-        CY_AUTO(cy_utf8_t) *r = elmy_rule_last("asia/kolkata");
-        printf("%s\n", r);
+        CY_AUTO(cy_utf8_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        if (CY_UNLIKELY(elmy_rule_last("asia/kolkata", &res, &err))) {
+                elmy_error_str(err);
+                return elmy_error_status(err);
+        }
+
+        printf("%s\n", res);
         return EXIT_SUCCESS;
 }
 

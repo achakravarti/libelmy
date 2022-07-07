@@ -6,8 +6,8 @@
 #include "error.h"
 #include "page.h"
 
-#include <libchrysalid/log.h>
-#include <libchrysalid/utf8.h>
+#include <libchrysalid/include/log.h>
+#include <libchrysalid/include/utf8.h>
 
 #include <stddef.h>
 
@@ -17,20 +17,18 @@ extern "C" {
 #endif
 
 
-extern size_t
-elmy_rule_count(void);
+extern CY_PSAFE enum elmy_status
+elmy_rule_count(size_t *, elmy_error_t **);
 
-extern CY_PSAFE cy_utf8_t *
-elmy_rule_initial(const char *);
+extern CY_PSAFE enum elmy_status
+elmy_rule_initial(const char *, cy_utf8_t **, elmy_error_t **);
 
-extern CY_PSAFE cy_utf8_t *
-elmy_rule_last(const char *);
+extern CY_PSAFE enum elmy_status
+elmy_rule_last(const char *, cy_utf8_t **, elmy_error_t **);
 
-extern CY_SAFE elmy_logs_t *
-elmy_rule_all(const char *);
-
-extern CY_SAFE elmy_logs_t *
-elmy_rule_all_paged(const char *, const struct elmy_page *);
+extern CY_PSAFE enum elmy_status
+elmy_rule_all(const char *, const elmy_page_t *, elmy_logs_t **,
+               elmy_error_t **);
 
 extern int
 elmy_rule_facility(const char *, const struct elmy_page *,

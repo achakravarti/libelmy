@@ -1,7 +1,7 @@
 #include "../../include/logs.h"
 
-#include <libchrysalid/hptr.h>
-#include <libchrysalid/utf8.h>
+#include <libchrysalid/include/hptr.h>
+#include <libchrysalid/include/utf8.h>
 #include <libpq-fe.h>
 
 #include <assert.h>

@@ -2,7 +2,7 @@
 #ifndef __LIBELMY_INCLUDE_PAGE_H__
 #define __LIBELMY_INCLUDE_PAGE_H__
 
-#include <libchrysalid/ext.h>
+#include <libchrysalid/include/ext.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -30,6 +30,43 @@ struct elmy_page {
         enum elmy_sort  sort_col;
         bool            sort_asc;
 };
+
+
+typedef struct elmy_page__  elmy_page_t;
+
+
+extern CY_RSAFE elmy_page_t *
+elmy_page_new(size_t, size_t, enum elmy_sort, bool);
+
+extern CY_RSAFE elmy_page_t *
+elmy_page_new_disabled(void);
+
+extern CY_SAFE elmy_page_t *
+elmy_page_copy(const elmy_page_t *);
+
+extern CY_SAFE elmy_page_t *
+elmy_page_clone(const elmy_page_t *);
+
+extern void
+elmy_page_t_free__(elmy_page_t **);
+
+#define elmy_page_free(ctx) \
+elmy_page_t_free__(ctx)
+
+extern CY_PSAFE bool
+elmy_page_disabled(const elmy_page_t *);
+
+extern CY_SAFE const char *
+elmy_page_start(const elmy_page_t *);
+
+extern CY_SAFE const char *
+elmy_page_count(const elmy_page_t *);
+
+extern CY_SAFE const char *
+elmy_page_col(const elmy_page_t *);
+
+extern CY_SAFE const char *
+elmy_page_dir(const elmy_page_t *);
 
 
 /* C++ compatiblity */
