@@ -8,39 +8,47 @@
 #include <getopt.h>
 
 
-#define OPT_SORT_COL 1000
-#define OPT_SORT_DIR 1001
-#define OPT_ROW_START 1002
-#define OPT_ROW_COUNT 1003
+//#define OPT_SORT_COL 1000
+//#define OPT_SORT_DIR 1001
+//#define OPT_ROW_START 1002
+//#define OPT_ROW_COUNT 1003
 
 
 struct opt_data {
-        bool count;
-        bool initial;
-        bool last;
-        bool all;
-        bool facility;
-        bool severity;
-        bool hostname;
-        bool tag;
-        bool message;
-        bool paged;
-        bool sortcol;
-        bool sortdir;
-        bool rowstart;
-        bool rowcount;
+        //bool count;
+        //bool initial;
+        //bool last;
+        //bool all;
+        //bool facility;
+        //bool severity;
+        //bool hostname;
+        //bool tag;
+        //bool message;
+        //bool paged;
+        //bool sortcol;
+        //bool sortdir;
+        //bool rowstart;
+        //bool rowcount;
+        //bool help;
+        //bool version;
+        //bool error;
+        //cy_utf8_t *facility_arg;
+        //cy_utf8_t *severity_arg;
+        //cy_utf8_t *hostname_arg;
+        //cy_utf8_t *tag_arg;
+        //cy_utf8_t *message_arg;
+        //cy_utf8_t *sortcol_arg;
+        //cy_utf8_t *sortdir_arg;
+        //cy_utf8_t *rowstart_arg;
+        //cy_utf8_t *rowcount_arg;
         bool help;
         bool version;
-        bool error;
-        cy_utf8_t *facility_arg;
-        cy_utf8_t *severity_arg;
-        cy_utf8_t *hostname_arg;
-        cy_utf8_t *tag_arg;
-        cy_utf8_t *message_arg;
-        cy_utf8_t *sortcol_arg;
-        cy_utf8_t *sortdir_arg;
-        cy_utf8_t *rowstart_arg;
-        cy_utf8_t *rowcount_arg;
+        cy_utf8_t *timezone;
+        cy_utf8_t *filter;
+        cy_utf8_t *sortcol;
+        cy_utf8_t *sortdir;
+        cy_utf8_t *rowstart;
+        cy_utf8_t *rowcount;
 };
 
 
@@ -50,20 +58,27 @@ struct opt_data {
 void opt_parse(int argc, char **argv, struct opt_data *data)
 {
         struct option opts[] = {
-                {"count", no_argument, NULL, 'c'},
-                {"initial", no_argument, NULL, 'i'},
-                {"last", no_argument, NULL, 'l'},
-                {"all", no_argument, NULL, 'a'},
-                {"facility", required_argument, NULL, 'f'},
-                {"severity", required_argument, NULL, 's'},
-                {"hostname", required_argument, NULL, 'n'},
-                {"tag", required_argument, NULL, 't'},
-                {"message", required_argument, NULL, 'm'},
-                {"paged", no_argument, NULL, 'p'},
-                {"sort-col", required_argument, NULL, OPT_SORT_COL},
-                {"sort-dir", required_argument, NULL, OPT_SORT_DIR},
-                {"row-start", required_argument, NULL, OPT_ROW_START},
-                {"row-count", required_argument, NULL, OPT_ROW_COUNT},
+                //{"count", no_argument, NULL, 'c'},
+                //{"initial", no_argument, NULL, 'i'},
+                //{"last", no_argument, NULL, 'l'},
+                //{"all", no_argument, NULL, 'a'},
+                //{"facility", required_argument, NULL, 'f'},
+                //{"severity", required_argument, NULL, 's'},
+                //{"hostname", required_argument, NULL, 'n'},
+                //{"t", required_argument, NULL, 't'},
+                //{"message", required_argument, NULL, 'm'},
+                //{"paged", no_argument, NULL, 'p'},
+                //{"sort-col", required_argument, NULL, OPT_SORT_COL},
+                //{"sort-dir", required_argument, NULL, OPT_SORT_DIR},
+                //{"row-start", required_argument, NULL, OPT_ROW_START},
+                //{"row-count", required_argument, NULL, OPT_ROW_COUNT},
+
+                {"timezone", required_argument, NULL, 't'},
+                {"filter", required_argument, NULL, 'f'},
+                {"sortcol", required_argument, NULL, 'c'},
+                {"sortdir", required_argument, NULL, 'd'},
+                {"rowstart", required_argument, NULL, 's'},
+                {"rowcount", required_argument, NULL, 's'},
                 {"help", no_argument, NULL, 'h'},
                 {"version", no_argument, NULL, 'v'},
                 { 0 }
@@ -77,7 +92,7 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
                 if (o == -1)
                         return;
 
-                switch (o) {
+                /*switch (o) {
                 case 'c':
                         data->count = true;
                         break;
@@ -155,7 +170,7 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
                 default:
                         data->error = true;
                         break;
-                }
+                }*/
         }
 
         argc -= optind;
@@ -165,7 +180,7 @@ void opt_parse(int argc, char **argv, struct opt_data *data)
 
 bool opt_check(int argc, char **argv, const struct opt_data *data)
 {
-        if (data->error) {
+        /*if (data->error) {
                 hnd_help();
                 return false;
         }
@@ -183,7 +198,7 @@ bool opt_check(int argc, char **argv, const struct opt_data *data)
                 || data->last))
                 goto combo_error;
 
-        return true;
+        return true;*/
 
 combo_error:
         fprintf(stderr, "%s: unknown argument combination\n", argv[0]);
@@ -207,7 +222,7 @@ int opt_proc(int argc, char **argv)
         if (d.version)
                 return hnd_version();
 
-        if (d.count)
+        /*if (d.count)
                 return hnd_count();
 
         if (d.initial)
@@ -246,7 +261,14 @@ int opt_proc(int argc, char **argv)
         cy_utf8_free(&d.sortcol_arg);
         cy_utf8_free(&d.sortdir_arg);
         cy_utf8_free(&d.rowstart_arg);
-        cy_utf8_free(&d.rowcount_arg);
+        cy_utf8_free(&d.rowcount_arg);*/
+
+        cy_utf8_free(&d.timezone);
+        cy_utf8_free(&d.filter);
+        cy_utf8_free(&d.sortcol);
+        cy_utf8_free(&d.sortdir);
+        cy_utf8_free(&d.rowstart);
+        cy_utf8_free(&d.rowcount);
 
         return EXIT_SUCCESS;
 }
