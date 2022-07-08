@@ -104,17 +104,29 @@ static void opt_free(struct opt **ctx)
 }
 
 
+static void proc_usage(void)
+{
+        printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
+                "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
+                "\t\t[-n,--hostname string [-p,--paged]]"
+                " [-s,--severity csv [-p,--paged]]\n"
+                "\t\t[-m,--message string [-p,--paged]]"
+                " [-t,--tag string [-p,--paged]]\n"
+                "\t[-h,--help] [-v,--version]\n");
+}
+
+
 static int proc_error(const struct opt *o, int argc, char *argv[])
 {
         if (argc == 1) {
                 fprintf(stderr, "%s: missing argument or option\n", argv[0]);
-                hnd_help();
+                proc_usage();
                 return EXIT_FAILURE;
         }
 
         if (o->error) {
                 fprintf(stderr, "%s: invalid argument or option(s)\n", argv[0]);
-                hnd_help();
+                proc_usage();
                 return EXIT_FAILURE;
         }
 
@@ -128,17 +140,11 @@ static int proc_help(const struct opt *o, int argc, char *argv[])
                 if (argc > 2) {
                         fprintf(stderr, "%s: invalid argument or option(s)\n",
                                 argv[0]);
-                        hnd_help();
+                        proc_usage();
                         return EXIT_FAILURE;
                 }
 
-                printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
-                       "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
-                       "\t\t[-n,--hostname string [-p,--paged]]"
-                       " [-s,--severity csv [-p,--paged]]\n"
-                       "\t\t[-m,--message string [-p,--paged]]"
-                       " [-t,--tag string [-p,--paged]]\n"
-                       "\t[-h,--help] [-v,--version]\n");
+                proc_usage();
         }
 
         return EXIT_SUCCESS;
@@ -151,7 +157,7 @@ static int proc_version(const struct opt *o, int argc, char *argv[])
                 if (argc > 2) {
                         fprintf(stderr, "%s: invalid argument or option(s)\n",
                                 argv[0]);
-                        hnd_help();
+                        proc_usage();
                         return EXIT_FAILURE;
                 }
 
@@ -163,6 +169,32 @@ static int proc_version(const struct opt *o, int argc, char *argv[])
         return EXIT_SUCCESS;
 }
 
+
+static int proc_count(const struct opt *o, int argc, char *argv[])
+{
+        if (!strcmp(argv[argc - 1], "count")) {
+                if (argc > 2) {
+                        fprintf(stderr, "%s: invalid argument or option(s)\n",
+                                argv[0]);
+                        proc_usage();
+                        return EXIT_FAILURE;
+                }
+
+                size_t res;
+                CY_AUTO(elmy_error_t) *err = NULL;
+
+                if (CY_UNLIKELY(elmy_rule_count(&res, &err))) {
+                        elmy_error_str(err);
+                        return elmy_error_status(err);
+                }
+
+                printf("%zu\n", res);
+        }
+
+        return EXIT_SUCCESS;
+}
+
+
 static int run_rule(const struct opt *o, int argc, char *argv[])
 {
         if (proc_error(o, argc, argv))
@@ -172,6 +204,9 @@ static int run_rule(const struct opt *o, int argc, char *argv[])
                 return EXIT_FAILURE;
 
         if (proc_version(o, argc, argv))
+                return EXIT_FAILURE;
+
+        if (proc_count(o, argc, argv))
                 return EXIT_FAILURE;
 
         /*const char *rule = argv[argc - 1];
