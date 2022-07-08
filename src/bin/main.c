@@ -92,8 +92,8 @@ static struct opt *opt_new(int argc, char *argv[])
                         break;
                 }
 
-                argc -= optind;
-                argv += optind;
+                //argc -= optind;
+                //argv += optind;
         }
 
         return ctx;
@@ -268,10 +268,6 @@ static int proc_all(const struct opt *o, int argc, char *argv[])
                                                                o->sortdir);
                 CY_AUTO(elmy_logs_t) *res = NULL;
                 CY_AUTO(elmy_error_t) *err = NULL;
-
-                printf("DIR = %s\n", o->sortdir);
-                printf("DIR = %s\n", elmy_page_dir(pg));
-                printf("COL = %s\n", elmy_page_col(pg));
 
                 if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
                         return show_error(err);
