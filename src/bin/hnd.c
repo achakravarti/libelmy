@@ -103,21 +103,6 @@ int hnd_message_paged(const char *arg)
 }
 
 
-int hnd_count(void)
-{
-        size_t res;
-        CY_AUTO(elmy_error_t) *err = NULL;
-
-        if (CY_UNLIKELY(elmy_rule_count(&res, &err))) {
-                elmy_error_str(err);
-                return elmy_error_status(err);
-        }
-
-        printf("%zu\n", res);
-        return EXIT_SUCCESS;
-}
-
-
 int hnd_initial(void)
 {
         CY_AUTO(cy_utf8_t) *res = NULL;
