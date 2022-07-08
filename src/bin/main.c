@@ -253,6 +253,30 @@ static int proc_last(const struct opt *o, int argc, char *argv[])
 }
 
 
+static int proc_all(const struct opt *o, int argc, char *argv[])
+{
+        if (!strcmp(argv[argc - 1], "all")) {
+                if (CY_UNLIKELY(argc < 3 && argc > 7))
+                        return show_invalid(argv);
+
+                if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
+                        return show_missing(argv);
+
+                CY_AUTO(elmy_page_t) *pg = elmy_page_new_disabled();
+                CY_AUTO(elmy_logs_t) *res = NULL;
+                CY_AUTO(elmy_error_t) *err = NULL;
+
+                if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
+                        return show_error(err);
+
+                CY_AUTO(cy_utf8_t) *s = elmy_logs_print(res, ELMY_LOGS_FORMAT_JSON);
+                printf("%s\n", s);
+        }
+
+        return EXIT_SUCCESS;
+}
+
+
 static int run_rule(const struct opt *o, int argc, char *argv[])
 {
         if (proc_error(o, argc, argv))
@@ -271,6 +295,9 @@ static int run_rule(const struct opt *o, int argc, char *argv[])
                 return EXIT_FAILURE;
 
         if (proc_last(o, argc, argv))
+                return EXIT_FAILURE;
+
+        if (proc_all(o, argc, argv))
                 return EXIT_FAILURE;
 
         /*const char *rule = argv[argc - 1];
