@@ -104,7 +104,7 @@ static void opt_free(struct opt **ctx)
 }
 
 
-static void proc_usage(void)
+static void show_usage(void)
 {
         printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
                 "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
@@ -116,19 +116,18 @@ static void proc_usage(void)
 }
 
 
+static int show_error(char *argv[])
+{
+        fprintf(stderr, "%s: invalid argument or option(s)\n", argv[0]);
+        show_usage();
+        return EXIT_FAILURE;
+}
+
+
 static int proc_error(const struct opt *o, int argc, char *argv[])
 {
-        if (argc == 1) {
-                fprintf(stderr, "%s: missing argument or option\n", argv[0]);
-                proc_usage();
-                return EXIT_FAILURE;
-        }
-
-        if (o->error) {
-                fprintf(stderr, "%s: invalid argument or option(s)\n", argv[0]);
-                proc_usage();
-                return EXIT_FAILURE;
-        }
+        if (argc == 1 || o->error)
+                return show_error(argv);
 
         return EXIT_SUCCESS;
 }
@@ -137,14 +136,10 @@ static int proc_error(const struct opt *o, int argc, char *argv[])
 static int proc_help(const struct opt *o, int argc, char *argv[])
 {
         if (o->help) {
-                if (argc > 2) {
-                        fprintf(stderr, "%s: invalid argument or option(s)\n",
-                                argv[0]);
-                        proc_usage();
-                        return EXIT_FAILURE;
-                }
+                if (argc > 2)
+                        return show_error(argv);
 
-                proc_usage();
+                show_usage();
         }
 
         return EXIT_SUCCESS;
@@ -154,12 +149,8 @@ static int proc_help(const struct opt *o, int argc, char *argv[])
 static int proc_version(const struct opt *o, int argc, char *argv[])
 {
         if (o->version) {
-                if (argc > 2) {
-                        fprintf(stderr, "%s: invalid argument or option(s)\n",
-                                argv[0]);
-                        proc_usage();
-                        return EXIT_FAILURE;
-                }
+                if (argc > 2)
+                        return show_error(argv);
 
                 printf("(lib)elmy 0.0.1 -- easy log monitoring\n"
                        "Copyright (c) 2022 Abhishek Chakravarti\n"
@@ -173,12 +164,8 @@ static int proc_version(const struct opt *o, int argc, char *argv[])
 static int proc_count(const struct opt *o, int argc, char *argv[])
 {
         if (!strcmp(argv[argc - 1], "count")) {
-                if (argc > 2) {
-                        fprintf(stderr, "%s: invalid argument or option(s)\n",
-                                argv[0]);
-                        proc_usage();
-                        return EXIT_FAILURE;
-                }
+                if (argc > 2)
+                        return show_error(argv);
 
                 size_t res;
                 CY_AUTO(elmy_error_t) *err = NULL;
