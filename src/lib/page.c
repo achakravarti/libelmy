@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 
 struct elmy_page__ {
@@ -61,6 +62,53 @@ static cy_utf8_t *col_str(enum elmy_sort sort)
 }
 
 
+static cy_utf8_t *parse_size(const char *src, const char *def)
+{
+        if (CY_UNLIKELY(!*src|| *src == '0'
+                        || strspn(src, "0123456789") != strlen(src)))
+                return cy_utf8_new(def);
+
+        return cy_utf8_new(src);
+}
+
+
+static cy_utf8_t *parse_dir(const char *src)
+{
+        if (CY_UNLIKELY(!*src || strcmp(src, "asc")))
+                return cy_utf8_new("desc");
+
+        return cy_utf8_new("asc");
+}
+
+
+static cy_utf8_t *parse_col(const char *src)
+{
+        if (CY_UNLIKELY(!*src))
+                return cy_utf8_new("receivedat");
+
+        if (!strcmp(src, "facility"))
+                return cy_utf8_new("facility");
+
+        if (!strcmp(src, "severity"))
+                return cy_utf8_new("priority");
+
+        if (!strcmp(src, "hostname"))
+                return cy_utf8_new("fromhost");
+
+        if (!strcmp(src, "tag"))
+                return cy_utf8_new("syslogtag");
+
+        if (!strcmp(src, "message"))
+                return cy_utf8_new("message");
+
+        if (!strcmp(src, "tslog"))
+                return cy_utf8_new("receivedat");
+
+        return cy_utf8_new("devicereportedtime");
+}
+
+
+
 elmy_page_t *elmy_page_new(size_t start, size_t count, enum elmy_sort col,
                            bool asc)
 {
@@ -84,6 +132,24 @@ elmy_page_t *elmy_page_new_disabled(void)
         ctx->count = cy_utf8_new_empty();
         ctx->col = cy_utf8_new_empty();
         ctx->dir = cy_utf8_new_empty();
+
+        return ctx;
+}
+
+
+elmy_page_t *elmy_page_new_parse(const char *start, const char *count,
+                                 const char *col, const char *dir)
+{
+        assert(start != NULL);
+        assert(count != NULL);
+        assert(col != NULL);
+        assert(dir != NULL);
+
+        elmy_page_t *ctx = cy_hptr_new(sizeof *ctx);
+        ctx->start = parse_size(start, "1");
+        ctx->count = parse_size(count, "25");
+        ctx->col = parse_col(col);
+        ctx->dir = parse_dir(dir);
 
         return ctx;
 }
