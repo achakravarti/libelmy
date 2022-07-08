@@ -75,7 +75,6 @@ static struct opt *opt_new(int argc, char *argv[])
                         break;
 
                 case '?':
-                default:
                         ctx->error = true;
                         break;
                 }
@@ -193,7 +192,6 @@ static int proc_count(const struct opt *o, int argc, char *argv[])
 static int proc_initial(const struct opt *o, int argc, char *argv[])
 {
         if (!strcmp(argv[argc - 1], "initial")) {
-                printf("INITIAL\n");
                 if (argc != 3)
                         return show_invalid(argv);
 
@@ -204,6 +202,30 @@ static int proc_initial(const struct opt *o, int argc, char *argv[])
                 CY_AUTO(elmy_error_t) *err = NULL;
 
                 if (CY_UNLIKELY(elmy_rule_initial(o->timezone, &res, &err))) {
+                        elmy_error_str(err);
+                        return elmy_error_status(err);
+                }
+
+                printf("%s\n", res);
+        }
+
+        return EXIT_SUCCESS;
+}
+
+
+static int proc_last(const struct opt *o, int argc, char *argv[])
+{
+        if (!strcmp(argv[argc - 1], "last")) {
+                if (argc != 3)
+                        return show_invalid(argv);
+
+                if (!o->timezone)
+                        return show_missing(argv);
+
+                CY_AUTO(cy_utf8_t) *res = NULL;
+                CY_AUTO(elmy_error_t) *err = NULL;
+
+                if (CY_UNLIKELY(elmy_rule_last(o->timezone, &res, &err))) {
                         elmy_error_str(err);
                         return elmy_error_status(err);
                 }
