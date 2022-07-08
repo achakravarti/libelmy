@@ -262,9 +262,15 @@ static int proc_all(const struct opt *o, int argc, char *argv[])
                 if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
                         return show_missing(argv);
 
-                CY_AUTO(elmy_page_t) *pg = elmy_page_new_disabled();
+                CY_AUTO(elmy_page_t) *pg = elmy_page_new_parse(o->rowstart,
+                                                               o->rowcount,
+                                                               o->sortcol,
+                                                               o->sortdir);
                 CY_AUTO(elmy_logs_t) *res = NULL;
                 CY_AUTO(elmy_error_t) *err = NULL;
+
+                printf("DIR = %s\n", elmy_page_col(pg));
+                printf("DIR = %s\n", o->sortdir);
 
                 if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
                         return show_error(err);
@@ -320,8 +326,8 @@ static int run_rule(const struct opt *o, int argc, char *argv[])
 int main(int argc, char *argv[])
 {
         //int rc = opt_proc(argc, argv);
-        struct opt *o = opt_new(argc, argv);
 
+        struct opt *o = opt_new(argc, argv);
         int rc = run_rule(o, argc, argv);
         opt_free(&o);
 
