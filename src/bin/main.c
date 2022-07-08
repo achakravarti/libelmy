@@ -116,9 +116,17 @@ static void show_usage(void)
 }
 
 
-static int show_error(char *argv[])
+static int show_invalid(char *argv[])
 {
         fprintf(stderr, "%s: invalid argument or option(s)\n", argv[0]);
+        show_usage();
+        return EXIT_FAILURE;
+}
+
+
+static int show_missing(char *argv[])
+{
+        fprintf(stderr, "%s: missing option(s) for argument\n", argv[0]);
         show_usage();
         return EXIT_FAILURE;
 }
@@ -127,7 +135,7 @@ static int show_error(char *argv[])
 static int proc_error(const struct opt *o, int argc, char *argv[])
 {
         if (argc == 1 || o->error)
-                return show_error(argv);
+                return show_invalid(argv);
 
         return EXIT_SUCCESS;
 }
@@ -137,7 +145,7 @@ static int proc_help(const struct opt *o, int argc, char *argv[])
 {
         if (o->help) {
                 if (argc > 2)
-                        return show_error(argv);
+                        return show_invalid(argv);
 
                 show_usage();
         }
@@ -150,7 +158,7 @@ static int proc_version(const struct opt *o, int argc, char *argv[])
 {
         if (o->version) {
                 if (argc > 2)
-                        return show_error(argv);
+                        return show_invalid(argv);
 
                 printf("(lib)elmy 0.0.1 -- easy log monitoring\n"
                        "Copyright (c) 2022 Abhishek Chakravarti\n"
@@ -165,7 +173,7 @@ static int proc_count(const struct opt *o, int argc, char *argv[])
 {
         if (!strcmp(argv[argc - 1], "count")) {
                 if (argc > 2)
-                        return show_error(argv);
+                        return show_invalid(argv);
 
                 size_t res;
                 CY_AUTO(elmy_error_t) *err = NULL;
@@ -176,6 +184,31 @@ static int proc_count(const struct opt *o, int argc, char *argv[])
                 }
 
                 printf("%zu\n", res);
+        }
+
+        return EXIT_SUCCESS;
+}
+
+
+static int proc_initial(const struct opt *o, int argc, char *argv[])
+{
+        if (!strcmp(argv[argc - 1], "initial")) {
+                printf("INITIAL\n");
+                if (argc != 3)
+                        return show_invalid(argv);
+
+                if (!o->timezone)
+                        return show_missing(argv);
+
+                CY_AUTO(cy_utf8_t) *res = NULL;
+                CY_AUTO(elmy_error_t) *err = NULL;
+
+                if (CY_UNLIKELY(elmy_rule_initial(o->timezone, &res, &err))) {
+                        elmy_error_str(err);
+                        return elmy_error_status(err);
+                }
+
+                printf("%s\n", res);
         }
 
         return EXIT_SUCCESS;
@@ -194,6 +227,9 @@ static int run_rule(const struct opt *o, int argc, char *argv[])
                 return EXIT_FAILURE;
 
         if (proc_count(o, argc, argv))
+                return EXIT_FAILURE;
+
+        if (proc_initial(o, argc, argv))
                 return EXIT_FAILURE;
 
         /*const char *rule = argv[argc - 1];
