@@ -84,7 +84,7 @@ static cy_utf8_t *parse_dir(const char *src)
 static cy_utf8_t *parse_col(const char *src)
 {
         if (CY_UNLIKELY(!*src))
-                return cy_utf8_new("receivedat");
+                return cy_utf8_new("devicereportedtime");
 
         if (!strcmp(src, "facility"))
                 return cy_utf8_new("facility");
