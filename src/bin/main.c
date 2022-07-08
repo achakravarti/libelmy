@@ -26,6 +26,13 @@ static struct opt *opt_new(int argc, char *argv[])
 {
         struct opt *ctx = cy_hptr_new(sizeof *ctx);
 
+        ctx->timezone = cy_utf8_new_empty();
+        ctx->filter = cy_utf8_new_empty();
+        ctx->sortcol = cy_utf8_new_empty();
+        ctx->sortdir = cy_utf8_new_empty();
+        ctx->rowstart = cy_utf8_new_empty();
+        ctx->rowcount = cy_utf8_new_empty();
+
         const char *opts = "t:f:c:d:s:n:hv";
         const struct option opt[] = {
                 {"timezone", required_argument, NULL, 't'},
@@ -43,26 +50,32 @@ static struct opt *opt_new(int argc, char *argv[])
         while ((o = getopt_long(argc, argv, opts, opt, NULL)) != -1) {
                 switch (o) {
                 case 't':
+                        cy_utf8_free(&ctx->timezone);
                         ctx->timezone = cy_utf8_new(optarg);
                         break;
 
                 case 'f':
+                        cy_utf8_free(&ctx->filter);
                         ctx->filter = cy_utf8_new(optarg);
                         break;
 
                 case 'c':
+                        cy_utf8_free(&ctx->sortcol);
                         ctx->sortcol = cy_utf8_new(optarg);
                         break;
 
                 case 'd':
+                        cy_utf8_free(&ctx->sortdir);
                         ctx->sortdir = cy_utf8_new(optarg);
                         break;
 
                 case 's':
+                        cy_utf8_free(&ctx->rowstart);
                         ctx->rowstart = cy_utf8_new(optarg);
                         break;
 
                 case 'n':
+                        cy_utf8_free(&ctx->rowcount);
                         ctx->rowcount = cy_utf8_new(optarg);
                         break;
 
@@ -180,7 +193,7 @@ static int proc_version(const struct opt *o, int argc, char *argv[])
 static int proc_count(const struct opt *o, int argc, char *argv[])
 {
         if (!strcmp(argv[argc - 1], "count")) {
-                if (argc > 2)
+                if (CY_UNLIKELY(argc > 2))
                         return show_invalid(argv);
 
                 size_t res;
@@ -199,10 +212,10 @@ static int proc_count(const struct opt *o, int argc, char *argv[])
 static int proc_initial(const struct opt *o, int argc, char *argv[])
 {
         if (!strcmp(argv[argc - 1], "initial")) {
-                if (argc != 3)
+                if (CY_UNLIKELY(argc != 3))
                         return show_invalid(argv);
 
-                if (!o->timezone)
+                if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
                         return show_missing(argv);
 
                 CY_AUTO(cy_utf8_t) *res = NULL;
@@ -221,10 +234,10 @@ static int proc_initial(const struct opt *o, int argc, char *argv[])
 static int proc_last(const struct opt *o, int argc, char *argv[])
 {
         if (!strcmp(argv[argc - 1], "last")) {
-                if (argc != 3)
+                if (CY_UNLIKELY(argc != 3))
                         return show_invalid(argv);
 
-                if (!o->timezone)
+                if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
                         return show_missing(argv);
 
                 CY_AUTO(cy_utf8_t) *res = NULL;
