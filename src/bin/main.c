@@ -254,6 +254,9 @@ static int run_rule(const struct opt *o, int argc, char *argv[])
         if (proc_initial(o, argc, argv))
                 return EXIT_FAILURE;
 
+        if (proc_last(o, argc, argv))
+                return EXIT_FAILURE;
+
         /*const char *rule = argv[argc - 1];
 
         if (!strcmp(rule, "count"))
