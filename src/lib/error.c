@@ -103,7 +103,7 @@ cy_utf8_t *elmy_error_str(const elmy_error_t *ctx)
 {
         assert(ctx != NULL);
 
-        return cy_utf8_new_fmt("Status: %zu\nRule: %s\nMessage: %s\n",
+        return cy_utf8_new_fmt("Status: %zu\nRule: %s\nMessage: %s",
                                ctx->status, ctx->rule, ctx->msg);
 }
 

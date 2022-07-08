@@ -131,6 +131,15 @@ static int show_missing(char *argv[])
 }
 
 
+static int show_error(const elmy_error_t *err)
+{
+        CY_AUTO(cy_utf8_t) *emsg = elmy_error_str(err);
+        fprintf(stderr, "%s\n", emsg);
+
+        return elmy_error_status(err);
+}
+
+
 static int proc_error(const struct opt *o, int argc, char *argv[])
 {
         if (argc == 1 || o->error)
@@ -177,10 +186,8 @@ static int proc_count(const struct opt *o, int argc, char *argv[])
                 size_t res;
                 CY_AUTO(elmy_error_t) *err = NULL;
 
-                if (CY_UNLIKELY(elmy_rule_count(&res, &err))) {
-                        elmy_error_str(err);
-                        return elmy_error_status(err);
-                }
+                if (CY_UNLIKELY(elmy_rule_count(&res, &err)))
+                        return show_error(err);
 
                 printf("%zu\n", res);
         }
@@ -201,10 +208,8 @@ static int proc_initial(const struct opt *o, int argc, char *argv[])
                 CY_AUTO(cy_utf8_t) *res = NULL;
                 CY_AUTO(elmy_error_t) *err = NULL;
 
-                if (CY_UNLIKELY(elmy_rule_initial(o->timezone, &res, &err))) {
-                        elmy_error_str(err);
-                        return elmy_error_status(err);
-                }
+                if (CY_UNLIKELY(elmy_rule_initial(o->timezone, &res, &err)))
+                        return show_error(err);
 
                 printf("%s\n", res);
         }
@@ -225,10 +230,8 @@ static int proc_last(const struct opt *o, int argc, char *argv[])
                 CY_AUTO(cy_utf8_t) *res = NULL;
                 CY_AUTO(elmy_error_t) *err = NULL;
 
-                if (CY_UNLIKELY(elmy_rule_last(o->timezone, &res, &err))) {
-                        elmy_error_str(err);
-                        return elmy_error_status(err);
-                }
+                if (CY_UNLIKELY(elmy_rule_last(o->timezone, &res, &err)))
+                        return show_error(err);
 
                 printf("%s\n", res);
         }
