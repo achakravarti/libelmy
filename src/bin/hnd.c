@@ -148,30 +148,6 @@ int hnd_last(void)
 }
 
 
-int hnd_help(void)
-{
-        printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
-               "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
-               "\t\t[-n,--hostname string [-p,--paged]]"
-               " [-s,--severity csv [-p,--paged]]\n"
-               "\t\t[-m,--message string [-p,--paged]]"
-               " [-t,--tag string [-p,--paged]]\n"
-               "\t[-h,--help] [-v,--version]\n");
-
-        return EXIT_SUCCESS;
-}
-
-
-int hnd_version(void)
-{
-        printf("(lib)elmy 0.0.1 -- easy log monitoring\n"
-               "Copyright (c) 2022 Abhishek Chakravarti\n"
-               "Released under the BSD 2-Clause License\n");
-
-        return EXIT_SUCCESS;
-}
-
-
 int hnd_severity(const char *arg)
 {
         printf("severity = %s\n", arg);

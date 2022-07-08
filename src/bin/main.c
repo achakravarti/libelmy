@@ -104,12 +104,77 @@ static void opt_free(struct opt **ctx)
 }
 
 
-static int run_rule(int argc, char *argv[])
+static int proc_error(const struct opt *o, int argc, char *argv[])
 {
-        if (argc == 1)
+        if (argc == 1) {
+                fprintf(stderr, "%s: missing argument or option\n", argv[0]);
+                hnd_help();
+                return EXIT_FAILURE;
+        }
+
+        if (o->error) {
+                fprintf(stderr, "%s: invalid argument or option(s)\n", argv[0]);
+                hnd_help();
+                return EXIT_FAILURE;
+        }
+
+        return EXIT_SUCCESS;
+}
+
+
+static int proc_help(const struct opt *o, int argc, char *argv[])
+{
+        if (o->help) {
+                if (argc > 2) {
+                        fprintf(stderr, "%s: invalid argument or option(s)\n",
+                                argv[0]);
+                        hnd_help();
+                        return EXIT_FAILURE;
+                }
+
+                printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
+                       "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
+                       "\t\t[-n,--hostname string [-p,--paged]]"
+                       " [-s,--severity csv [-p,--paged]]\n"
+                       "\t\t[-m,--message string [-p,--paged]]"
+                       " [-t,--tag string [-p,--paged]]\n"
+                       "\t[-h,--help] [-v,--version]\n");
+        }
+
+        return EXIT_SUCCESS;
+}
+
+
+static int proc_version(const struct opt *o, int argc, char *argv[])
+{
+        if (o->version) {
+                if (argc > 2) {
+                        fprintf(stderr, "%s: invalid argument or option(s)\n",
+                                argv[0]);
+                        hnd_help();
+                        return EXIT_FAILURE;
+                }
+
+                printf("(lib)elmy 0.0.1 -- easy log monitoring\n"
+                       "Copyright (c) 2022 Abhishek Chakravarti\n"
+                       "Released under the BSD 2-Clause License\n");
+        }
+
+        return EXIT_SUCCESS;
+}
+
+static int run_rule(const struct opt *o, int argc, char *argv[])
+{
+        if (proc_error(o, argc, argv))
                 return EXIT_FAILURE;
 
-        const char *rule = argv[argc - 1];
+        if (proc_help(o, argc, argv))
+                return EXIT_FAILURE;
+
+        if (proc_version(o, argc, argv))
+                return EXIT_FAILURE;
+
+        /*const char *rule = argv[argc - 1];
 
         if (!strcmp(rule, "count"))
                 return hnd_count();
@@ -120,11 +185,19 @@ static int run_rule(int argc, char *argv[])
         if (!strcmp(rule, "last"))
                 return hnd_last();
 
-        return EXIT_FAILURE;
+                return EXIT_FAILURE;*/
+
+        return EXIT_SUCCESS;
 }
+
 
 int main(int argc, char *argv[])
 {
         //int rc = opt_proc(argc, argv);
-        return run_rule(argc, argv);
+        struct opt *o = opt_new(argc, argv);
+
+        int rc = run_rule(o, argc, argv);
+        opt_free(&o);
+
+        return rc;
 }
