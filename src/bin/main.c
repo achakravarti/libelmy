@@ -274,8 +274,12 @@ static int proc_all(const struct opt *o, int argc, char *argv[])
 
                 //CY_AUTO(cy_utf8_t) *s = elmy_logs_print(res, ELMY_LOGS_FORMAT_JSON);
                 //printf("%s\n", s);
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
+                //CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
+                //printf("%s", s);
+
+                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
+                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
+                printf("%s\n", s);
         }
 
         return EXIT_SUCCESS;
