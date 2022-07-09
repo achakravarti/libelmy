@@ -12,6 +12,7 @@
 struct opt {
         bool             error;
         bool             help;
+        bool             json;
         bool             unpaged;
         bool             version;
         cy_utf8_t       *timezone;
@@ -34,7 +35,7 @@ static struct opt *opt_new(int argc, char *argv[])
         ctx->rowstart = cy_utf8_new_empty();
         ctx->rowcount = cy_utf8_new_empty();
 
-        const char *opts = "t:f:c:d:s:n:hvu";
+        const char *opts = "t:f:c:d:s:n:hjvu";
         const struct option opt[] = {
                 {"timezone", required_argument, NULL, 't'},
                 {"filter",   required_argument, NULL, 'f'},
@@ -43,6 +44,7 @@ static struct opt *opt_new(int argc, char *argv[])
                 {"rowstart", required_argument, NULL, 's'},
                 {"rowcount", required_argument, NULL, 'n'},
                 {"help",     no_argument,       NULL, 'h'},
+                {"json",     no_argument,       NULL, 'j'},
                 {"version",  no_argument,       NULL, 'v'},
                 {"unpaged",  no_argument,       NULL, 'u'},
                 { 0 }
@@ -83,6 +85,10 @@ static struct opt *opt_new(int argc, char *argv[])
 
                 case 'h':
                         ctx->help = true;
+                        break;
+
+                case 'j':
+                        ctx->json = true;
                         break;
 
                 case 'v':
@@ -280,12 +286,14 @@ static int proc_all(const struct opt *o, int argc, char *argv[])
                 if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
                         return show_error(err);
 
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
-
-                //CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
-                //CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
-                //printf("%s\n", s);
+                if (o->json) {
+                        CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
+                        CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
+                        printf("%s\n", s);
+                } else {
+                        CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
+                        printf("%s", s);
+                }
         }
 
         return EXIT_SUCCESS;
