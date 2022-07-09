@@ -223,17 +223,22 @@ cy_json_t *elmy_logs_json(const elmy_logs_t *ctx)
         for (register size_t i = 0; i < ctx->len; i++) {
                 cy_json_t *j = elmy_log_json(ctx->items[i]);
                 cy_utf8_t *s = cy_json_print(j, false);
-                len = strlen(s);
 
+                len = strlen(s);
                 strncpy(b, s, len);
-                b += len;
+
+                if (i < ctx->len - 1) {
+                        memcpy(b + len, ",", 1);
+                        b += (len + 1);
+                } else {
+                        b += len;
+                }
 
                 cy_utf8_free(&s);
                 cy_json_free(&j);
         }
 
-        memcpy(b, "}]", 2);
-        printf("BFR = %s\n", bfr);
+        memcpy(b, "]}", 2);
         cy_json_t *j = cy_json_new(bfr);
         cy_hptr_free((cy_hptr_t **) &bfr);
 
