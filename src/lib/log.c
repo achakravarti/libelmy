@@ -239,11 +239,13 @@ cy_json_t *elmy_log_json(const elmy_log_t *ctx)
                           "\"hostname\":\"%s\",\"tag\":\"%s\","
                           "\"message\":\"%s\"}";
 
+        CY_AUTO(cy_utf8_t) *host = cy_utf8_escape_json(ctx->hostname);
+        CY_AUTO(cy_utf8_t) *tag = cy_utf8_escape_json(ctx->tag);
         CY_AUTO(cy_utf8_t) *msg = cy_utf8_escape_json(ctx->message);
         CY_AUTO(cy_utf8_t) *j = cy_utf8_new_fmt(fmt, ctx->ts, ctx->evts,
                                                 ctx->facility, ctx->facility_kw,
                                                 ctx->severity, ctx->severity_kw,
-                                                ctx->hostname, ctx->tag, msg);
+                                                host, tag, msg);
 
         return cy_json_new(j);
 }

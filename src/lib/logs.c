@@ -233,6 +233,7 @@ cy_json_t *elmy_logs_json(const elmy_logs_t *ctx)
         }
 
         memcpy(b, "}]", 2);
+        printf("BFR = %s\n", bfr);
         cy_json_t *j = cy_json_new(bfr);
         cy_hptr_free((cy_hptr_t **) &bfr);
 
