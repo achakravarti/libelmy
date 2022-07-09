@@ -220,8 +220,8 @@ cy_json_t *elmy_logs_json(const elmy_logs_t *ctx)
 
 
         for (register size_t i = 0; i < ctx->len; i++) {
-                cy_json_t *j = elmy_log_json(ctx->items[i]);
-                cy_utf8_t *s = cy_json_print(j, false);
+                CY_AUTO(cy_json_t) *j = elmy_log_json(ctx->items[i]);
+                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, false);
 
                 len = strlen(s);
                 memcpy(b, s, len);
@@ -232,9 +232,6 @@ cy_json_t *elmy_logs_json(const elmy_logs_t *ctx)
                 } else {
                         b += len;
                 }
-
-                cy_utf8_free(&s);
-                cy_json_free(&j);
         }
 
         memcpy(b, "]}", 2);
