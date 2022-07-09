@@ -12,6 +12,7 @@
 struct opt {
         bool             error;
         bool             help;
+        bool             unpaged;
         bool             version;
         cy_utf8_t       *timezone;
         cy_utf8_t       *filter;
@@ -33,7 +34,7 @@ static struct opt *opt_new(int argc, char *argv[])
         ctx->rowstart = cy_utf8_new_empty();
         ctx->rowcount = cy_utf8_new_empty();
 
-        const char *opts = "t:f:c:d:s:n:hv";
+        const char *opts = "t:f:c:d:s:n:hvu";
         const struct option opt[] = {
                 {"timezone", required_argument, NULL, 't'},
                 {"filter",   required_argument, NULL, 'f'},
@@ -43,6 +44,7 @@ static struct opt *opt_new(int argc, char *argv[])
                 {"rowcount", required_argument, NULL, 'n'},
                 {"help",     no_argument,       NULL, 'h'},
                 {"version",  no_argument,       NULL, 'v'},
+                {"unpaged",  no_argument,       NULL, 'u'},
                 { 0 }
         };
 
@@ -85,6 +87,10 @@ static struct opt *opt_new(int argc, char *argv[])
 
                 case 'v':
                         ctx->version = true;
+                        break;
+
+                case 'u':
+                        ctx->unpaged = true;
                         break;
 
                 case '?':
@@ -262,10 +268,12 @@ static int proc_all(const struct opt *o, int argc, char *argv[])
                 if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
                         return show_missing(argv);
 
-                CY_AUTO(elmy_page_t) *pg = elmy_page_new_parse(o->rowstart,
-                                                               o->rowcount,
-                                                               o->sortcol,
-                                                               o->sortdir);
+                CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
+                                           ? elmy_page_new_disabled()
+                                           : elmy_page_new_parse(o->rowstart,
+                                                                 o->rowcount,
+                                                                 o->sortcol,
+                                                                 o->sortdir);
                 CY_AUTO(elmy_logs_t) *res = NULL;
                 CY_AUTO(elmy_error_t) *err = NULL;
 
