@@ -110,7 +110,7 @@ enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
         if (CY_UNLIKELY(rc))
                 goto error;
 
-        *res = elmy_logs_parse__(db_result(db));
+        *res = elmy_logs_new_parse__(db_result(db));
         return ELMY_STATUS_OK;
 
 error:

@@ -36,7 +36,7 @@ elmy_logs_t *elmy_logs_new_empty(void)
 }
 
 
-elmy_logs_t *elmy_logs_parse__(void *res)
+elmy_logs_t *elmy_logs_new_parse__(void *res)
 {
         assert(res != NULL);
 
