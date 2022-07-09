@@ -218,12 +218,32 @@ cy_utf8_t *elmy_log_str(const elmy_log_t *ctx)
 {
         assert(ctx != NULL);
 
-        const char *fmt = "log_ts:\t%s\nevent_ts:\t%s\nfacility:\t%d\n"
-                          "facility_kw\t%s\nseverity:\t%d\nseverity_kw:\t%s\n"
-                          "hostname:\t%s\ntag:\t%s\nmessage:\t%s\n";
+        const char *fmt = "log_ts:\t\t%s\nevent_ts:\t%s\nfacility:\t%d\n"
+                          "facility_kw:\t%s\nseverity:\t%d\nseverity_kw:\t%s\n"
+                          "hostname:\t%s\ntag:\t\t%s\nmessage:\t%s\n";
 
         return cy_utf8_new_fmt(fmt, ctx->ts, ctx->evts, ctx->facility,
                                ctx->facility_kw, ctx->severity,
                                ctx->severity_kw, ctx->hostname,
                                ctx->tag, ctx->message);
+}
+
+
+cy_json_t *elmy_log_json(const elmy_log_t *ctx)
+{
+        assert(ctx != NULL);
+
+        const char *fmt = "{\"log_ts\":\"%s\",\"event_ts\":\"%s\","
+                          "\"facility\":%d,\"facility_kw\":\"%s\","
+                          "\"severity\":%d,\"severity_kw\":\"%s\","
+                          "\"hostname\":\"%s\",\"tag\":\"%s\","
+                          "\"message\":\"%s\"}";
+
+        CY_AUTO(cy_utf8_t) *msg = cy_utf8_escape_json(ctx->message);
+        CY_AUTO(cy_utf8_t) *j = cy_utf8_new_fmt(fmt, ctx->ts, ctx->evts,
+                                                ctx->facility, ctx->facility_kw,
+                                                ctx->severity, ctx->severity_kw,
+                                                ctx->hostname, ctx->tag, msg);
+
+        return cy_json_new(j);
 }

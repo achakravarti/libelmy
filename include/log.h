@@ -4,6 +4,7 @@
 
 #include <libchrysalid/include/log.h>
 #include <libchrysalid/include/utf8.h>
+#include <libchrysalid/include/json.h>
 
 /* C++ compatiblity */
 #ifdef __cplusplus
@@ -74,6 +75,8 @@ elmy_log_print(const elmy_log_t *, enum elmy_log_format);
 extern CY_RSAFE cy_utf8_t *
 elmy_log_str(const elmy_log_t *);
 
+extern CY_RSAFE cy_json_t *
+elmy_log_json(const elmy_log_t *ctx);
 
 /* C++ compatiblity */
 #ifdef __cplusplus
