@@ -48,11 +48,7 @@ elmy_logs_t *elmy_logs_parse__(void *res)
                                    PQgetvalue(r, i, 7), PQgetvalue(r, i, 8));
 
                 ctx->items[i] = log;
-                ctx->sz += (PQgetlength(r, i, 0) + PQgetlength(r, i, 1)
-                           + PQgetlength(r, i, 2) + PQgetlength(r, i, 3)
-                           + PQgetlength(r, i ,4) + PQgetlength(r, i, 5)
-                           + PQgetlength(r, i, 6) + PQgetlength(r, i, 6)
-                           + PQgetlength(r, i, 7) + PQgetlength(r, i, 8));
+                ctx->sz += elmy_log_sz(log);
         }
 
         return ctx;
@@ -186,4 +182,24 @@ cy_utf8_t *elmy_logs_print(const elmy_logs_t *ctx, enum elmy_logs_format fmt)
 
         cy_hptr_free((cy_hptr_t **) &bfr);
         return str;
+}
+
+
+cy_utf8_t *elmy_logs_str(const elmy_logs_t *ctx)
+{
+        char *bfr = cy_hptr_new(ctx->sz + ctx->len + 1);
+        register char *b = bfr;
+
+        for (register size_t i = 0; i < ctx->len; i++) {
+                cy_utf8_t *s = elmy_log_str(ctx->items[i]);
+                size_t len = strlen(s);
+
+                strncpy(b, s, len);
+                b += len;
+                memcpy(b++, "\n", 1);
+
+                cy_utf8_free(&s);
+        }
+
+        return bfr;
 }

@@ -272,8 +272,10 @@ static int proc_all(const struct opt *o, int argc, char *argv[])
                 if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
                         return show_error(err);
 
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_print(res, ELMY_LOGS_FORMAT_JSON);
-                printf("%s\n", s);
+                //CY_AUTO(cy_utf8_t) *s = elmy_logs_print(res, ELMY_LOGS_FORMAT_JSON);
+                //printf("%s\n", s);
+                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
+                printf("%s", s);
         }
 
         return EXIT_SUCCESS;
