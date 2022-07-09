@@ -85,7 +85,7 @@ void elmy_logs_t_free__(elmy_logs_t **ctx)
                         for (register size_t i = 0; i < l->len; i++)
                                 elmy_log_free(&l->items[i]);
 
-                        cy_hptr_free((cy_hptr_t **) l->items);
+                        cy_hptr_free((cy_hptr_t **) &l->items);
                 }
 
                 cy_hptr_free((cy_hptr_t **) ctx);
@@ -189,21 +189,23 @@ cy_utf8_t *elmy_logs_str(const elmy_logs_t *ctx)
 {
         assert(ctx != NULL);
 
-        char *bfr = cy_hptr_new(ctx->sz + ctx->len + 1);
+        /*char *bfr = cy_hptr_new(ctx->sz + ctx->len + 1);
         register char *b = bfr;
 
         for (register size_t i = 0; i < ctx->len; i++) {
                 cy_utf8_t *s = elmy_log_str(ctx->items[i]);
                 size_t len = strlen(s);
 
-                strncpy(b, s, len);
+                memcpy(b, s, len);
                 b += len;
                 memcpy(b++, "\n", 1);
 
                 cy_utf8_free(&s);
         }
 
-        return bfr;
+        return bfr;*/
+
+        return elmy_log_str(ctx->items[0]);
 }
 
 
