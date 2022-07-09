@@ -187,6 +187,8 @@ cy_utf8_t *elmy_logs_print(const elmy_logs_t *ctx, enum elmy_logs_format fmt)
 
 cy_utf8_t *elmy_logs_str(const elmy_logs_t *ctx)
 {
+        assert(ctx != NULL);
+
         char *bfr = cy_hptr_new(ctx->sz + ctx->len + 1);
         register char *b = bfr;
 
@@ -202,4 +204,37 @@ cy_utf8_t *elmy_logs_str(const elmy_logs_t *ctx)
         }
 
         return bfr;
+}
+
+
+cy_json_t *elmy_logs_json(const elmy_logs_t *ctx)
+{
+        assert(ctx != NULL);
+
+        char *bfr = cy_hptr_new(ctx->sz * 2);
+        register char *b = bfr;
+
+        const char *hdr = "{\"logs\":[";
+        size_t len = strlen(hdr);
+        strncpy(bfr, hdr, len);
+        b += len;
+
+
+        for (register size_t i = 0; i < ctx->len; i++) {
+                cy_json_t *j = elmy_log_json(ctx->items[i]);
+                cy_utf8_t *s = cy_json_print(j, false);
+                len = strlen(s);
+
+                strncpy(b, s, len);
+                b += len;
+
+                cy_utf8_free(&s);
+                cy_json_free(&j);
+        }
+
+        memcpy(b, "}]", 2);
+        cy_json_t *j = cy_json_new(bfr);
+        cy_hptr_free((cy_hptr_t **) &bfr);
+
+        return j;
 }

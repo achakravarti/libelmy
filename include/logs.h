@@ -54,6 +54,9 @@ elmy_logs_print(const elmy_logs_t *, enum elmy_logs_format);
 extern CY_SAFE cy_utf8_t *
 elmy_logs_str(const elmy_logs_t *);
 
+extern CY_SAFE cy_json_t *
+elmy_logs_json(const elmy_logs_t *ctx);
+
 
 /* C++ compatiblity */
 #ifdef __cplusplus
