@@ -29,6 +29,13 @@ elmy_logs_t *elmy_logs_new(size_t len)
 }
 
 
+elmy_logs_t *elmy_logs_new_empty(void)
+{
+        elmy_logs_t *ctx = cy_hptr_new(sizeof *ctx);
+        return ctx;
+}
+
+
 elmy_logs_t *elmy_logs_parse__(void *res)
 {
         assert(res != NULL);
@@ -36,9 +43,13 @@ elmy_logs_t *elmy_logs_parse__(void *res)
         PGresult *r = (PGresult *) res;
 
         register size_t len = PQntuples(r);
-        elmy_logs_t *ctx = elmy_logs_new(len);
 
+        if (CY_UNLIKELY(!len))
+                return elmy_logs_new_empty();
+
+        elmy_logs_t *ctx = elmy_logs_new(len);
         elmy_log_t *log;
+
         for (register size_t i = 0; i < len; i++) {
                 log = elmy_log_new(PQgetvalue(r, i, 1), PQgetvalue(r, i, 0),
                                    strtoumax(PQgetvalue(r, i, 2), NULL, 10),
@@ -93,9 +104,18 @@ void elmy_logs_t_free__(elmy_logs_t **ctx)
 }
 
 
+size_t elmy_logs_len(const elmy_logs_t *ctx)
+{
+        assert(ctx != NULL);
+
+        return ctx->len;
+}
+
+
 const elmy_log_t *elmy_logs_get(const elmy_logs_t *ctx, size_t idx)
 {
         assert(ctx != NULL);
+        assert(idx < ctx->len);
         assert(ctx->items[idx] != NULL);
 
         return ctx->items[idx];
@@ -189,6 +209,9 @@ cy_utf8_t *elmy_logs_str(const elmy_logs_t *ctx)
 {
         assert(ctx != NULL);
 
+        if (CY_UNLIKELY(!elmy_logs_len(ctx)))
+                return cy_utf8_new_empty();
+
         char *bfr = cy_hptr_new(ctx->sz * 2); /* approximation */
         register char *b = bfr;
 
@@ -209,6 +232,9 @@ cy_utf8_t *elmy_logs_str(const elmy_logs_t *ctx)
 cy_json_t *elmy_logs_json(const elmy_logs_t *ctx)
 {
         assert(ctx != NULL);
+
+        if (CY_UNLIKELY(!elmy_logs_len(ctx)))
+                return cy_json_new("{\"logs\":null}");
 
         char *bfr = cy_hptr_new(ctx->sz * 2); /* approximation */
         register char *b = bfr;

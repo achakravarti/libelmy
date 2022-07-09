@@ -42,6 +42,9 @@ elmy_logs_t_free__(elmy_logs_t **);
 #define elmy_logs_free(ctx) \
 elmy_logs_t_free__(ctx)
 
+extern CY_PSAFE size_t
+elmy_logs_len(const elmy_logs_t *ctx);
+
 extern CY_SAFE const elmy_log_t *
 elmy_logs_get(const elmy_logs_t *, size_t);
 
