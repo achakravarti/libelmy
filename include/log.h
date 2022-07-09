@@ -71,6 +71,9 @@ elmy_log_message(const elmy_log_t *);
 extern CY_RSAFE cy_utf8_t *
 elmy_log_print(const elmy_log_t *, enum elmy_log_format);
 
+extern CY_RSAFE cy_utf8_t *
+elmy_log_str(const elmy_log_t *);
+
 
 /* C++ compatiblity */
 #ifdef __cplusplus

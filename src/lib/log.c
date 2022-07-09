@@ -84,7 +84,8 @@ void elmy_log_t_free__(elmy_log_t **ctx)
 
 size_t elmy_log_sz(const elmy_log_t *ctx)
 {
-        const size_t enum_sz = ctx->facility < 10 ? 2 : 3;
+        const size_t enum_sz = ctx->facility < 10 ? 2 : 3
+                             + ctx->severity < 10 ? 2 : 3;
 
         return cy_hptr_sz((const cy_hptr_t *) ctx)
                + cy_utf8_sz(ctx->facility_kw) + cy_utf8_sz(ctx->severity_kw)
@@ -210,4 +211,19 @@ cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
 
         return cy_utf8_new_fmt(f, ts, evts, ctx->facility, fkw, ctx->severity,
                                skw, hn, tag, msg);
+}
+
+
+cy_utf8_t *elmy_log_str(const elmy_log_t *ctx)
+{
+        assert(ctx != NULL);
+
+        const char *fmt = "log_ts:\t%s\nevent_ts:\t%s\nfacility:\t%d\n"
+                          "facility_kw\t%s\nseverity:\t%d\nseverity_kw:\t%s\n"
+                          "hostname:\t%s\ntag:\t%s\nmessage:\t%s\n";
+
+        return cy_utf8_new_fmt(fmt, ctx->ts, ctx->evts, ctx->facility,
+                               ctx->facility_kw, ctx->severity,
+                               ctx->severity_kw, ctx->hostname,
+                               ctx->tag, ctx->message);
 }
