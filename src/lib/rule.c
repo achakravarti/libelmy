@@ -34,7 +34,7 @@ static CY_PSAFE int filter_intarray(
     const char *, int [], size_t, const char *, const elmy_page_t *,
     elmy_logs_t **, elmy_error_t **);
 
-static CY_PSAFE int run_filter(
+static CY_PSAFE int filter_text(
     const char *, const char *, const char *, const elmy_page_t *,
     elmy_logs_t **, elmy_error_t **);
 
@@ -183,7 +183,7 @@ elmy_rule_hostname(const char            *filter,
                    elmy_logs_t          **res,
                    elmy_error_t         **err)
 {
-        return run_filter("hostname", filter, tz, pg, res, err);
+        return filter_text("hostname", filter, tz, pg, res, err);
 }
 
 
@@ -194,7 +194,7 @@ elmy_rule_tag(const char         *filter,
               elmy_logs_t       **res,
               elmy_error_t      **err)
 {
-        return run_filter("tag", filter, tz, pg, res, err);
+        return filter_text("tag", filter, tz, pg, res, err);
 }
 
 
@@ -205,7 +205,7 @@ elmy_rule_message(const char             *filter,
                   elmy_logs_t           **res,
                   elmy_error_t          **err)
 {
-        return run_filter("message", filter, tz, pg, res, err);
+        return filter_text("message", filter, tz, pg, res, err);
 }
 
 
@@ -275,7 +275,7 @@ int filter_intarray(
 }
 
 
-int run_filter(
+int filter_text(
     const char *rule, const char *filter, const char *tz, const elmy_page_t *pg,
     elmy_logs_t **res, elmy_error_t **err)
 {
