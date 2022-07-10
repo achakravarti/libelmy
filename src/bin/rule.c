@@ -33,6 +33,15 @@ rule_all(const struct opt *, char *[]);
 /*                                                               %func:rule_exec
  * __NAME__
  *      rule_exec() - executes user-specified rule
+ *
+ * __RETURN__
+ *      The {{rule_exec()}} functions returns one of the following {{int}}
+ *      status codes:
+ *
+ *        - {{EXIT_SUCCESS}} if the rule executed successfully
+ *        - {{EXIT_FAILURE: if a command line-related error occurrs
+ *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
+ *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
 int
 rule_exec(const struct opt *o, int argc, char *argv[])
@@ -74,6 +83,15 @@ rule_exec(const struct opt *o, int argc, char *argv[])
 /*                                                              %func:rule_count
  * __NAME__
  *      rule_count() - executes the "count" rule
+ *
+ * __RETURN__
+ *      The {{rule_exec()}} functions returns one of the following {{int}}
+ *      status codes:
+ *
+ *        - {{EXIT_SUCCESS}} if the rule executed successfully
+ *        - {{EXIT_FAILURE: if a command line-related error occurrs
+ *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
+ *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
 int
 rule_count(const struct opt *o, int argc, char *argv[])
@@ -95,6 +113,15 @@ rule_count(const struct opt *o, int argc, char *argv[])
 /*                                                            %func:rule_initial
  * __NAME__
  *      rule_initial() - executes the "initial" rule
+ *
+ * __RETURN__
+ *      The {{rule_exec()}} functions returns one of the following {{int}}
+ *      status codes:
+ *
+ *        - {{EXIT_SUCCESS}} if the rule executed successfully
+ *        - {{EXIT_FAILURE: if a command line-related error occurrs
+ *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
+ *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
 int
 rule_initial(const struct opt *o, char *argv[])
@@ -121,6 +148,15 @@ rule_initial(const struct opt *o, char *argv[])
 /*                                                               %func:rule_last
  * __NAME__
  *      rule_last() - executes the "last" rule
+ *
+ * __RETURN__
+ *      The {{rule_exec()}} functions returns one of the following {{int}}
+ *      status codes:
+ *
+ *        - {{EXIT_SUCCESS}} if the rule executed successfully
+ *        - {{EXIT_FAILURE: if a command line-related error occurrs
+ *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
+ *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
 int
 rule_last(const struct opt *o, char *argv[])
@@ -147,6 +183,15 @@ rule_last(const struct opt *o, char *argv[])
 /*                                                                %func:rule_all
  * __NAME__
  *      rule_all() - executes the "all" rule
+ *
+ * __RETURN__
+ *      The {{rule_exec()}} functions returns one of the following {{int}}
+ *      status codes:
+ *
+ *        - {{EXIT_SUCCESS}} if the rule executed successfully
+ *        - {{EXIT_FAILURE: if a command line-related error occurrs
+ *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
+ *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
 int
 rule_all(const struct opt *o, char *argv[])

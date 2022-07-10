@@ -15,8 +15,8 @@ db_t *db_new(const char *rule, const char *sql)
         ctx->conn = PQconnectdb("user=rsyslog password=rsyslog dbname=syslog");
 
         if (CY_UNLIKELY(PQstatus(ctx->conn) == CONNECTION_BAD)) {
-                ctx->status = ELMY_STATUS_ERR_DBCONN;
-                ctx->err = elmy_error_new(ELMY_STATUS_ERR_DBCONN, rule,
+                ctx->status = ELMY_STATUS_DBCONN;
+                ctx->err = elmy_error_new(ELMY_STATUS_DBCONN, rule,
                                           PQerrorMessage(ctx->conn));
         }
 
@@ -48,10 +48,10 @@ enum elmy_status db_exec(db_t *ctx)
         ctx->res = PQexec(ctx->conn, ctx->sql);
 
         if (CY_UNLIKELY(PQresultStatus(ctx->res) != PGRES_TUPLES_OK)) {
-                ctx->status = ELMY_STATUS_ERR_DBQRY;
-                ctx->err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, ctx->rule,
+                ctx->status = ELMY_STATUS_DBQRY;
+                ctx->err = elmy_error_new(ELMY_STATUS_DBQRY, ctx->rule,
                                           PQerrorMessage(ctx->conn));
-                return ELMY_STATUS_ERR_DBQRY;
+                return ELMY_STATUS_DBQRY;
         }
 
         return ELMY_STATUS_OK;
@@ -72,10 +72,10 @@ enum elmy_status db_exec_param(db_t *ctx, const char *params[])
                                 NULL, NULL, 0);
 
         if (CY_UNLIKELY(PQresultStatus(ctx->res) != PGRES_TUPLES_OK)) {
-                ctx->status = ELMY_STATUS_ERR_DBQRY;
-                ctx->err = elmy_error_new(ELMY_STATUS_ERR_DBQRY, ctx->rule,
+                ctx->status = ELMY_STATUS_DBQRY;
+                ctx->err = elmy_error_new(ELMY_STATUS_DBQRY, ctx->rule,
                                           PQerrorMessage(ctx->conn));
-                return ELMY_STATUS_ERR_DBQRY;
+                return ELMY_STATUS_DBQRY;
         }
 
         return ELMY_STATUS_OK;

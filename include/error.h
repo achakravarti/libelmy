@@ -27,9 +27,9 @@ enum elmy_error {
 
 
 enum elmy_status {
-        ELMY_STATUS_OK,
-        ELMY_STATUS_ERR_DBCONN,
-        ELMY_STATUS_ERR_DBQRY
+        ELMY_STATUS_OK      = 0,
+        ELMY_STATUS_DBCONN  = -1,
+        ELMY_STATUS_DBQRY   = -2
 };
 
 
