@@ -1,8 +1,6 @@
-#ifndef __LIBELMY_SRC_BIN_OPT_H__
-#define __LIBELMY_SRC_BIN_OPT_H__
-
 #include <libchrysalid/include/hptr.h>
 #include <libchrysalid/include/utf8.h>
+
 #include <getopt.h>
 
 
@@ -123,6 +121,3 @@ static void opt_free(struct opt **ctx)
 
         cy_hptr_free((cy_hptr_t **) ctx);
 }
-
-
-#endif /* !__LIBELMY_SRC_BIN_OPT_H__ */
