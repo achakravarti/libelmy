@@ -189,7 +189,7 @@ rule_last(const struct opt *o, char *argv[])
  *      status codes:
  *
  *        - {{EXIT_SUCCESS}} if the rule executed successfully
- *        - {{EXIT_FAILURE: if a command line-related error occurrs
+ *        - {{EXIT_FAILURE}} if a command line-related error occurrs
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
