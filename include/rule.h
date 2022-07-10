@@ -39,10 +39,9 @@ elmy_rule_facility(enum cy_log_facility[],
                    elmy_logs_t **,
                    elmy_error_t **);
 
-extern CY_PSAFE int
-elmy_rule_severity(const char *, const struct elmy_page *,
-                   enum cy_log_severity [], size_t, elmy_logs_t **,
-                   cy_utf8_t **);
+extern CY_PSAFE int elmy_rule_severity(
+    enum cy_log_severity [], size_t, const char *, const elmy_page_t *,
+    elmy_logs_t **, elmy_error_t **);
 
 extern CY_PSAFE int
 elmy_rule_hostname(const char *, const char *, const elmy_page_t *,
