@@ -45,12 +45,12 @@ elmy_rule_hostname(const char *, const char *, const elmy_page_t *,
                    elmy_logs_t **, elmy_error_t **);
 
 extern CY_PSAFE int
-elmy_rule_tag(const char *, const struct elmy_page *, const char *,
-              elmy_logs_t **, cy_utf8_t **);
+elmy_rule_tag(const char *, const char *, const elmy_page_t *, elmy_logs_t **,
+              elmy_error_t **);
 
 extern CY_PSAFE int
-elmy_rule_message(const char *, const struct elmy_page *, const char *,
-                  elmy_logs_t **, cy_utf8_t **);
+elmy_rule_message(const char *, const char *, const elmy_page_t *,
+                  elmy_logs_t **, elmy_error_t **);
 
 
 /* C++ compatiblity */
