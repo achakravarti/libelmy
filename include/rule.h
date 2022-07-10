@@ -30,10 +30,14 @@ extern CY_PSAFE enum elmy_status
 elmy_rule_all(const char *, const elmy_page_t *, elmy_logs_t **,
                elmy_error_t **);
 
-extern int
-elmy_rule_facility(const char *, const struct elmy_page *,
-                   enum cy_log_facility [], size_t, elmy_logs_t **,
-                   cy_utf8_t **);
+
+extern CY_PSAFE int
+elmy_rule_facility(enum cy_log_facility[],
+                   size_t,
+                   const char *,
+                   const elmy_page_t *,
+                   elmy_logs_t **,
+                   elmy_error_t **);
 
 extern CY_PSAFE int
 elmy_rule_severity(const char *, const struct elmy_page *,
