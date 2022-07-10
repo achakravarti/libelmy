@@ -14,12 +14,10 @@
 #include <stdlib.h>
 
 
-#define RULE_COUNT      "count"
 #define RULE_INITIAL    "initial"
 #define RULE_LAST       "last"
 #define RULE_ALL        "all"
 
-#define SQL_COUNT               "SELECT * FROM logs_count();"
 #define SQL_INITIAL             "SELECT * FROM logs_ts_first($1);"
 #define SQL_LAST                "SELECT * FROM logs_ts_last($1);"
 #define SQL_ALL                 "SELECT * FROM logs_all($1);"
@@ -69,18 +67,16 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
         assert(res != NULL);
         assert(err != NULL && *err == NULL);
 
-        CY_AUTO(db_t) *db = db_new(RULE_COUNT, SQL_COUNT);
+        CY_AUTO(db_t) *db = db_new("count", "SELECT * FROM logs_count();");
 
-        if (CY_UNLIKELY(db_exec(db)))
-                goto error;
+        if (CY_UNLIKELY(db_exec(db))) {
+                *res = 0;
+                *err = db_error(db);
+                return elmy_error_status(*err);
+        }
 
         *res = strtoumax(PQgetvalue(db_result(db), 0, 0), NULL, 10);
         return ELMY_STATUS_OK;
-
-error:
-        *res = 0;
-        *err = db_error(db);
-        return elmy_error_status(*err);
 }
 
 
