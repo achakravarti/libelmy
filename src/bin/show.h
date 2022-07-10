@@ -1,6 +1,3 @@
-#ifndef __LIBELMY_SRC_BIN_SHOW_H__
-#define __LIBELMY_SRC_BIN_SHOW_H__
-
 #include "../../include/error.h"
 
 #include <stdio.h>
@@ -50,5 +47,3 @@ static int show_error(const elmy_error_t *err)
 
         return elmy_error_status(err);
 }
-
-#endif /* !__LIBELMY_SRC_BIN_SHOW_H__ */

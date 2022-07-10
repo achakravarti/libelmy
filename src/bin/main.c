@@ -1,4 +1,4 @@
-#include "opt.h"
+#include "opt.c"
 #include "rule.h"
 
 
