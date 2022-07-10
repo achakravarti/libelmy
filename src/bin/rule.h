@@ -29,16 +29,12 @@ static int rule_count(const struct opt *o, int argc, char *argv[])
 
 static int rule_initial(const struct opt *o, char *argv[])
 {
-        if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version))
+        if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version
+                        || *o->filter || *o->sortcol || *o->sortdir
+                        || *o->rowstart || *o->rowcount))
                 return show_invalid(argv);
 
-        if (CY_UNLIKELY(!cy_utf8_empty(o->filter) || !cy_utf8_empty(o->sortcol)
-                        || !cy_utf8_empty(o->sortdir)
-                        || !cy_utf8_empty(o->rowstart)
-                        || !cy_utf8_empty(o->rowcount)))
-                return show_invalid(argv);
-
-        if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
+        if (CY_UNLIKELY(!*o->timezone))
                 return show_missing(argv);
 
         CY_AUTO(cy_utf8_t) *res = NULL;
@@ -54,16 +50,12 @@ static int rule_initial(const struct opt *o, char *argv[])
 
 static int rule_last(const struct opt *o, char *argv[])
 {
-        if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version))
+        if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version
+                        || *o->filter || *o->sortcol || *o->sortdir
+                        || *o->rowstart || *o->rowcount))
                 return show_invalid(argv);
 
-        if (CY_UNLIKELY(!cy_utf8_empty(o->filter) || !cy_utf8_empty(o->sortcol)
-                        || !cy_utf8_empty(o->sortdir)
-                        || !cy_utf8_empty(o->rowstart)
-                        || !cy_utf8_empty(o->rowcount)))
-                return show_invalid(argv);
-
-        if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
+        if (CY_UNLIKELY(!*o->timezone))
                 return show_missing(argv);
 
         CY_AUTO(cy_utf8_t) *res = NULL;
@@ -78,14 +70,12 @@ static int rule_last(const struct opt *o, char *argv[])
 
 static int rule_all(const struct opt *o, char *argv[])
 {
-        if (CY_UNLIKELY(!cy_utf8_empty(o->filter)))
+        if (CY_UNLIKELY(o->help || o->version || *o->filter))
                 return show_invalid(argv);
 
-        if (CY_UNLIKELY(cy_utf8_empty(o->timezone)))
+        if (CY_UNLIKELY(!*o->timezone))
                 return show_missing(argv);
 
-        if (CY_UNLIKELY(o->help || o->version))
-                return show_invalid(argv);
 
         CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
                                    ? elmy_page_new_disabled()
