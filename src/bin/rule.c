@@ -1,21 +1,41 @@
+/* Local dependencies */
 #include "opt.h"
 #include "show.h"
 
+/* Non-standard libary dependencies */
 #include "../../include/rule.h"
 #include <libchrysalid/include/utf8.h>
 
+/* Standard library dependencies */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
-static int rule_count(const struct opt *o, int argc, char *argv[]);
-static int rule_initial(const struct opt *o, char *argv[]);
-static int rule_last(const struct opt *o, char *argv[]);
-static int rule_all(const struct opt *o, char *argv[]);
+/* Prototypes for private support functions */
+
+static CY_PSAFE int
+rule_count(const struct opt *, int, char *[]);
+
+static CY_PSAFE int
+rule_initial(const struct opt *, char *[]);
+
+static CY_PSAFE int
+rule_last(const struct opt *, char *[]);
+
+static CY_PSAFE int
+rule_all(const struct opt *, char *[]);
 
 
-int rule_exec(const struct opt *o, int argc, char *argv[])
+/* Implementation of public function */
+
+
+/*                                                               %func:rule_exec
+ * __NAME__
+ *      rule_exec() - executes user-specified rule
+ */
+int
+rule_exec(const struct opt *o, int argc, char *argv[])
 {
         if (argc == 1 || o->error)
                 return show_invalid(argv);
@@ -48,7 +68,15 @@ int rule_exec(const struct opt *o, int argc, char *argv[])
 }
 
 
-int rule_count(const struct opt *o, int argc, char *argv[])
+/* Implementation of private functions */
+
+
+/*                                                              %func:rule_count
+ * __NAME__
+ *      rule_count() - executes the "count" rule
+ */
+int
+rule_count(const struct opt *o, int argc, char *argv[])
 {
         if (CY_UNLIKELY(argc > 2))
                 return show_invalid(argv);
@@ -64,7 +92,12 @@ int rule_count(const struct opt *o, int argc, char *argv[])
 }
 
 
-int rule_initial(const struct opt *o, char *argv[])
+/*                                                            %func:rule_initial
+ * __NAME__
+ *      rule_initial() - executes the "initial" rule
+ */
+int
+rule_initial(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version
                         || *o->filter || *o->sortcol || *o->sortdir
@@ -85,7 +118,12 @@ int rule_initial(const struct opt *o, char *argv[])
 }
 
 
-int rule_last(const struct opt *o, char *argv[])
+/*                                                               %func:rule_last
+ * __NAME__
+ *      rule_last() - executes the "last" rule
+ */
+int
+rule_last(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version
                         || *o->filter || *o->sortcol || *o->sortdir
@@ -106,7 +144,12 @@ int rule_last(const struct opt *o, char *argv[])
 }
 
 
-int rule_all(const struct opt *o, char *argv[])
+/*                                                                %func:rule_all
+ * __NAME__
+ *      rule_all() - executes the "all" rule
+ */
+int
+rule_all(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version || *o->filter))
                 return show_invalid(argv);
