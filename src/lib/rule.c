@@ -18,12 +18,16 @@
 #define RULE_INITIAL    "initial"
 #define RULE_LAST       "last"
 #define RULE_ALL        "all"
+#define RULE_HOSTNAME   "hostname"
 
-#define SQL_COUNT       "SELECT * FROM logs_count();"
-#define SQL_INITIAL     "SELECT * FROM logs_ts_first($1);"
-#define SQL_LAST        "SELECT * FROM logs_ts_last($1);"
-#define SQL_ALL         "SELECT * FROM logs_all($1);"
-#define SQL_ALL_PAGED   "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);"
+#define SQL_COUNT               "SELECT * FROM logs_count();"
+#define SQL_INITIAL             "SELECT * FROM logs_ts_first($1);"
+#define SQL_LAST                "SELECT * FROM logs_ts_last($1);"
+#define SQL_ALL                 "SELECT * FROM logs_all($1);"
+#define SQL_ALL_PAGED           "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);"
+#define SQL_HOSTNAME            "SELECT * FROM logs_hostname($1,$2);"
+#define SQL_HOSTNAME_PAGED      "SELECT * FROM logs_hostname_paged"     \
+                                "($1,$2,$3,$4,$5,$6);"
 
 
 enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
@@ -144,14 +148,38 @@ int elmy_rule_severity(const char *tz, const struct elmy_page *pg,
 }
 
 
-int elmy_rule_hostname(const char *tz, const struct elmy_page *pg,
-                       const char *filter, elmy_logs_t **res, cy_utf8_t **err)
+int
+elmy_rule_hostname(const char *filter, const char *tz, const elmy_page_t *pg,
+                   elmy_logs_t **res, elmy_error_t **err)
 {
-        assert(tz && *tz);
-        assert(res && !*res);
-        assert(err);
+        assert(filter != NULL && *filter != '\0');
+        assert(tz != NULL && *tz != '\0');
+        assert(pg != NULL);
+        assert(res != NULL && *res == NULL);
+        assert(err != NULL && *err == NULL);
 
-        return ELMY_STATUS_FAIL;
+        CY_AUTO(db_t) *db;
+        enum elmy_status rc;
+
+        if (CY_UNLIKELY(elmy_page_disabled(pg))) {
+                db = db_new(RULE_HOSTNAME, SQL_HOSTNAME);
+                rc = db_exec_param(db, (const char *[2]) {filter, tz});
+        } else {
+                const char *p[] = {filter, elmy_page_start(pg),
+                                   elmy_page_count(pg), elmy_page_col(pg),
+                                   elmy_page_dir(pg), tz};
+                db = db_new(RULE_HOSTNAME, SQL_HOSTNAME_PAGED);
+                rc = db_exec_param(db, p);
+        }
+
+        if (CY_UNLIKELY(rc)) {
+                *res = NULL;
+                *err = db_error(db);
+                return rc;
+        }
+
+        *res = elmy_logs_new_parse__(db_result(db));
+        return ELMY_STATUS_OK;
 }
 
 
