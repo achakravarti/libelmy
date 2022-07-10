@@ -26,115 +26,42 @@
 #define SQL_ALL_PAGED           "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);"
 
 
-// https://stackoverflow.com/questions/1745811
-static cy_utf8_t *
-enums_csv(int enums[], size_t len)
-{
-        const size_t bfrlen = 80;
-        char bfr[bfrlen];
+/* Prototypes for support functions */
 
-        register size_t off = 1;
-
-        for (register size_t i = 0; i < len; i++) {
-                off += snprintf(bfr + off,
-                                bfrlen - off,
-                                i > 0 ? ",%d" : "%u",
-                                enums[i]);
-        }
-
-        bfr[0] = '{';
-        bfr[off] = '}';
-        bfr[off + 1] = '\0';
-
-        return cy_utf8_new(bfr);
-}
+static CY_RSAFE cy_utf8_t *enums_csv(int enums[], size_t len);
 
 static CY_PSAFE int filter_intarray(
-    const char *rule, int filter[], size_t nfilter, const char *tz,
-    const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
-{
-        assert(*rule);
-        assert(nfilter > 0);
-        assert(*tz);
-        assert(!*res);
-        assert(!*err);
-
-        enum elmy_status rc;
-        CY_AUTO(db_t) *db;
-        CY_AUTO(cy_utf8_t) *csv = enums_csv(filter, nfilter);
-
-        if (CY_UNLIKELY(elmy_page_disabled(pg))) {
-                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
-                    "SELECT * FROM logs_%s($1,$2);", rule);
-
-                db = db_new(rule, sql);
-                rc = db_exec_param(db, (const char *[2]) {csv, tz});
-        } else {
-                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
-                    "SELECT * FROM logs_%s_paged($1,$2,$3,$4,$5,$6);", rule);
-
-                const char *p[] = {
-                    csv, elmy_page_start(pg), elmy_page_count(pg),
-                    elmy_page_col(pg), elmy_page_dir(pg), tz};
-
-                db = db_new(rule, sql);
-                rc = db_exec_param(db, p);
-        }
-
-        if (CY_UNLIKELY(rc)) {
-                *res = NULL;
-                *err = db_error(db);
-                return rc;
-        }
-
-        *res = elmy_logs_new_parse__(db_result(db));
-        return ELMY_STATUS_OK;
-}
-
+    const char *, int [], size_t, const char *, const elmy_page_t *,
+    elmy_logs_t **, elmy_error_t **);
 
 static CY_PSAFE int run_filter(
-    const char *rule, const char *filter, const char *tz, const elmy_page_t *pg,
-    elmy_logs_t **res, elmy_error_t **err)
+    const char *, const char *, const char *, const elmy_page_t *,
+    elmy_logs_t **, elmy_error_t **);
+
+
+static CY_PSAFE db_t *query_unpaged(const char *rule, const char *params[], size_t nparams, elmy_error_t **err)
 {
         assert(*rule);
-        assert(*filter);
-        assert(*tz);
-        assert(!*res);
+        assert(nparams == 1 || nparams == 2);
         assert(!*err);
 
-        enum elmy_status rc;
-        CY_AUTO(db_t) *db;
+        const char *p = nparams == 1 ? "$1" : "$1,$2";
+        CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
+            "SELECT * FROM logs_%s(%s);", rule, p);
 
+        db_t *db = db_new("rule", sql);
 
-        if (CY_UNLIKELY(elmy_page_disabled(pg))) {
-                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
-                    "SELECT * FROM logs_%s($1,$2);", rule);
-
-                db = db_new(rule, sql);
-                rc = db_exec_param(db, (const char *[2]) {filter, tz});
-        } else {
-                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
-                    "SELECT * FROM logs_%s_paged($1,$2,$3,$4,$5,$6);", rule);
-
-                const char *p[] = {
-                    filter, elmy_page_start(pg), elmy_page_count(pg),
-                    elmy_page_col(pg), elmy_page_dir(pg), tz};
-
-                db = db_new(rule, sql);
-                rc = db_exec_param(db, p);
-        }
-
-        if (CY_UNLIKELY(rc)) {
-                *res = NULL;
+        if (CY_UNLIKELY(db_exec_param(db, params))) {
                 *err = db_error(db);
-                return rc;
+                db_free(&db);
+                return NULL;
         }
 
-        *res = elmy_logs_new_parse__(db_result(db));
-        return ELMY_STATUS_OK;
+        return db;
 }
 
 
+/* Implementations of public functions */
 
 
 enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
@@ -160,15 +87,14 @@ error:
 enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
                                    elmy_error_t **err)
 {
-        assert(tz != NULL && *tz != '\0');
-        assert(res != NULL && *res == NULL);
-        assert(err != NULL && *err == NULL);
+        assert(*tz);
+        assert(!*res);
 
-        CY_AUTO(db_t) *db = db_new(RULE_INITIAL, SQL_INITIAL);
+        CY_AUTO(db_t) *db = query_unpaged(
+            "ts_first", (const char *[1]) {tz}, 1, err);
 
-        if (CY_UNLIKELY(db_exec_param(db, (const char *[1]) {tz}))) {
+        if (CY_UNLIKELY(!db)) {
                 *res = cy_utf8_new_empty();
-                *err = db_error(db);
                 return elmy_error_status(*err);
         }
 
@@ -180,15 +106,14 @@ enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
 enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
                                 elmy_error_t **err)
 {
-        assert(tz != NULL && *tz != '\0');
-        assert(res != NULL && *res == NULL);
-        assert(err != NULL && *err == NULL);
+        assert(*tz);
+        assert(!*res);
 
-        CY_AUTO(db_t) *db = db_new(RULE_LAST, SQL_LAST);
+        CY_AUTO(db_t) *db = query_unpaged(
+            "ts_last", (const char *[1]) {tz}, 1, err);
 
-        if (CY_UNLIKELY(db_exec_param(db, (const char *[1]) {tz}))) {
+        if (CY_UNLIKELY(!db)) {
                 *res = cy_utf8_new_empty();
-                *err = db_error(db);
                 return elmy_error_status(*err);
         }
 
@@ -200,10 +125,8 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
 enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
                                elmy_logs_t **res, elmy_error_t **err)
 {
-        assert(tz != NULL && *tz != '\0');
-        assert(pg != NULL);
-        assert(res != NULL && *res == NULL);
-        assert(err != NULL && *err == NULL);
+        assert(*tz);
+        assert(!*res);
 
         CY_AUTO(db_t) *db;
         enum elmy_status rc;
@@ -283,4 +206,113 @@ elmy_rule_message(const char             *filter,
                   elmy_error_t          **err)
 {
         return run_filter("message", filter, tz, pg, res, err);
+}
+
+
+/* Implementations of support functions */
+
+
+// https://stackoverflow.com/questions/1745811
+cy_utf8_t *enums_csv(int enums[], size_t len)
+{
+        const size_t bfrlen = 80;
+        char bfr[bfrlen];
+
+        register size_t off = 1;
+
+        for (register size_t i = 0; i < len; i++)
+                off += snprintf(
+                    bfr + off, bfrlen - off, i > 0 ? ",%d" : "%u", enums[i]);
+
+        bfr[0] = '{';
+        bfr[off] = '}';
+        bfr[off + 1] = '\0';
+
+        return cy_utf8_new(bfr);
+}
+
+
+int filter_intarray(
+    const char *rule, int filter[], size_t nfilter, const char *tz,
+    const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
+{
+        assert(*rule);
+        assert(nfilter > 0);
+        assert(*tz);
+        assert(!*res);
+        assert(!*err);
+
+        enum elmy_status rc;
+        CY_AUTO(db_t) *db;
+        CY_AUTO(cy_utf8_t) *csv = enums_csv(filter, nfilter);
+
+        if (CY_UNLIKELY(elmy_page_disabled(pg))) {
+                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
+                    "SELECT * FROM logs_%s($1,$2);", rule);
+
+                db = db_new(rule, sql);
+                rc = db_exec_param(db, (const char *[2]) {csv, tz});
+        } else {
+                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
+                    "SELECT * FROM logs_%s_paged($1,$2,$3,$4,$5,$6);", rule);
+
+                const char *p[] = {
+                    csv, elmy_page_start(pg), elmy_page_count(pg),
+                    elmy_page_col(pg), elmy_page_dir(pg), tz};
+
+                db = db_new(rule, sql);
+                rc = db_exec_param(db, p);
+        }
+
+        if (CY_UNLIKELY(rc)) {
+                *res = NULL;
+                *err = db_error(db);
+                return rc;
+        }
+
+        *res = elmy_logs_new_parse__(db_result(db));
+        return ELMY_STATUS_OK;
+}
+
+
+int run_filter(
+    const char *rule, const char *filter, const char *tz, const elmy_page_t *pg,
+    elmy_logs_t **res, elmy_error_t **err)
+{
+        assert(*rule);
+        assert(*filter);
+        assert(*tz);
+        assert(!*res);
+        assert(!*err);
+
+        enum elmy_status rc;
+        CY_AUTO(db_t) *db;
+
+
+        if (CY_UNLIKELY(elmy_page_disabled(pg))) {
+                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
+                    "SELECT * FROM logs_%s($1,$2);", rule);
+
+                db = db_new(rule, sql);
+                rc = db_exec_param(db, (const char *[2]) {filter, tz});
+        } else {
+                CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
+                    "SELECT * FROM logs_%s_paged($1,$2,$3,$4,$5,$6);", rule);
+
+                const char *p[] = {
+                    filter, elmy_page_start(pg), elmy_page_count(pg),
+                    elmy_page_col(pg), elmy_page_dir(pg), tz};
+
+                db = db_new(rule, sql);
+                rc = db_exec_param(db, p);
+        }
+
+        if (CY_UNLIKELY(rc)) {
+                *res = NULL;
+                *err = db_error(db);
+                return rc;
+        }
+
+        *res = elmy_logs_new_parse__(db_result(db));
+        return ELMY_STATUS_OK;
 }
