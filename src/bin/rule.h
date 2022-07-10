@@ -1,7 +1,4 @@
-#ifndef __LIBELMY_SRC_BIN_RULE_H__
-#define __LIBELMY_SRC_BIN_RULE_H__
-
-#include "show.h"
+#include "show.c"
 
 #include "../../include/rule.h"
 
@@ -76,7 +73,6 @@ static int rule_all(const struct opt *o, char *argv[])
         if (CY_UNLIKELY(!*o->timezone))
                 return show_missing(argv);
 
-
         CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
                                    ? elmy_page_new_disabled()
                                    : elmy_page_new_parse(o->rowstart,
@@ -133,6 +129,3 @@ static int rule_exec(const struct opt *o, int argc, char *argv[])
 
         return show_invalid(argv);
 }
-
-
-#endif /* !__LIBELMY_SRC_BIN_RULE_H__ */
