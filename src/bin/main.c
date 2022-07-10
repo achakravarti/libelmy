@@ -1,5 +1,5 @@
-#include "opt.c"
-#include "rule.c"
+#include "opt.h"
+#include "rule.h"
 
 
 int main(int argc, char *argv[])

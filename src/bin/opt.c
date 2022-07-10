@@ -1,25 +1,11 @@
+#include "opt.h"
+
 #include <libchrysalid/include/hptr.h>
-#include <libchrysalid/include/utf8.h>
 
 #include <getopt.h>
 
 
-struct opt {
-        bool             error;
-        bool             help;
-        bool             json;
-        bool             unpaged;
-        bool             version;
-        cy_utf8_t       *timezone;
-        cy_utf8_t       *filter;
-        cy_utf8_t       *sortcol;
-        cy_utf8_t       *sortdir;
-        cy_utf8_t       *rowstart;
-        cy_utf8_t       *rowcount;
-};
-
-
-static struct opt *opt_new(int argc, char *argv[])
+struct opt *opt_new(int argc, char *argv[])
 {
         struct opt *ctx = cy_hptr_new(sizeof *ctx);
 
@@ -106,7 +92,8 @@ static struct opt *opt_new(int argc, char *argv[])
         return ctx;
 }
 
-static void opt_free(struct opt **ctx)
+
+void opt_free(struct opt **ctx)
 {
         struct opt *o;
 
