@@ -242,7 +242,7 @@ enum elmy_status elmy_rule_severity(
  *          elmy_logs_t **res, elmy_error_t **err);
  *
  * __PARAMETERS__
- *      - {{filter}}: hostnames to filter
+ *      - {{filter}}: hostname to filter
  *      - {{tz}}: reporting time zone
  *      - {{pg}}: pagination options
  *      - {{res}}: handle to rule result
@@ -260,6 +260,27 @@ enum elmy_status elmy_rule_hostname(
 }
 
 
+/*                                                           %func:elmy_rule_tag
+ * __NAME__
+ *      {{elmy_rule_tag()}} - filters logs by syslog tag
+ *
+ * __SYNOPSIS__
+ *      #include <libelmy/libelmy.h>
+ *      extern CY_PSAFE enum elmy_status elmy_rule_tag(
+ *          const char *filter, const char *tz, const elmy_page_t *pg,
+ *          elmy_logs_t **res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{filter}}: tag to filter
+ *      - {{tz}}: reporting time zone
+ *      - {{pg}}: pagination options
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status elmy_rule_tag(
     const char *filter, const char *tz, const elmy_page_t *pg, elmy_logs_t **res,
     elmy_error_t **err)
