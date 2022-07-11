@@ -289,6 +289,27 @@ enum elmy_status elmy_rule_tag(
 }
 
 
+/*                                                       %func:elmy_rule_message
+ * __NAME__
+ *      {{elmy_rule_message()}} - filters logs by message
+ *
+ * __SYNOPSIS__
+ *      #include <libelmy/libelmy.h>
+ *      extern CY_PSAFE enum elmy_status elmy_rule_tag(
+ *          const char *filter, const char *tz, const elmy_page_t *pg,
+ *          elmy_logs_t **res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{filter}}: message to filter
+ *      - {{tz}}: reporting time zone
+ *      - {{pg}}: pagination options
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status elmy_rule_message(
     const char *filter, const char *tz, const elmy_page_t *pg, elmy_logs_t **res,
     elmy_error_t **err)
