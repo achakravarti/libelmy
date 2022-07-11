@@ -14,13 +14,6 @@ extern "C" {
 
 typedef struct elmy_log__ elmy_log_t;
 
-enum elmy_log_format {
-        ELMY_LOG_FORMAT_DEFAULT,
-        ELMY_LOG_FORMAT_CSV,
-        ELMY_LOG_FORMAT_CSV_HDR,
-        ELMY_LOG_FORMAT_JSON
-};
-
 
 extern CY_HOT CY_SAFE elmy_log_t *
 elmy_log_new(const char *, const char *, enum cy_log_facility, const char *,
@@ -68,9 +61,6 @@ elmy_log_tag(const elmy_log_t *);
 
 extern CY_SAFE const cy_utf8_t *
 elmy_log_message(const elmy_log_t *);
-
-extern CY_RSAFE cy_utf8_t *
-elmy_log_print(const elmy_log_t *, enum elmy_log_format);
 
 extern CY_RSAFE cy_utf8_t *
 elmy_log_str(const elmy_log_t *);

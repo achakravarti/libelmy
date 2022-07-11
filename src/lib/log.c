@@ -166,54 +166,6 @@ const cy_utf8_t *elmy_log_message(const elmy_log_t *ctx)
 }
 
 
-cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
-{
-        assert(ctx != NULL);
-
-        const char *f;
-
-        switch (fmt) {
-        case ELMY_LOG_FORMAT_CSV:
-                f = "%s,%s,%d,%s,%d,%s,%s,%s,%s";
-                break;
-
-        case ELMY_LOG_FORMAT_CSV_HDR:
-                f = "log_ts,event_ts,facility,facility_kw,severity,severity_kw,"
-                    "hostname,tag,message\n%s,%s,%d,%s,%d,%s,%s,%s,%s";
-                break;
-
-        case ELMY_LOG_FORMAT_JSON:
-                f = "{\"log_ts\":\"%s\",\"event_ts\":\"%s\",\"facility\":%d,"
-                    "\"facility_kw\":\"%s\",\"severity\":%d,"
-                    "\"severity_kw\":\"%s\",\"hostname\":\"%s\",\"tag\":\"%s\","
-                    "\"message\":\"%s\"}";
-                break;
-
-        default:
-                f = "log_ts = %s, event_ts = %s, facility = %d,"
-                    " facility_kw = %s, severity = %d, severity_kw = %s,"
-                    " hostname = %s, tag = %s, message = %s";
-        }
-
-        if (fmt != ELMY_LOG_FORMAT_JSON)
-                return cy_utf8_new_fmt(f, ctx->ts, ctx->evts, ctx->facility,
-                                       ctx->facility_kw, ctx->severity,
-                                       ctx->severity_kw, ctx->hostname,
-                                       ctx->tag, ctx->message);
-
-        CY_AUTO(cy_utf8_t) *ts = cy_utf8_escape_json(ctx->ts);
-        CY_AUTO(cy_utf8_t) *evts = cy_utf8_escape_json(ctx->evts);
-        CY_AUTO(cy_utf8_t) *fkw = cy_utf8_escape_json(ctx->facility_kw);
-        CY_AUTO(cy_utf8_t) *skw = cy_utf8_escape_json(ctx->severity_kw);
-        CY_AUTO(cy_utf8_t) *hn = cy_utf8_escape_json(ctx->hostname);
-        CY_AUTO(cy_utf8_t) *tag = cy_utf8_escape_json(ctx->tag);
-        CY_AUTO(cy_utf8_t) *msg = cy_utf8_escape_json(ctx->message);
-
-        return cy_utf8_new_fmt(f, ts, evts, ctx->facility, fkw, ctx->severity,
-                               skw, hn, tag, msg);
-}
-
-
 cy_utf8_t *elmy_log_str(const elmy_log_t *ctx)
 {
         assert(ctx != NULL);
