@@ -69,6 +69,23 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 }
 
 
+/*                                                       %func:elmy_rule_initial
+ * __NAME__
+ *      {{elmy_rule_initial()}} - rule to get timestamp of first log entry
+ *
+ * __SYNOPSIS__
+ *      #include <libelmy/libelmy.h>
+ *      extern CY_PSAFE enum elmy_status elmy_rule_initial(
+ *          const char *tz, cy_utf8_t **res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status elmy_rule_initial(
     const char *tz, cy_utf8_t **res, elmy_error_t **err)
 {
