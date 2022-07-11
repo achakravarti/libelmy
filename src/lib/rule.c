@@ -119,8 +119,28 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
 }
 
 
-enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
-                               elmy_logs_t **res, elmy_error_t **err)
+/*                                                           %func:elmy_rule_all
+ * __NAME__
+ *      {{elmy_rule_all()}} - rule to get all log entries
+ *
+ * __SYNOPSIS__
+ *      #include <libelmy/libelmy.h>
+ *      extern CY_PSAFE enum elmy_status elmy_rule_all(
+ *          const char *tz, const elmy_page_t *pg, elmy_logs_t **res,
+ *          elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{tz}}: reporting time zone
+ *      - {{pg}}: pagination options
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
+enum elmy_status elmy_rule_all(
+    const char *tz, const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
 {
         assert(*tz);
         assert(!*res);
@@ -132,8 +152,9 @@ enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
                 db = db_new("all", "SELECT * FROM logs_all($1);");
                 rc = db_exec_param(db, (const char *[1]) {tz});
         } else {
-                const char *p[] = {elmy_page_start(pg), elmy_page_count(pg),
-                                   elmy_page_col(pg), elmy_page_dir(pg), tz};
+                const char *p[] = {
+                    elmy_page_start(pg), elmy_page_count(pg), elmy_page_col(pg),
+                    elmy_page_dir(pg), tz};
                 db = db_new(
                     "all", "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);");
                 rc = db_exec_param(db, p);
