@@ -34,6 +34,23 @@ static CY_PSAFE enum elmy_status rule_fstr(
 /* Implementations of public functions */
 
 
+/*                                                         %func:elmy_rule_count
+ * __NAME__
+ *      {{elmy_rule_count()}} - rule to count number of logs
+ *
+ * __SYNOPSIS__
+ *      #include <libelmy/libelmy.h>
+ *      extern CY_PSAFE enum elmy_status elmy_rule_count(
+ *          size_t *res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 {
         assert(res != NULL);
