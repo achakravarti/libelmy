@@ -36,7 +36,7 @@ static CY_PSAFE enum elmy_status rule_fstr(
 
 /*                                                         %func:elmy_rule_count
  * __NAME__
- *      {{elmy_rule_count()}} - rule to count number of logs
+ *      {{elmy_rule_count()}} - counts logs
  *
  * __SYNOPSIS__
  *      #include <libelmy/libelmy.h>
@@ -71,7 +71,7 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 
 /*                                                       %func:elmy_rule_initial
  * __NAME__
- *      {{elmy_rule_initial()}} - rule to get timestamp of first log entry
+ *      {{elmy_rule_initial()}} - gets first log timestamp
  *
  * __SYNOPSIS__
  *      #include <libelmy/libelmy.h>
@@ -96,7 +96,7 @@ enum elmy_status elmy_rule_initial(
 
 /*                                                          %func:elmy_rule_last
  * __NAME__
- *      {{elmy_rule_last()}} - rule to get timestamp of last log entry
+ *      {{elmy_rule_last()}} - gets last log timestamp
  *
  * __SYNOPSIS__
  *      #include <libelmy/libelmy.h>
@@ -121,7 +121,7 @@ enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
 
 /*                                                           %func:elmy_rule_all
  * __NAME__
- *      {{elmy_rule_all()}} - rule to get all log entries
+ *      {{elmy_rule_all()}} - gets all logs
  *
  * __SYNOPSIS__
  *      #include <libelmy/libelmy.h>
@@ -171,6 +171,28 @@ enum elmy_status elmy_rule_all(
 }
 
 
+/*                                                      %func:elmy_rule_facility
+ * __NAME__
+ *      {{elmy_rule_facility()}} - filters logs by facility
+ *
+ * __SYNOPSIS__
+ *      #include <libelmy/libelmy.h>
+ *      extern CY_PSAFE enum elmy_status elmy_rule_facility(
+ *          enum cy_log_facility filter[], size_t nfilter, const char *tz,
+ *          const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{filter}}: facilities to filter
+ *      - {{nfilter}}: length of {{filter}}
+ *      - {{tz}}: reporting time zone
+ *      - {{pg}}: pagination options
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status elmy_rule_facility(
     enum cy_log_facility filter[], size_t nfilter, const char *tz,
     const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
