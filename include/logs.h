@@ -27,6 +27,8 @@ enum elmy_logs_format {
 extern CY_HOT CY_SAFE elmy_logs_t *
 elmy_logs_new(size_t);
 
+extern CY_RSAFE elmy_logs_t *elmy_logs_new_empty(void);
+
 extern CY_HOT CY_SAFE elmy_logs_t *
 elmy_logs_new_parse__(void *);
 

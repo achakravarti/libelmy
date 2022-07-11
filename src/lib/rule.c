@@ -1,27 +1,18 @@
+/* Local dependencies */
 #include "../../include/error.h"
 #include "../../include/rule.h"
 #include "db.h"
 
+/* External dependencies */
 #include <libchrysalid/include/ext.h>
 #include <libchrysalid/include/hptr.h>
 #include <libchrysalid/include/log.h>
 #include <libchrysalid/include/utf8.h>
 #include <libpq-fe.h>
 
+/* Standard library dependencies */
 #include <assert.h>
-#include <errno.h>
 #include <inttypes.h>
-#include <stdlib.h>
-
-
-#define RULE_INITIAL    "initial"
-#define RULE_LAST       "last"
-#define RULE_ALL        "all"
-
-#define SQL_INITIAL             "SELECT * FROM logs_ts_first($1);"
-#define SQL_LAST                "SELECT * FROM logs_ts_last($1);"
-#define SQL_ALL                 "SELECT * FROM logs_all($1);"
-#define SQL_ALL_PAGED           "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);"
 
 
 /* Prototypes for support functions */
@@ -38,8 +29,6 @@ static CY_PSAFE enum elmy_status rule_fint(
 static CY_PSAFE enum elmy_status rule_fstr(
     const char *, const char *, const char *, const elmy_page_t *,
     elmy_logs_t **, elmy_error_t **);
-
-
 
 
 /* Implementations of public functions */
@@ -87,28 +76,25 @@ enum elmy_status elmy_rule_all(const char *tz, const elmy_page_t *pg,
         enum elmy_status rc;
 
         if (elmy_page_disabled(pg)) {
-                db = db_new(RULE_ALL, SQL_ALL);
+                db = db_new("all", "SELECT * FROM logs_all($1);");
                 rc = db_exec_param(db, (const char *[1]) {tz});
         } else {
                 const char *p[] = {elmy_page_start(pg), elmy_page_count(pg),
                                    elmy_page_col(pg), elmy_page_dir(pg), tz};
-                db = db_new(RULE_ALL, SQL_ALL_PAGED);
+                db = db_new(
+                    "all", "SELECT * FROM logs_all_paged($1,$2,$3,$4,$5);");
                 rc = db_exec_param(db, p);
         }
 
-        if (CY_UNLIKELY(rc))
-                goto error;
+        if (CY_UNLIKELY(rc)) {
+                *res = elmy_logs_new_empty();
+                *err = db_error(db);
+                return rc;
+        }
 
         *res = elmy_logs_new_parse__(db_result(db));
         return ELMY_STATUS_OK;
-
-error:
-        *res = NULL;
-        *err = db_error(db);
-        return rc;
 }
-
-
 
 
 enum elmy_status elmy_rule_facility(
@@ -197,8 +183,6 @@ enum elmy_status rule_ts(
 }
 
 
-
-
 enum elmy_status rule_fint(
     const char *rule, int filter[], size_t nfilter, const char *tz,
     const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
@@ -232,7 +216,7 @@ enum elmy_status rule_fint(
         }
 
         if (CY_UNLIKELY(rc)) {
-                *res = NULL;
+                *res = elmy_logs_new_empty();
                 *err = db_error(db);
                 return rc;
         }
@@ -275,7 +259,7 @@ enum elmy_status rule_fstr(
         }
 
         if (CY_UNLIKELY(rc)) {
-                *res = NULL;
+                *res = elmy_logs_new_empty();
                 *err = db_error(db);
                 return rc;
         }
