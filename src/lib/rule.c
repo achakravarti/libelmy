@@ -28,35 +28,18 @@
 
 static CY_RSAFE cy_utf8_t *enums_csv(int enums[], size_t len);
 
-static CY_PSAFE int filter_intarray(
+static CY_PSAFE enum elmy_status rule_ts(
+    const char *, const char *, cy_utf8_t **, elmy_error_t **);
+
+static CY_PSAFE enum elmy_status rule_fint(
     const char *, int [], size_t, const char *, const elmy_page_t *,
     elmy_logs_t **, elmy_error_t **);
 
-static CY_PSAFE int filter_text(
+static CY_PSAFE enum elmy_status rule_fstr(
     const char *, const char *, const char *, const elmy_page_t *,
     elmy_logs_t **, elmy_error_t **);
 
 
-static CY_PSAFE db_t *query_unpaged(const char *rule, const char *params[], size_t nparams, elmy_error_t **err)
-{
-        assert(*rule);
-        assert(nparams == 1 || nparams == 2);
-        assert(!*err);
-
-        const char *p = nparams == 1 ? "$1" : "$1,$2";
-        CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
-            "SELECT * FROM logs_%s(%s);", rule, p);
-
-        db_t *db = db_new("rule", sql);
-
-        if (CY_UNLIKELY(db_exec_param(db, params))) {
-                *err = db_error(db);
-                db_free(&db);
-                return NULL;
-        }
-
-        return db;
-}
 
 
 /* Implementations of public functions */
@@ -80,41 +63,17 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 }
 
 
-enum elmy_status elmy_rule_initial(const char *tz, cy_utf8_t **res,
-                                   elmy_error_t **err)
+enum elmy_status elmy_rule_initial(
+    const char *tz, cy_utf8_t **res, elmy_error_t **err)
 {
-        assert(*tz);
-        assert(!*res);
-
-        CY_AUTO(db_t) *db = query_unpaged(
-            "ts_first", (const char *[1]) {tz}, 1, err);
-
-        if (CY_UNLIKELY(!db)) {
-                *res = cy_utf8_new_empty();
-                return elmy_error_status(*err);
-        }
-
-        *res = cy_utf8_new(PQgetvalue(db_result(db), 0, 0));
-        return ELMY_STATUS_OK;
+        return rule_ts("ts_first", tz, res, err);
 }
 
 
 enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
                                 elmy_error_t **err)
 {
-        assert(*tz);
-        assert(!*res);
-
-        CY_AUTO(db_t) *db = query_unpaged(
-            "ts_last", (const char *[1]) {tz}, 1, err);
-
-        if (CY_UNLIKELY(!db)) {
-                *res = cy_utf8_new_empty();
-                return elmy_error_status(*err);
-        }
-
-        *res = cy_utf8_new(PQgetvalue(db_result(db), 0, 0));
-        return ELMY_STATUS_OK;
+        return rule_ts("ts_first", tz, res, err);
 }
 
 
@@ -152,56 +111,43 @@ error:
 
 
 
-int
-elmy_rule_facility(
+enum elmy_status elmy_rule_facility(
     enum cy_log_facility filter[], size_t nfilter, const char *tz,
     const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
 {
-        return filter_intarray(
-            "facility", (int *) filter, nfilter, tz, pg, res, err);
+        return rule_fint("facility", (int *) filter, nfilter, tz, pg, res, err);
 }
 
 
-int
-elmy_rule_severity(
+enum elmy_status elmy_rule_severity(
     enum cy_log_severity filter[], size_t nfilter, const char *tz,
     const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
 {
-        return filter_intarray(
-            "severity", (int *) filter, nfilter, tz, pg, res, err);
+        return rule_fint("severity", (int *) filter, nfilter, tz, pg, res, err);
 }
 
 
-int
-elmy_rule_hostname(const char            *filter,
-                   const char            *tz,
-                   const elmy_page_t     *pg,
-                   elmy_logs_t          **res,
-                   elmy_error_t         **err)
+enum elmy_status elmy_rule_hostname(
+    const char *filter, const char *tz, const elmy_page_t *pg, elmy_logs_t **res,
+    elmy_error_t **err)
 {
-        return filter_text("hostname", filter, tz, pg, res, err);
+        return rule_fstr("hostname", filter, tz, pg, res, err);
 }
 
 
-int
-elmy_rule_tag(const char         *filter,
-              const char         *tz,
-              const elmy_page_t  *pg,
-              elmy_logs_t       **res,
-              elmy_error_t      **err)
+enum elmy_status elmy_rule_tag(
+    const char *filter, const char *tz, const elmy_page_t *pg, elmy_logs_t **res,
+    elmy_error_t **err)
 {
-        return filter_text("tag", filter, tz, pg, res, err);
+        return rule_fstr("tag", filter, tz, pg, res, err);
 }
 
 
-int
-elmy_rule_message(const char             *filter,
-                  const char             *tz,
-                  const elmy_page_t      *pg,
-                  elmy_logs_t           **res,
-                  elmy_error_t          **err)
+enum elmy_status elmy_rule_message(
+    const char *filter, const char *tz, const elmy_page_t *pg, elmy_logs_t **res,
+    elmy_error_t **err)
 {
-        return filter_text("message", filter, tz, pg, res, err);
+        return rule_fstr("message", filter, tz, pg, res, err);
 }
 
 
@@ -228,7 +174,32 @@ cy_utf8_t *enums_csv(int enums[], size_t len)
 }
 
 
-int filter_intarray(
+enum elmy_status rule_ts(
+    const char *rule, const char *tz, cy_utf8_t **res, elmy_error_t **err)
+{
+        assert(*rule);
+        assert(*tz);
+        assert(!*err);
+
+        CY_AUTO(cy_utf8_t) *sql = cy_utf8_new_fmt(
+            "SELECT * FROM logs_%s($1);", rule);
+
+        db_t *db = db_new(rule, sql);
+
+        if (CY_UNLIKELY(db_exec_param(db, (const char *[1]) {tz}))) {
+                *res = 0;
+                *err = db_error(db);
+                return elmy_error_status(*err);
+        }
+
+        *res = cy_utf8_new(PQgetvalue(db_result(db), 0, 0));
+        return ELMY_STATUS_OK;
+}
+
+
+
+
+enum elmy_status rule_fint(
     const char *rule, int filter[], size_t nfilter, const char *tz,
     const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
 {
@@ -271,7 +242,7 @@ int filter_intarray(
 }
 
 
-int filter_text(
+enum elmy_status rule_fstr(
     const char *rule, const char *filter, const char *tz, const elmy_page_t *pg,
     elmy_logs_t **res, elmy_error_t **err)
 {
