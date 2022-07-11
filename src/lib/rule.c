@@ -79,6 +79,7 @@ enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
  *          const char *tz, cy_utf8_t **res, elmy_error_t **err);
  *
  * __PARAMETERS__
+ *      - {{tz}}: reporting time zone
  *      - {{res}}: handle to rule result
  *      - {{err}}: handle to error
  *
@@ -93,6 +94,24 @@ enum elmy_status elmy_rule_initial(
 }
 
 
+/*                                                          %func:elmy_rule_last
+ * __NAME__
+ *      {{elmy_rule_last()}} - rule to get timestamp of last log entry
+ *
+ * __SYNOPSIS__
+ *      #include <libelmy/libelmy.h>
+ *      extern CY_PSAFE enum elmy_status elmy_rule_last(
+ *          const char *tz, cy_utf8_t **res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{tz}}: reporting time zone
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
                                 elmy_error_t **err)
 {
