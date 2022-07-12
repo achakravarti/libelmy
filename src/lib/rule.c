@@ -396,6 +396,28 @@ enum elmy_status rule_ts(
 }
 
 
+/*                                                               %func:rule_fint
+ * __NAME__
+ *      {{rule_fint()}} - executes integer filtered rule
+ *
+ * __SYNOPSIS__
+ *      static CY_PSAFE enum elmy_status rule_fint(
+ *          const char *rule, int filter[], size_t nfilter, const char *tz,
+ *          const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{rule}}: rule name
+ *      - {{filter}}: integers to filter
+ *      - {{nfilter}}: length of {{filter}}
+ *      - {{tz}}: reporting time zone
+ *      - {{pg}}: pagination options
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status rule_fint(
     const char *rule, int filter[], size_t nfilter, const char *tz,
     const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err)
