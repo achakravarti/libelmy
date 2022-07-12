@@ -461,6 +461,27 @@ enum elmy_status rule_fint(
 }
 
 
+/*                                                               %func:rule_fstr
+ * __NAME__
+ *      {{rule_fstr()}} - executes string filtered rule
+ *
+ * __SYNOPSIS__
+ *      static CY_PSAFE enum elmy_status rule_fstr(
+ *          const char *rule, const char *filter, const char *tz,
+ *          const elmy_page_t *pg, elmy_logs_t **res, elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{rule}}: rule name
+ *      - {{filter}}: string to filter
+ *      - {{tz}}: reporting time zone
+ *      - {{pg}}: pagination options
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status rule_fstr(
     const char *rule, const char *filter, const char *tz, const elmy_page_t *pg,
     elmy_logs_t **res, elmy_error_t **err)
