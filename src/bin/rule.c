@@ -19,10 +19,6 @@
 
 static CY_PSAFE int rule_count(const struct opt *, int, char *[]);
 
-static CY_PSAFE int rule_initial(const struct opt *, char *[]);
-
-static CY_PSAFE int rule_last(const struct opt *, char *[]);
-
 static CY_PSAFE int rule_all(const struct opt *, char *[]);
 
 static CY_PSAFE int rule_facility(const struct opt *, char *[]);
@@ -35,6 +31,11 @@ static CY_PSAFE int rule_message(const struct opt *, char *[]);
 
 
 static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *);
+
+typedef enum elmy_status (rule_ts_f)(const char *, cy_utf8_t **, elmy_error_t **);
+
+
+static CY_PSAFE int run_ts(rule_ts_f *rule, const struct opt *o, char *argv[]);
 
 
 /* Implementation of public function */
@@ -75,10 +76,10 @@ rule_exec(const struct opt *o, int argc, char *argv[])
                 return rule_count(o, argc, argv);
 
         if (!strcmp(rule, "initial"))
-                return rule_initial(o, argv);
+                return run_ts(elmy_rule_initial, o, argv);
 
         if (!strcmp(rule, "last"))
-                return rule_last(o, argv);
+                return run_ts(elmy_rule_last, o, argv);
 
         if (!strcmp(rule, "all"))
                 return rule_all(o, argv);
@@ -131,26 +132,11 @@ rule_count(const struct opt *o, int argc, char *argv[])
         return EXIT_SUCCESS;
 }
 
-
-/*                                                            %func:rule_initial
- * __NAME__
- *      rule_initial() - executes the "initial" rule
- *
- * __RETURN__
- *      The {{rule_exec()}} functions returns one of the following {{int}}
- *      status codes:
- *
- *        - {{EXIT_SUCCESS}} if the rule executed successfully
- *        - {{EXIT_FAILURE: if a command line-related error occurrs
- *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
- *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
- */
-int
-rule_initial(const struct opt *o, char *argv[])
+int run_ts(rule_ts_f *rule, const struct opt *o, char *argv[])
 {
-        if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version
-                        || *o->filter || *o->sortcol || *o->sortdir
-                        || *o->rowstart || *o->rowcount))
+        if (CY_UNLIKELY(
+            o->help || o->json || o->unpaged || o->version || *o->filter
+            || *o->sortcol || *o->sortdir || *o->rowstart || *o->rowcount))
                 return show_invalid(argv);
 
         if (CY_UNLIKELY(!*o->timezone))
@@ -159,42 +145,7 @@ rule_initial(const struct opt *o, char *argv[])
         CY_AUTO(cy_utf8_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
 
-        if (CY_UNLIKELY(elmy_rule_initial(o->timezone, &res, &err)))
-                return show_error(err);
-
-        printf("%s\n", res);
-        return EXIT_SUCCESS;
-}
-
-
-/*                                                               %func:rule_last
- * __NAME__
- *      rule_last() - executes the "last" rule
- *
- * __RETURN__
- *      The {{rule_exec()}} functions returns one of the following {{int}}
- *      status codes:
- *
- *        - {{EXIT_SUCCESS}} if the rule executed successfully
- *        - {{EXIT_FAILURE: if a command line-related error occurrs
- *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
- *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
- */
-int
-rule_last(const struct opt *o, char *argv[])
-{
-        if (CY_UNLIKELY(o->help || o->json || o->unpaged || o->version
-                        || *o->filter || *o->sortcol || *o->sortdir
-                        || *o->rowstart || *o->rowcount))
-                return show_invalid(argv);
-
-        if (CY_UNLIKELY(!*o->timezone))
-                return show_missing(argv);
-
-        CY_AUTO(cy_utf8_t) *res = NULL;
-        CY_AUTO(elmy_error_t) *err = NULL;
-
-        if (CY_UNLIKELY(elmy_rule_last(o->timezone, &res, &err)))
+        if (CY_UNLIKELY(rule(o->timezone, &res, &err)))
                 return show_error(err);
 
         printf("%s\n", res);

@@ -114,7 +114,7 @@ enum elmy_status elmy_rule_initial(
 enum elmy_status elmy_rule_last(const char *tz, cy_utf8_t **res,
                                 elmy_error_t **err)
 {
-        return rule_ts("ts_first", tz, res, err);
+        return rule_ts("ts_last", tz, res, err);
 }
 
 
