@@ -17,7 +17,7 @@
 
 /* Prototypes for support functions */
 
-static CY_RSAFE cy_utf8_t *enums_csv(int enums[], size_t len);
+static CY_RSAFE cy_utf8_t *enums_csv(int [], size_t);
 
 static CY_PSAFE enum elmy_status rule_ts(
     const char *, const char *, cy_utf8_t **, elmy_error_t **);
@@ -321,9 +321,23 @@ enum elmy_status elmy_rule_message(
 /* Implementations of support functions */
 
 
-// https://stackoverflow.com/questions/1745811
+/*                                                               %func:enums_csv
+ * __NAME__
+ *      {{enums_csv()}} - converts enumerator array to CSV string
+ *
+ * __SYNOPSIS__
+ *      static CY_RSAFE cy_utf8_t *enums_csv(int enums[], size_t len);
+ *
+ * __PARAMETERS__
+ *      - {{enums}}: array of enumerators
+ *      - {{enums}}: length of {{enums}} array
+ *
+ * __RETURN__
+ *      - CSV representation of {{enums}}
+ */
 cy_utf8_t *enums_csv(int enums[], size_t len)
 {
+        // https://stackoverflow.com/questions/1745811
         const size_t bfrlen = 80;
         char bfr[bfrlen];
 
