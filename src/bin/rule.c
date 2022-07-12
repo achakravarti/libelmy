@@ -365,15 +365,14 @@ int rule_facility(const struct opt *o, char *argv[])
         CY_AUTO(elmy_error_t) *err = NULL;
 
         const char *regex
-            //= "^\b([0-9]|1[0-9]|2[0123])\b(,\b([0-9]|1[0-9]|2[0123])\b{0,23}$";
-            = "^[0-7](,[0-7]){0,7}$";
+            = "^\\b([0-9]|1[0-9]|2[0123])\\b(,\\b([0-9]|1[0-9]|2[0123])\\b){0,23}$";
 
         int *facilities = NULL;
         size_t len = 0;
 
         if (CY_UNLIKELY(csv_array(
             o->filter, regex, __CY_LOG_FACILITY_LEN__, &facilities, &len)))
-                return EXIT_FAILURE;
+                return show_invalid(argv);
 
         if (CY_UNLIKELY(elmy_rule_facility(
             (enum cy_log_facility *) facilities, len, o->timezone, pg, &res,
@@ -405,8 +404,10 @@ int csv_array(
 
         CY_AUTO(cy_utf8_t) *s = cy_utf8_new(csv);
 
-        if (CY_UNLIKELY(!cy_utf8_match(s, regex)))
+        if (CY_UNLIKELY(!cy_utf8_match(s, regex))) {
+                printf("MATCH FAILED\n");
                 return EXIT_FAILURE;
+        }
 
         register char *t;
         char *r = NULL;
