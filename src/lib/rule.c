@@ -53,8 +53,7 @@ static CY_PSAFE enum elmy_status rule_fstr(
  */
 enum elmy_status elmy_rule_count(size_t *res, elmy_error_t **err)
 {
-        assert(res != NULL);
-        assert(err != NULL && *err == NULL);
+        assert(!*err);
 
         CY_AUTO(db_t) *db = db_new("count", "SELECT * FROM logs_count();");
 
@@ -330,7 +329,7 @@ enum elmy_status elmy_rule_message(
  *
  * __PARAMETERS__
  *      - {{enums}}: array of enumerators
- *      - {{enums}}: length of {{enums}} array
+ *      - {{len}}: length of {{enums}} array
  *
  * __RETURN__
  *      - CSV representation of {{enums}}
@@ -355,6 +354,25 @@ cy_utf8_t *enums_csv(int enums[], size_t len)
 }
 
 
+/*                                                                 %func:rule_ts
+ * __NAME__
+ *      {{rule_ts()}} - executes timestamp rule
+ *
+ * __SYNOPSIS__
+ *      static CY_PSAFE enum elmy_status rule_ts(
+ *          const char *rule, const char *tz, cy_utf8_t **res,
+ *          elmy_error_t **err);
+ *
+ * __PARAMETERS__
+ *      - {{rule}}: rule name
+ *      - {{tz}}: reporting time zone
+ *      - {{res}}: handle to rule result
+ *      - {{err}}: handle to error
+ *
+ * __RETURN__
+ *      - {{ELMY_STATUS_OK}} if no error occurred
+ *      - Any other relevant {{elmy_status}} enumerator if an error occured
+ */
 enum elmy_status rule_ts(
     const char *rule, const char *tz, cy_utf8_t **res, elmy_error_t **err)
 {
