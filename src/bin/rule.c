@@ -9,7 +9,6 @@
 
 /* Standard library dependencies */
 #include <assert.h>
-#include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +31,7 @@ static CY_PSAFE int rule_tag(const struct opt *, char *[]);
 
 static CY_PSAFE int rule_message(const struct opt *, char *[]);
 
-static CY_PSAFE int csv_array(const char *, const char *, int **, size_t *);
+static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *);
 
 
 /* Implementation of public function */
@@ -343,9 +342,12 @@ int rule_message(const struct opt *o, char *argv[])
 }
 
 
-int csv_array(const char *csv, const char *regex, int **array, size_t *len)
+int csv_array(
+    const char *csv, const char *regex, int max, int **array, size_t *len)
 {
         assert(!*array);
+        assert(!*regex);
+        assert(max >= 0 && max <= __CY_LOG_FACILITY_LEN__);
 
         if (CY_UNLIKELY(!*csv))
                 return EXIT_FAILURE;
@@ -358,12 +360,12 @@ int csv_array(const char *csv, const char *regex, int **array, size_t *len)
         register char *t;
         char *r = NULL;
         register size_t i = 0;
-        *array = cy_hptr_new(sizeof (int) * 24);
+        *array = cy_hptr_new(sizeof (int) * __CY_LOG_FACILITY_LEN__);
 
         for (t = strtok_r(s, ",", &r); t; strtok_r(NULL, ",", &r)) {
                 *array[i] = strtoumax(t, NULL, 10);
 
-                if (CY_UNLIKELY(*array[i++] == UINTMAX_MAX && errno == ERANGE))
+                if (CY_UNLIKELY(*array[i] < 0 || *array[i++] > max))
                         return EXIT_FAILURE;
         }
 
