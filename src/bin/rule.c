@@ -4,9 +4,13 @@
 
 /* Non-standard libary dependencies */
 #include "../../include/rule.h"
+#include <libchrysalid/include/hptr.h>
 #include <libchrysalid/include/utf8.h>
 
 /* Standard library dependencies */
+#include <assert.h>
+#include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +31,8 @@ static CY_PSAFE int rule_hostname(const struct opt *, char *[]);
 static CY_PSAFE int rule_tag(const struct opt *, char *[]);
 
 static CY_PSAFE int rule_message(const struct opt *, char *[]);
+
+static CY_PSAFE int csv_array(const char *, const char *, int **, size_t *);
 
 
 /* Implementation of public function */
@@ -333,5 +339,34 @@ int rule_message(const struct opt *o, char *argv[])
                 printf("%s", s);
         }
 
+        return EXIT_SUCCESS;
+}
+
+
+int csv_array(const char *csv, const char *regex, int **array, size_t *len)
+{
+        assert(!*array);
+
+        if (CY_UNLIKELY(!*csv))
+                return EXIT_FAILURE;
+
+        CY_AUTO(cy_utf8_t) *s = cy_utf8_new(csv);
+
+        if (CY_UNLIKELY(!cy_utf8_match(s, regex)))
+                return EXIT_FAILURE;
+
+        register char *t;
+        char *r = NULL;
+        register size_t i = 0;
+        *array = cy_hptr_new(sizeof (int) * 24);
+
+        for (t = strtok_r(s, ",", &r); t; strtok_r(NULL, ",", &r)) {
+                *array[i] = strtoumax(t, NULL, 10);
+
+                if (CY_UNLIKELY(*array[i++] == UINTMAX_MAX && errno == ERANGE))
+                        return EXIT_FAILURE;
+        }
+
+        *len = i;
         return EXIT_SUCCESS;
 }
