@@ -411,21 +411,19 @@ int csv_array(
         register char *t;
         char *r = NULL;
         register int i = 0;
-        *array = cy_hptr_new(sizeof (int) * __CY_LOG_FACILITY_LEN__);
+        int *a = cy_hptr_new(sizeof (int) * __CY_LOG_FACILITY_LEN__);
 
-        for (t = strtok_r(s, ",", &r); t != NULL; strtok_r(NULL, ",", &r)) {
-                printf("%s\n", t);
-                //*array[i] = strtoumax(t, NULL, 10);
+        for (t = strtok_r(s, ",", &r); t != NULL; t = strtok_r(NULL, ",", &r)) {
+                a[i] = strtoumax(t, NULL, 10);
 
-                /*if (CY_UNLIKELY(*array[i] < 0 || *array[i] > max))
-                        return EXIT_FAILURE;*/
-
-                i++;
+                if (CY_UNLIKELY(a[i] < 0 || a[i++] > max))
+                        return EXIT_FAILURE;
         }
 
         if (CY_UNLIKELY(i > max))
                 return EXIT_FAILURE;
 
+        *array = a;
         *len = i;
         return EXIT_SUCCESS;
 }
