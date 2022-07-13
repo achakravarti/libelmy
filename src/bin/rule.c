@@ -22,6 +22,7 @@ static CY_PSAFE int rule_count(const struct opt *, int, char *[]);
 static CY_PSAFE int rule_all(const struct opt *, char *[]);
 
 static CY_PSAFE int rule_facility(const struct opt *, char *[]);
+static CY_PSAFE int rule_severity(const struct opt *, char *[]);
 
 static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *);
 
@@ -81,6 +82,9 @@ rule_exec(const struct opt *o, int argc, char *argv[])
 
         if (!strcmp(rule, "facility"))
                 return rule_facility(o, argv);
+
+        if (!strcmp(rule, "severity"))
+                return rule_severity(o, argv);
 
         if (!strcmp(rule, "hostname"))
                 return run_fstr(elmy_rule_hostname, o, argv);
@@ -268,6 +272,49 @@ int rule_facility(const struct opt *o, char *argv[])
 
         return EXIT_SUCCESS;
 }
+
+
+int rule_severity(const struct opt *o, char *argv[])
+{
+        if (CY_UNLIKELY(o->help || o->version))
+                return show_invalid(argv);
+
+        if (CY_UNLIKELY(!*o->timezone || !*o->filter))
+                return show_missing(argv);
+
+        CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
+            ? elmy_page_new_disabled()
+            : elmy_page_new_parse(
+                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
+
+        CY_AUTO(elmy_logs_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
+
+        const char *regex = "^[0-7](,[0-7]){0,7}$";
+        int *severities = NULL;
+        size_t len = 0;
+
+        if (CY_UNLIKELY(csv_array(
+            o->filter, regex, __CY_LOG_SEVERITY_LEN__, &severities, &len)))
+                return show_invalid(argv);
+
+        if (CY_UNLIKELY(elmy_rule_severity(
+            (enum cy_log_severity *) severities, len, o->timezone, pg, &res,
+            &err)))
+                return show_error(err);
+
+        if (o->json) {
+                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
+                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
+                printf("%s\n", s);
+        } else {
+                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
+                printf("%s", s);
+        }
+
+        return EXIT_SUCCESS;
+}
+
 
 
 int csv_array(
