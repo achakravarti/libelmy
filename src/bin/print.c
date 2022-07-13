@@ -1,7 +1,7 @@
 #include "print.h"
 
 
-void show_usage(void)
+void print_usage(void)
 {
         printf("Usage: elmy [-c,--count] [-i,--initial] [-l,--last]\n"
                 "\t[-a,--all [-p,--paged]] [-f,--facility csv [-p,--paged]]\n"
@@ -13,7 +13,7 @@ void show_usage(void)
 }
 
 
-void show_version(void)
+void print_version(void)
 {
         printf("(lib)elmy 0.0.1 -- easy log monitoring\n"
                 "Copyright (c) 2022 Abhishek Chakravarti\n"
@@ -21,24 +21,24 @@ void show_version(void)
 }
 
 
-int show_invalid(char *argv[])
+int print_invalid(char *argv[])
 {
         fprintf(stderr, "%s: invalid argument or option(s)\n", argv[0]);
-        show_usage();
+        print_usage();
 
         return EXIT_FAILURE;
 }
 
 
-int show_missing(char *argv[])
+int print_missing(char *argv[])
 {
         fprintf(stderr, "%s: missing option(s) for argument\n", argv[0]);
-        show_usage();
+        print_usage();
         return EXIT_FAILURE;
 }
 
 
-int show_error(const elmy_error_t *err)
+int print_error(const elmy_error_t *err)
 {
         CY_AUTO(cy_utf8_t) *emsg = elmy_error_str(err);
         fprintf(stderr, "%s\n", emsg);
@@ -47,7 +47,7 @@ int show_error(const elmy_error_t *err)
 }
 
 
-int show_logs(const elmy_logs_t *logs, const struct opt *o)
+int print_logs(const elmy_logs_t *logs, const struct opt *o)
 {
         if (o->json) {
                 CY_AUTO(cy_json_t) *j = elmy_logs_json(logs);

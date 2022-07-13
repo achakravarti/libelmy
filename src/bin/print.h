@@ -6,13 +6,14 @@
 #include "../../include/error.h"
 #include "../../include/logs.h"
 
+/* Prototypes for printing routines */
 
-extern void show_usage(void);
-extern void show_version(void);
-extern CY_PSAFE int show_invalid(char *[]);
-extern CY_PSAFE int show_missing(char *[]);
-extern CY_PSAFE int show_error(const elmy_error_t *);
-extern CY_PSAFE int show_logs(const elmy_logs_t *, const struct opt *);
+extern void print_usage(void);
+extern void print_version(void);
+extern CY_PSAFE int print_invalid(char *[]);
+extern CY_PSAFE int print_missing(char *[]);
+extern CY_PSAFE int print_error(const elmy_error_t *);
+extern CY_PSAFE int print_logs(const elmy_logs_t *, const struct opt *);
 
 
 #endif /* !__LIBELMY_BIN_SRC_SHOW_H__ */

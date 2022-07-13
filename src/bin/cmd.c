@@ -62,15 +62,15 @@ static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *)
 int cmd_exec(const struct opt *o, int argc, char *argv[])
 {
         if (argc == 1 || o->error)
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (o->help) {
-                show_usage();
+                print_usage();
                 return EXIT_SUCCESS;
         }
 
         if (o->version) {
-                show_version();
+                print_version();
                 return EXIT_SUCCESS;
         }
 
@@ -103,7 +103,7 @@ int cmd_exec(const struct opt *o, int argc, char *argv[])
         if (!strcmp(rule, "message"))
                 return cmd_fstr(elmy_rule_message, o, argv);
 
-        return show_invalid(argv);
+        return print_invalid(argv);
 }
 
 
@@ -126,13 +126,13 @@ int cmd_exec(const struct opt *o, int argc, char *argv[])
 int cmd_count(const struct opt *o, int argc, char *argv[])
 {
         if (CY_UNLIKELY(argc > 2))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         size_t res;
         CY_AUTO(elmy_error_t) *err = NULL;
 
         if (CY_UNLIKELY(elmy_rule_count(&res, &err)))
-                return show_error(err);
+                return print_error(err);
 
         printf("%zu\n", res);
         return EXIT_SUCCESS;
@@ -144,16 +144,16 @@ int cmd_ts(cmd_ts_f *rule, const struct opt *o, char *argv[])
         if (CY_UNLIKELY(
             o->help || o->json || o->unpaged || o->version || *o->filter
             || *o->sortcol || *o->sortdir || *o->rowstart || *o->rowcount))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (CY_UNLIKELY(!*o->timezone))
-                return show_missing(argv);
+                return print_missing(argv);
 
         CY_AUTO(cy_utf8_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
 
         if (CY_UNLIKELY(rule(o->timezone, &res, &err)))
-                return show_error(err);
+                return print_error(err);
 
         printf("%s\n", res);
         return EXIT_SUCCESS;
@@ -163,19 +163,19 @@ int cmd_ts(cmd_ts_f *rule, const struct opt *o, char *argv[])
 int cmd_fstr(cmd_fstr_f *rule, const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (CY_UNLIKELY(!*o->timezone || !*o->filter))
-                return show_missing(argv);
+                return print_missing(argv);
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
         CY_AUTO(elmy_page_t) *pg = opt_page(o);
 
         if (CY_UNLIKELY(rule(o->filter, o->timezone, pg, &res, &err)))
-                return show_error(err);
+                return print_error(err);
 
-        return show_logs(res, o);
+        return print_logs(res, o);
 }
 
 
@@ -195,28 +195,28 @@ int cmd_fstr(cmd_fstr_f *rule, const struct opt *o, char *argv[])
 int cmd_all(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version || *o->filter))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (CY_UNLIKELY(!*o->timezone))
-                return show_missing(argv);
+                return print_missing(argv);
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
         CY_AUTO(elmy_page_t) *pg = opt_page(o);
 
         if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
-                return show_error(err);
+                return print_error(err);
 
-        return show_logs(res, o);
+        return print_logs(res, o);
 }
 
 int cmd_facility(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (CY_UNLIKELY(!*o->timezone || !*o->filter))
-                return show_missing(argv);
+                return print_missing(argv);
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
@@ -231,24 +231,24 @@ int cmd_facility(const struct opt *o, char *argv[])
 
         if (CY_UNLIKELY(csv_array(
             o->filter, regex, __CY_LOG_FACILITY_LEN__, &facilities, &len)))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (CY_UNLIKELY(elmy_rule_facility(
             (enum cy_log_facility *) facilities, len, o->timezone, pg, &res,
             &err)))
-                return show_error(err);
+                return print_error(err);
 
-        return show_logs(res, o);
+        return print_logs(res, o);
 }
 
 
 int cmd_severity(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (CY_UNLIKELY(!*o->timezone || !*o->filter))
-                return show_missing(argv);
+                return print_missing(argv);
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
@@ -260,14 +260,14 @@ int cmd_severity(const struct opt *o, char *argv[])
 
         if (CY_UNLIKELY(csv_array(
             o->filter, regex, __CY_LOG_SEVERITY_LEN__, &severities, &len)))
-                return show_invalid(argv);
+                return print_invalid(argv);
 
         if (CY_UNLIKELY(elmy_rule_severity(
             (enum cy_log_severity *) severities, len, o->timezone, pg, &res,
             &err)))
-                return show_error(err);
+                return print_error(err);
 
-        return show_logs(res, o);
+        return print_logs(res, o);
 }
 
 
