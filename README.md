@@ -12,3 +12,10 @@ with Python glue code). The binary uses the shared libary. The shared library
 code is in the `include/` and `src/lib` directories, whereas the binary code is
 in the `src/bin` directory. The database schema and setup scripts are available
 int the `tools` directory.
+
+
+## Build Options
+
+  - As library only
+  - As library + command line binary
+  - As library + FastCGI binary (future)
