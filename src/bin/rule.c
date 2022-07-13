@@ -50,8 +50,7 @@ static CY_PSAFE int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
-int
-rule_exec(const struct opt *o, int argc, char *argv[])
+int cmd_exec(const struct opt *o, int argc, char *argv[])
 {
         if (argc == 1 || o->error)
                 return show_invalid(argv);
@@ -175,27 +174,17 @@ rule_all(const struct opt *o, char *argv[])
                 return show_missing(argv);
 
         CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
-                                   ? elmy_page_new_disabled()
-                                   : elmy_page_new_parse(o->rowstart,
-                                                         o->rowcount,
-                                                         o->sortcol,
-                                                         o->sortdir);
+            ? elmy_page_new_disabled()
+            : elmy_page_new_parse(
+                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
+
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
 
         if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
                 return show_error(err);
 
-        if (o->json) {
-                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
-                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
-                printf("%s\n", s);
-        } else {
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
-        }
-
-        return EXIT_SUCCESS;
+        return show_logs(res, o);
 }
 
 int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[])
@@ -217,16 +206,7 @@ int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[])
         if (CY_UNLIKELY(rule(o->filter, o->timezone, pg, &res, &err)))
                 return show_error(err);
 
-        if (o->json) {
-                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
-                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
-                printf("%s\n", s);
-        } else {
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
-        }
-
-        return EXIT_SUCCESS;
+        return show_logs(res, o);
 }
 
 
@@ -262,16 +242,7 @@ int rule_facility(const struct opt *o, char *argv[])
             &err)))
                 return show_error(err);
 
-        if (o->json) {
-                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
-                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
-                printf("%s\n", s);
-        } else {
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
-        }
-
-        return EXIT_SUCCESS;
+        return show_logs(res, o);
 }
 
 
@@ -304,16 +275,7 @@ int rule_severity(const struct opt *o, char *argv[])
             &err)))
                 return show_error(err);
 
-        if (o->json) {
-                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
-                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
-                printf("%s\n", s);
-        } else {
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
-        }
-
-        return EXIT_SUCCESS;
+        return show_logs(res, o);
 }
 
 

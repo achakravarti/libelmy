@@ -45,3 +45,18 @@ int show_error(const elmy_error_t *err)
 
         return elmy_error_status(err);
 }
+
+
+int show_logs(const elmy_logs_t *logs, const struct opt *o)
+{
+        if (o->json) {
+                CY_AUTO(cy_json_t) *j = elmy_logs_json(logs);
+                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
+                printf("%s\n", s);
+        } else {
+                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(logs);
+                printf("%s", s);
+        }
+
+        return EXIT_SUCCESS;
+}
