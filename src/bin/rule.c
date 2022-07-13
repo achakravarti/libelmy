@@ -247,7 +247,8 @@ int rule_facility(const struct opt *o, char *argv[])
         CY_AUTO(elmy_error_t) *err = NULL;
 
         const char *regex
-            = "^\\b([0-9]|1[0-9]|2[0123])\\b(,\\b([0-9]|1[0-9]|2[0123])\\b){0,23}$";
+            = "^\\b([0-9]|1[0-9]|2[0123])\\b(,\\b([0-9]|1[0-9]|2[0123])\\b)"
+                "{0,23}$";
 
         int *facilities = NULL;
         size_t len = 0;
