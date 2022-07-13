@@ -1,6 +1,7 @@
 /* Local dependencies */
+#include "cmd.h"
 #include "opt.h"
-#include "show.h"
+#include "print.h"
 
 /* Non-standard libary dependencies */
 #include "../../include/rule.h"
