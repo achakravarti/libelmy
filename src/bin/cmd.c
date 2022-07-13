@@ -69,10 +69,8 @@ int bin_cmd_exec(const struct bin_opt *o, int argc, char *argv[])
                 return EXIT_SUCCESS;
         }
 
-        if (o->version) {
-                print_version();
-                return EXIT_SUCCESS;
-        }
+        if (o->version)
+                return print_version();
 
         const char *rule = argv[argc - 1];
 

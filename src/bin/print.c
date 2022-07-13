@@ -13,11 +13,13 @@ void print_usage(void)
 }
 
 
-void print_version(void)
+int print_version(void)
 {
         printf("(lib)elmy 0.0.1 -- easy log monitoring\n"
                 "Copyright (c) 2022 Abhishek Chakravarti\n"
                 "Released under the BSD 2-Clause License\n");
+
+        return EXIT_SUCCESS;
 }
 
 

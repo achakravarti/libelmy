@@ -9,7 +9,7 @@
 /* Prototypes for printing routines */
 
 extern void print_usage(void);
-extern void print_version(void);
+extern int print_version(void);
 extern CY_PSAFE int print_invalid(char *[]);
 extern CY_PSAFE int print_missing(char *[]);
 extern CY_PSAFE int print_error(const elmy_error_t *);
