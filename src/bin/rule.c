@@ -23,19 +23,14 @@ static CY_PSAFE int rule_all(const struct opt *, char *[]);
 
 static CY_PSAFE int rule_facility(const struct opt *, char *[]);
 
-static CY_PSAFE int rule_hostname(const struct opt *, char *[]);
-
-static CY_PSAFE int rule_tag(const struct opt *, char *[]);
-
-static CY_PSAFE int rule_message(const struct opt *, char *[]);
-
-
 static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *);
 
 typedef enum elmy_status (rule_ts_f)(const char *, cy_utf8_t **, elmy_error_t **);
+typedef enum elmy_status (rule_fstr_f)(const char *, const char *, const elmy_page_t *, elmy_logs_t **, elmy_error_t **);
 
 
 static CY_PSAFE int run_ts(rule_ts_f *rule, const struct opt *o, char *argv[]);
+static CY_PSAFE int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[]);
 
 
 /* Implementation of public function */
@@ -88,13 +83,13 @@ rule_exec(const struct opt *o, int argc, char *argv[])
                 return rule_facility(o, argv);
 
         if (!strcmp(rule, "hostname"))
-                return rule_hostname(o, argv);
+                return run_fstr(elmy_rule_hostname, o, argv);
 
         if (!strcmp(rule, "tag"))
-                return rule_tag(o, argv);
+                return run_fstr(elmy_rule_tag, o, argv);
 
         if (!strcmp(rule, "message"))
-                return rule_message(o, argv);
+                return run_fstr(elmy_rule_message, o, argv);
 
         return show_invalid(argv);
 }
@@ -199,8 +194,7 @@ rule_all(const struct opt *o, char *argv[])
         return EXIT_SUCCESS;
 }
 
-
-int rule_hostname(const struct opt *o, char *argv[])
+int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
                 return show_invalid(argv);
@@ -216,74 +210,7 @@ int rule_hostname(const struct opt *o, char *argv[])
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
 
-        if (CY_UNLIKELY(
-            elmy_rule_hostname(o->filter, o->timezone, pg, &res, &err)))
-                return show_error(err);
-
-        if (o->json) {
-                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
-                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
-                printf("%s\n", s);
-        } else {
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
-        }
-
-        return EXIT_SUCCESS;
-}
-
-
-int rule_tag(const struct opt *o, char *argv[])
-{
-        if (CY_UNLIKELY(o->help || o->version))
-                return show_invalid(argv);
-
-        if (CY_UNLIKELY(!*o->timezone || !*o->filter))
-                return show_missing(argv);
-
-        CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
-            ? elmy_page_new_disabled()
-            : elmy_page_new_parse(
-                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
-
-        CY_AUTO(elmy_logs_t) *res = NULL;
-        CY_AUTO(elmy_error_t) *err = NULL;
-
-        if (CY_UNLIKELY(
-            elmy_rule_tag(o->filter, o->timezone, pg, &res, &err)))
-                return show_error(err);
-
-        if (o->json) {
-                CY_AUTO(cy_json_t) *j = elmy_logs_json(res);
-                CY_AUTO(cy_utf8_t) *s = cy_json_print(j, true);
-                printf("%s\n", s);
-        } else {
-                CY_AUTO(cy_utf8_t) *s = elmy_logs_str(res);
-                printf("%s", s);
-        }
-
-        return EXIT_SUCCESS;
-}
-
-
-int rule_message(const struct opt *o, char *argv[])
-{
-        if (CY_UNLIKELY(o->help || o->version))
-                return show_invalid(argv);
-
-        if (CY_UNLIKELY(!*o->timezone || !*o->filter))
-                return show_missing(argv);
-
-        CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
-            ? elmy_page_new_disabled()
-            : elmy_page_new_parse(
-                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
-
-        CY_AUTO(elmy_logs_t) *res = NULL;
-        CY_AUTO(elmy_error_t) *err = NULL;
-
-        if (CY_UNLIKELY(
-            elmy_rule_message(o->filter, o->timezone, pg, &res, &err)))
+        if (CY_UNLIKELY(rule(o->filter, o->timezone, pg, &res, &err)))
                 return show_error(err);
 
         if (o->json) {
