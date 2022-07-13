@@ -24,5 +24,20 @@ int the `tools` directory.
     - make install
     - make uninstall
   - As library + command line binary
-  - As library + FastCGI binary (future)
-  - As containerised libary + FastCGI binary (future)
+    - make
+    - make doc
+    - make clean
+    - make check
+    - make install
+    - make uninstall
+  - As containerised library + command line binary
+    - make
+    - make doc
+    - make clean
+    - make check
+    - make install
+    - make uninstall
+    
+## Future build options
+  - As library + FastCGI binary
+  - As containerised libary + FastCGI binary
