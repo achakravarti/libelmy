@@ -17,12 +17,10 @@
 
 /* Prototypes for private support functions */
 
-static CY_PSAFE int rule_count(const struct opt *, int, char *[]);
-
-static CY_PSAFE int rule_all(const struct opt *, char *[]);
-
-static CY_PSAFE int rule_facility(const struct opt *, char *[]);
-static CY_PSAFE int rule_severity(const struct opt *, char *[]);
+static CY_PSAFE int cmd_count(const struct opt *, int, char *[]);
+static CY_PSAFE int cmd_all(const struct opt *, char *[]);
+static CY_PSAFE int cmd_facility(const struct opt *, char *[]);
+static CY_PSAFE int cmd_severity(const struct opt *, char *[]);
 
 static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *);
 
@@ -68,7 +66,7 @@ int cmd_exec(const struct opt *o, int argc, char *argv[])
         const char *rule = argv[argc - 1];
 
         if (!strcmp(rule, "count"))
-                return rule_count(o, argc, argv);
+                return cmd_count(o, argc, argv);
 
         if (!strcmp(rule, "initial"))
                 return run_ts(elmy_rule_initial, o, argv);
@@ -77,13 +75,13 @@ int cmd_exec(const struct opt *o, int argc, char *argv[])
                 return run_ts(elmy_rule_last, o, argv);
 
         if (!strcmp(rule, "all"))
-                return rule_all(o, argv);
+                return cmd_all(o, argv);
 
         if (!strcmp(rule, "facility"))
-                return rule_facility(o, argv);
+                return cmd_facility(o, argv);
 
         if (!strcmp(rule, "severity"))
-                return rule_severity(o, argv);
+                return cmd_severity(o, argv);
 
         if (!strcmp(rule, "hostname"))
                 return run_fstr(elmy_rule_hostname, o, argv);
@@ -114,8 +112,7 @@ int cmd_exec(const struct opt *o, int argc, char *argv[])
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
-int
-rule_count(const struct opt *o, int argc, char *argv[])
+int cmd_count(const struct opt *o, int argc, char *argv[])
 {
         if (CY_UNLIKELY(argc > 2))
                 return show_invalid(argv);
@@ -164,8 +161,7 @@ int run_ts(rule_ts_f *rule, const struct opt *o, char *argv[])
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
-int
-rule_all(const struct opt *o, char *argv[])
+int cmd_all(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version || *o->filter))
                 return show_invalid(argv);
@@ -210,7 +206,7 @@ int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[])
 }
 
 
-int rule_facility(const struct opt *o, char *argv[])
+int cmd_facility(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
                 return show_invalid(argv);
@@ -246,7 +242,7 @@ int rule_facility(const struct opt *o, char *argv[])
 }
 
 
-int rule_severity(const struct opt *o, char *argv[])
+int cmd_severity(const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
                 return show_invalid(argv);
