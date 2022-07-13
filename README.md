@@ -26,21 +26,21 @@ int the `tools` directory.
 
 ## Build Options
 
-  - As library only
+  - As library only (devel/prod)
     - make
     - make doc
     - make clean
     - make check
     - make install
     - make uninstall
-  - As library + command line binary
+  - As library + command line binary (devel/release)
     - make
     - make doc
     - make clean
     - make check
     - make install
     - make uninstall
-  - As containerised library + command line binary
+  - As containerised library + command line binary (devel/release)
     - make
     - make doc
     - make clean
