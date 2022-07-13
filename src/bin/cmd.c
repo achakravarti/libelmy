@@ -59,7 +59,7 @@ static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *)
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
-int cmd_exec(const struct opt *o, int argc, char *argv[])
+int bin_cmd_exec(const struct opt *o, int argc, char *argv[])
 {
         if (argc == 1 || o->error)
                 return print_invalid(argv);
