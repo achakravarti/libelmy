@@ -15,21 +15,31 @@
 #include <string.h>
 
 
-/* Prototypes for private support functions */
+/* Private callback functions  */
+
+typedef enum elmy_status (cmd_ts_f)(
+    const char *, cy_utf8_t **, elmy_error_t **);
+
+typedef enum elmy_status (cmd_fstr_f)(
+    const char *, const char *, const elmy_page_t *, elmy_logs_t **,
+    elmy_error_t **);
+
+
+/* Prototypes for private command processing routines */
 
 static CY_PSAFE int cmd_count(const struct opt *, int, char *[]);
 static CY_PSAFE int cmd_all(const struct opt *, char *[]);
 static CY_PSAFE int cmd_facility(const struct opt *, char *[]);
 static CY_PSAFE int cmd_severity(const struct opt *, char *[]);
+static CY_PSAFE int cmd_ts(cmd_ts_f *, const struct opt *, char *[]);
+static CY_PSAFE int cmd_fstr(cmd_fstr_f *, const struct opt *, char *[]);
+
+/* Prototype for private support function */
 
 static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *);
 
-typedef enum elmy_status (rule_ts_f)(const char *, cy_utf8_t **, elmy_error_t **);
-typedef enum elmy_status (rule_fstr_f)(const char *, const char *, const elmy_page_t *, elmy_logs_t **, elmy_error_t **);
 
 
-static CY_PSAFE int run_ts(rule_ts_f *rule, const struct opt *o, char *argv[]);
-static CY_PSAFE int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[]);
 
 
 /* Implementation of public function */
@@ -69,10 +79,10 @@ int cmd_exec(const struct opt *o, int argc, char *argv[])
                 return cmd_count(o, argc, argv);
 
         if (!strcmp(rule, "initial"))
-                return run_ts(elmy_rule_initial, o, argv);
+                return cmd_ts(elmy_rule_initial, o, argv);
 
         if (!strcmp(rule, "last"))
-                return run_ts(elmy_rule_last, o, argv);
+                return cmd_ts(elmy_rule_last, o, argv);
 
         if (!strcmp(rule, "all"))
                 return cmd_all(o, argv);
@@ -84,19 +94,19 @@ int cmd_exec(const struct opt *o, int argc, char *argv[])
                 return cmd_severity(o, argv);
 
         if (!strcmp(rule, "hostname"))
-                return run_fstr(elmy_rule_hostname, o, argv);
+                return cmd_fstr(elmy_rule_hostname, o, argv);
 
         if (!strcmp(rule, "tag"))
-                return run_fstr(elmy_rule_tag, o, argv);
+                return cmd_fstr(elmy_rule_tag, o, argv);
 
         if (!strcmp(rule, "message"))
-                return run_fstr(elmy_rule_message, o, argv);
+                return cmd_fstr(elmy_rule_message, o, argv);
 
         return show_invalid(argv);
 }
 
 
-/* Implementation of private functions */
+/* Implementation of private command processing functions */
 
 
 /*                                                              %func:rule_count
@@ -127,7 +137,8 @@ int cmd_count(const struct opt *o, int argc, char *argv[])
         return EXIT_SUCCESS;
 }
 
-int run_ts(rule_ts_f *rule, const struct opt *o, char *argv[])
+
+int cmd_ts(cmd_ts_f *rule, const struct opt *o, char *argv[])
 {
         if (CY_UNLIKELY(
             o->help || o->json || o->unpaged || o->version || *o->filter
@@ -145,6 +156,25 @@ int run_ts(rule_ts_f *rule, const struct opt *o, char *argv[])
 
         printf("%s\n", res);
         return EXIT_SUCCESS;
+}
+
+
+int cmd_fstr(cmd_fstr_f *rule, const struct opt *o, char *argv[])
+{
+        if (CY_UNLIKELY(o->help || o->version))
+                return show_invalid(argv);
+
+        if (CY_UNLIKELY(!*o->timezone || !*o->filter))
+                return show_missing(argv);
+
+        CY_AUTO(elmy_logs_t) *res = NULL;
+        CY_AUTO(elmy_error_t) *err = NULL;
+        CY_AUTO(elmy_page_t) *pg = opt_page(o);
+
+        if (CY_UNLIKELY(rule(o->filter, o->timezone, pg, &res, &err)))
+                return show_error(err);
+
+        return show_logs(res, o);
 }
 
 
@@ -178,25 +208,6 @@ int cmd_all(const struct opt *o, char *argv[])
 
         return show_logs(res, o);
 }
-
-int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[])
-{
-        if (CY_UNLIKELY(o->help || o->version))
-                return show_invalid(argv);
-
-        if (CY_UNLIKELY(!*o->timezone || !*o->filter))
-                return show_missing(argv);
-
-        CY_AUTO(elmy_logs_t) *res = NULL;
-        CY_AUTO(elmy_error_t) *err = NULL;
-        CY_AUTO(elmy_page_t) *pg = opt_page(o);
-
-        if (CY_UNLIKELY(rule(o->filter, o->timezone, pg, &res, &err)))
-                return show_error(err);
-
-        return show_logs(res, o);
-}
-
 
 int cmd_facility(const struct opt *o, char *argv[])
 {
@@ -258,6 +269,8 @@ int cmd_severity(const struct opt *o, char *argv[])
         return show_logs(res, o);
 }
 
+
+/* Implementation of private support function */
 
 
 int csv_array(
