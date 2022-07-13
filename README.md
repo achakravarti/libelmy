@@ -14,6 +14,16 @@ in the `src/bin` directory. The database schema and setup scripts are available
 int the `tools` directory.
 
 
+## Supported Platforms
+
+  - Alpine Linux
+  - Arch Linux
+  - CentOS
+  - Debian
+  - Fedora
+  - FreeBSD
+  - Ubuntu
+
 ## Build Options
 
   - As library only
