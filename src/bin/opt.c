@@ -5,9 +5,9 @@
 #include <getopt.h>
 
 
-struct opt *opt_new(int argc, char *argv[])
+struct bin_opt *bin_opt_new(int argc, char *argv[])
 {
-        struct opt *ctx = cy_hptr_new(sizeof *ctx);
+        struct bin_opt *ctx = cy_hptr_new(sizeof *ctx);
 
         ctx->timezone = cy_utf8_new_empty();
         ctx->filter = cy_utf8_new_empty();
@@ -93,9 +93,9 @@ struct opt *opt_new(int argc, char *argv[])
 }
 
 
-void opt_free(struct opt **ctx)
+void bin_opt_free(struct bin_opt **ctx)
 {
-        struct opt *o;
+        struct bin_opt *o;
 
         if (CY_LIKELY(ctx && (o = *ctx))) {
                 cy_utf8_free(&o->timezone);
@@ -110,7 +110,7 @@ void opt_free(struct opt **ctx)
 }
 
 
-elmy_page_t *opt_page(const struct opt *o)
+elmy_page_t *bin_opt_page(const struct bin_opt *o)
 {
         return CY_UNLIKELY(o->unpaged)
             ? elmy_page_new_disabled()

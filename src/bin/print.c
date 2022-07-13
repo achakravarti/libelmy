@@ -47,7 +47,7 @@ int print_error(const elmy_error_t *err)
 }
 
 
-int print_logs(const elmy_logs_t *logs, const struct opt *o)
+int print_logs(const elmy_logs_t *logs, const struct bin_opt *o)
 {
         if (o->json) {
                 CY_AUTO(cy_json_t) *j = elmy_logs_json(logs);

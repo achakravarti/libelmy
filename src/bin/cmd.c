@@ -28,12 +28,12 @@ typedef enum elmy_status (cmd_fstr_f)(
 
 /* Prototypes for private command processing routines */
 
-static CY_PSAFE int cmd_count(const struct opt *, int, char *[]);
-static CY_PSAFE int cmd_all(const struct opt *, char *[]);
-static CY_PSAFE int cmd_facility(const struct opt *, char *[]);
-static CY_PSAFE int cmd_severity(const struct opt *, char *[]);
-static CY_PSAFE int cmd_ts(cmd_ts_f *, const struct opt *, char *[]);
-static CY_PSAFE int cmd_fstr(cmd_fstr_f *, const struct opt *, char *[]);
+static CY_PSAFE int cmd_count(const struct bin_opt *, int, char *[]);
+static CY_PSAFE int cmd_all(const struct bin_opt *, char *[]);
+static CY_PSAFE int cmd_facility(const struct bin_opt *, char *[]);
+static CY_PSAFE int cmd_severity(const struct bin_opt *, char *[]);
+static CY_PSAFE int cmd_ts(cmd_ts_f *, const struct bin_opt *, char *[]);
+static CY_PSAFE int cmd_fstr(cmd_fstr_f *, const struct bin_opt *, char *[]);
 
 /* Prototype for private support function */
 
@@ -59,7 +59,7 @@ static CY_PSAFE int csv_array(const char *, const char *, int, int **, size_t *)
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
-int bin_cmd_exec(const struct opt *o, int argc, char *argv[])
+int bin_cmd_exec(const struct bin_opt *o, int argc, char *argv[])
 {
         if (argc == 1 || o->error)
                 return print_invalid(argv);
@@ -123,7 +123,7 @@ int bin_cmd_exec(const struct opt *o, int argc, char *argv[])
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
-int cmd_count(const struct opt *o, int argc, char *argv[])
+int cmd_count(const struct bin_opt *o, int argc, char *argv[])
 {
         if (CY_UNLIKELY(argc > 2))
                 return print_invalid(argv);
@@ -139,7 +139,7 @@ int cmd_count(const struct opt *o, int argc, char *argv[])
 }
 
 
-int cmd_ts(cmd_ts_f *rule, const struct opt *o, char *argv[])
+int cmd_ts(cmd_ts_f *rule, const struct bin_opt *o, char *argv[])
 {
         if (CY_UNLIKELY(
             o->help || o->json || o->unpaged || o->version || *o->filter
@@ -160,7 +160,7 @@ int cmd_ts(cmd_ts_f *rule, const struct opt *o, char *argv[])
 }
 
 
-int cmd_fstr(cmd_fstr_f *rule, const struct opt *o, char *argv[])
+int cmd_fstr(cmd_fstr_f *rule, const struct bin_opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
                 return print_invalid(argv);
@@ -170,7 +170,7 @@ int cmd_fstr(cmd_fstr_f *rule, const struct opt *o, char *argv[])
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
-        CY_AUTO(elmy_page_t) *pg = opt_page(o);
+        CY_AUTO(elmy_page_t) *pg = bin_opt_page(o);
 
         if (CY_UNLIKELY(rule(o->filter, o->timezone, pg, &res, &err)))
                 return print_error(err);
@@ -192,7 +192,7 @@ int cmd_fstr(cmd_fstr_f *rule, const struct opt *o, char *argv[])
  *        - {{ELMY_STATUS_DBCONN}} if a database connection error occurs
  *        - {{ELMY_STATUS_DBQRY}} if a database query error occurs
  */
-int cmd_all(const struct opt *o, char *argv[])
+int cmd_all(const struct bin_opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version || *o->filter))
                 return print_invalid(argv);
@@ -202,7 +202,7 @@ int cmd_all(const struct opt *o, char *argv[])
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
-        CY_AUTO(elmy_page_t) *pg = opt_page(o);
+        CY_AUTO(elmy_page_t) *pg = bin_opt_page(o);
 
         if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
                 return print_error(err);
@@ -210,7 +210,7 @@ int cmd_all(const struct opt *o, char *argv[])
         return print_logs(res, o);
 }
 
-int cmd_facility(const struct opt *o, char *argv[])
+int cmd_facility(const struct bin_opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
                 return print_invalid(argv);
@@ -220,7 +220,7 @@ int cmd_facility(const struct opt *o, char *argv[])
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
-        CY_AUTO(elmy_page_t) *pg = opt_page(o);
+        CY_AUTO(elmy_page_t) *pg = bin_opt_page(o);
 
         const char *regex
             = "^\\b([0-9]|1[0-9]|2[0123])\\b(,\\b([0-9]|1[0-9]|2[0123])\\b)"
@@ -242,7 +242,7 @@ int cmd_facility(const struct opt *o, char *argv[])
 }
 
 
-int cmd_severity(const struct opt *o, char *argv[])
+int cmd_severity(const struct bin_opt *o, char *argv[])
 {
         if (CY_UNLIKELY(o->help || o->version))
                 return print_invalid(argv);
@@ -252,7 +252,7 @@ int cmd_severity(const struct opt *o, char *argv[])
 
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
-        CY_AUTO(elmy_page_t) *pg = opt_page(o);
+        CY_AUTO(elmy_page_t) *pg = bin_opt_page(o);
 
         const char *regex = "^[0-7](,[0-7]){0,7}$";
         int *severities = NULL;
