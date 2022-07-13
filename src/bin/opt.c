@@ -108,3 +108,12 @@ void opt_free(struct opt **ctx)
 
         cy_hptr_free((cy_hptr_t **) ctx);
 }
+
+
+elmy_page_t *opt_page(const struct opt *o)
+{
+        return CY_UNLIKELY(o->unpaged)
+            ? elmy_page_new_disabled()
+            : elmy_page_new_parse(
+                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
+}

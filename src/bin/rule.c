@@ -169,13 +169,9 @@ int cmd_all(const struct opt *o, char *argv[])
         if (CY_UNLIKELY(!*o->timezone))
                 return show_missing(argv);
 
-        CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
-            ? elmy_page_new_disabled()
-            : elmy_page_new_parse(
-                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
-
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
+        CY_AUTO(elmy_page_t) *pg = opt_page(o);
 
         if (CY_UNLIKELY(elmy_rule_all(o->timezone, pg, &res, &err)))
                 return show_error(err);
@@ -191,13 +187,9 @@ int run_fstr(rule_fstr_f *rule, const struct opt *o, char *argv[])
         if (CY_UNLIKELY(!*o->timezone || !*o->filter))
                 return show_missing(argv);
 
-        CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
-            ? elmy_page_new_disabled()
-            : elmy_page_new_parse(
-                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
-
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
+        CY_AUTO(elmy_page_t) *pg = opt_page(o);
 
         if (CY_UNLIKELY(rule(o->filter, o->timezone, pg, &res, &err)))
                 return show_error(err);
@@ -214,13 +206,9 @@ int cmd_facility(const struct opt *o, char *argv[])
         if (CY_UNLIKELY(!*o->timezone || !*o->filter))
                 return show_missing(argv);
 
-        CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
-            ? elmy_page_new_disabled()
-            : elmy_page_new_parse(
-                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
-
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
+        CY_AUTO(elmy_page_t) *pg = opt_page(o);
 
         const char *regex
             = "^\\b([0-9]|1[0-9]|2[0123])\\b(,\\b([0-9]|1[0-9]|2[0123])\\b)"
@@ -250,13 +238,9 @@ int cmd_severity(const struct opt *o, char *argv[])
         if (CY_UNLIKELY(!*o->timezone || !*o->filter))
                 return show_missing(argv);
 
-        CY_AUTO(elmy_page_t) *pg = CY_UNLIKELY(o->unpaged)
-            ? elmy_page_new_disabled()
-            : elmy_page_new_parse(
-                o->rowstart, o->rowcount, o->sortcol, o->sortdir);
-
         CY_AUTO(elmy_logs_t) *res = NULL;
         CY_AUTO(elmy_error_t) *err = NULL;
+        CY_AUTO(elmy_page_t) *pg = opt_page(o);
 
         const char *regex = "^[0-7](,[0-7]){0,7}$";
         int *severities = NULL;
