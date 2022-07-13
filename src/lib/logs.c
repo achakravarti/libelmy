@@ -11,9 +11,9 @@
 
 
 struct elmy_logs__ {
-        size_t        sz;
-        size_t        len;
-        elmy_log_t  **items;
+        size_t            sz;
+        size_t            len;
+        elmy_log_t      **items;
 };
 
 
@@ -51,12 +51,13 @@ elmy_logs_t *elmy_logs_new_parse__(void *res)
         elmy_log_t *log;
 
         for (register size_t i = 0; i < len; i++) {
-                log = elmy_log_new(PQgetvalue(r, i, 1), PQgetvalue(r, i, 0),
-                                   strtoumax(PQgetvalue(r, i, 2), NULL, 10),
-                                   PQgetvalue(r, i, 3),
-                                   strtoumax(PQgetvalue(r, i, 4), NULL, 10),
-                                   PQgetvalue(r, i, 5), PQgetvalue(r, i, 6),
-                                   PQgetvalue(r, i, 7), PQgetvalue(r, i, 8));
+                log = elmy_log_new(
+                    PQgetvalue(r, i, 1), PQgetvalue(r, i, 0),
+                    strtoumax(PQgetvalue(r, i, 2), NULL, 10),
+                    PQgetvalue(r, i, 3),
+                    strtoumax(PQgetvalue(r, i, 4), NULL, 10),
+                    PQgetvalue(r, i, 5), PQgetvalue(r, i, 6),
+                    PQgetvalue(r, i, 7), PQgetvalue(r, i, 8));
 
                 ctx->items[i] = log;
                 ctx->sz += elmy_log_sz(log);
