@@ -84,7 +84,8 @@ void elmy_log_t_free__(elmy_log_t **ctx)
 
 size_t elmy_log_sz(const elmy_log_t *ctx)
 {
-        const size_t enum_sz = ctx->facility < 10 ? 2 : 3;
+        const size_t enum_sz = ctx->facility < 10 ? 2 : 3
+                             + ctx->severity < 10 ? 2 : 3;
 
         return cy_hptr_sz((const cy_hptr_t *) ctx)
                + cy_utf8_sz(ctx->facility_kw) + cy_utf8_sz(ctx->severity_kw)
@@ -165,49 +166,37 @@ const cy_utf8_t *elmy_log_message(const elmy_log_t *ctx)
 }
 
 
-cy_utf8_t *elmy_log_print(const elmy_log_t *ctx, enum elmy_log_format fmt)
+cy_utf8_t *elmy_log_str(const elmy_log_t *ctx)
 {
         assert(ctx != NULL);
 
-        const char *f;
+        const char *fmt = "log_ts:\t\t%s\nevent_ts:\t%s\nfacility:\t%d\n"
+                          "facility_kw:\t%s\nseverity:\t%d\nseverity_kw:\t%s\n"
+                          "hostname:\t%s\ntag:\t\t%s\nmessage:\t%s\n";
 
-        switch (fmt) {
-        case ELMY_LOG_FORMAT_CSV:
-                f = "%s,%s,%d,%s,%d,%s,%s,%s,%s";
-                break;
+        return cy_utf8_new_fmt(fmt, ctx->ts, ctx->evts, ctx->facility,
+                               ctx->facility_kw, ctx->severity,
+                               ctx->severity_kw, ctx->hostname,
+                               ctx->tag, ctx->message);
+}
 
-        case ELMY_LOG_FORMAT_CSV_HDR:
-                f = "log_ts,event_ts,facility,facility_kw,severity,severity_kw,"
-                    "hostname,tag,message\n%s,%s,%d,%s,%d,%s,%s,%s,%s";
-                break;
 
-        case ELMY_LOG_FORMAT_JSON:
-                f = "{\"log_ts\":\"%s\",\"event_ts\":\"%s\",\"facility\":%d,"
-                    "\"facility_kw\":\"%s\",\"severity\":%d,"
-                    "\"severity_kw\":\"%s\",\"hostname\":\"%s\",\"tag\":\"%s\","
-                    "\"message\":\"%s\"}";
-                break;
+cy_json_t *elmy_log_json(const elmy_log_t *ctx)
+{
+        assert(ctx != NULL);
 
-        default:
-                f = "log_ts = %s, event_ts = %s, facility = %d,"
-                    " facility_kw = %s, severity = %d, severity_kw = %s,"
-                    " hostname = %s, tag = %s, message = %s";
-        }
+        const char *fmt = "{\"log_ts\":\"%s\",\"event_ts\":\"%s\","
+                          "\"facility\":%d,\"facility_kw\":\"%s\","
+                          "\"severity\":%d,\"severity_kw\":\"%s\","
+                          "\"hostname\":\"%s\",\"tag\":\"%s\","
+                          "\"message\":\"%s\"}";
 
-        if (fmt != ELMY_LOG_FORMAT_JSON)
-                return cy_utf8_new_fmt(f, ctx->ts, ctx->evts, ctx->facility,
-                                       ctx->facility_kw, ctx->severity,
-                                       ctx->severity_kw, ctx->hostname,
-                                       ctx->tag, ctx->message);
+        CY_AUTO(cy_utf8_t) *h = cy_utf8_escape_json(ctx->hostname);
+        CY_AUTO(cy_utf8_t) *t = cy_utf8_escape_json(ctx->tag);
+        CY_AUTO(cy_utf8_t) *m = cy_utf8_escape_json(ctx->message);
+        CY_AUTO(cy_utf8_t) *j = cy_utf8_new_fmt(
+            fmt, ctx->ts, ctx->evts, ctx->facility, ctx->facility_kw,
+            ctx->severity, ctx->severity_kw, h, t, m);
 
-        CY_AUTO(cy_utf8_t) *ts = cy_utf8_escape_json(ctx->ts);
-        CY_AUTO(cy_utf8_t) *evts = cy_utf8_escape_json(ctx->evts);
-        CY_AUTO(cy_utf8_t) *fkw = cy_utf8_escape_json(ctx->facility_kw);
-        CY_AUTO(cy_utf8_t) *skw = cy_utf8_escape_json(ctx->severity_kw);
-        CY_AUTO(cy_utf8_t) *hn = cy_utf8_escape_json(ctx->hostname);
-        CY_AUTO(cy_utf8_t) *tag = cy_utf8_escape_json(ctx->tag);
-        CY_AUTO(cy_utf8_t) *msg = cy_utf8_escape_json(ctx->message);
-
-        return cy_utf8_new_fmt(f, ts, evts, ctx->facility, fkw, ctx->severity,
-                               skw, hn, tag, msg);
+        return cy_json_new(j);
 }

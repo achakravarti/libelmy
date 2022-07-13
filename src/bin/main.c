@@ -1,9 +1,12 @@
-#include "opt.c"
+#include "cmd.h"
+#include "opt.h"
 
-#include <stdlib.h>
 
-
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-        return opt_proc(argc, argv);
+        struct bin_opt *o = bin_opt_new(argc, argv);
+        int rc = bin_cmd_exec(o, argc, argv);
+        bin_opt_free(&o);
+
+        return rc;
 }

@@ -42,6 +42,9 @@ extern CY_RSAFE elmy_page_t *
 elmy_page_new_disabled(void);
 
 extern CY_SAFE elmy_page_t *
+elmy_page_new_parse(const char *, const char *, const char *, const char *);
+
+extern CY_SAFE elmy_page_t *
 elmy_page_copy(const elmy_page_t *);
 
 extern CY_SAFE elmy_page_t *
