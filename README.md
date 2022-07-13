@@ -17,5 +17,12 @@ int the `tools` directory.
 ## Build Options
 
   - As library only
+    - make
+    - make doc
+    - make clean
+    - make check
+    - make install
+    - make uninstall
   - As library + command line binary
   - As library + FastCGI binary (future)
+  - As containerised libary + FastCGI binary (future)
