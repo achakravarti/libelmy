@@ -149,10 +149,10 @@ vgfile_arch()
                 echo "  config.ssh.forward_agent = true";
                 echo "  config.vm.provision \"shell\", inline: <<-SHELL";
                 echo "    pacman -Sy --noconfirm"
-                echo "    pacman -S base-devel git --noconfirm --needed";
+                echo "    pacman -S base-devel git go --noconfirm --needed";
                 echo "    git clone https://aur.archlinux.org/yay.git";
                 echo "    chown -R vagrant:vagrant yay";
-                echo "    su - vagrant -c \"cd yay; makepkg -si\"";
+                echo "    su - vagrant -c \"cd yay; makepkg -si --noconfirm\"";
                 echo "  SHELL";
                 echo "end";
         } >> Vagrantfile
