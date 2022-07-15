@@ -51,7 +51,7 @@ pacman_update()
 
 pacman_install()
 {
-        if ! /usr/bin/sudo /usr/bin/pacman -S --noconfirm "$1"; then
+        if ! /usr/bin/sudo /usr/bin/pacman -S --noconfirm --needed "$1"; then
                 echo "Failed to install $1, exiting..."
                 exit 1
         fi
