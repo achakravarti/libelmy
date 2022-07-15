@@ -5,11 +5,9 @@
 
 # -b,--box (default arch)
 # -k,--sshkey (default $HOME/.ssh/id_rsa)
-# -u,--update (default true)
-# -d,--doc (default true)
 # -p,--purge (default false)
 #
-# ./vgsetup -b arch -k ~/.ssh/id_rsa -u -d -p
+# ./vgsetup -b arch -k ~/.ssh/id_rsa -p
 
 
 #                                                               %func:flag_setup
@@ -20,8 +18,6 @@ flag_setup()
 {
         DEFINE_string 'box' 'arch' 'Vagrant box' 'b'
         DEFINE_string 'sshkey' "$HOME/.ssh/id_rsa" 'GitHub SSH key' 'k'
-        DEFINE_boolean 'update' true 'update Vagrant box on provisioning' 'u'
-        DEFINE_boolean 'doc' true 'install Pandoc on provisioning' 'd'
         DEFINE_boolean 'purge' false 'purge existing Vagrant box' 'p'
 
         FLAGS "$@" || exit $?
@@ -153,27 +149,10 @@ vgfile_arch()
                 echo "  config.ssh.forward_agent = true";
                 echo "  config.vm.provision \"shell\", inline: <<-SHELL";
                 echo "    pacman -Sy --noconfirm"
-        } >> Vagrantfile
-
-        if [ "$FLAGS_update" -eq "$FLAGS_TRUE" ]; then
-                echo "    pacman -Su --noconfirm" >> Vagrantfile
-        fi
-
-        if [ "$FLAGS_doc " -eq "$FLAGS_TRUE" ]; then
-                echo "    pacman -S pandoc --noconfirm" >> Vagrantfile
-        fi
-
-        {
                 echo "    pacman -S base-devel git --noconfirm --needed";
-                echo "    pacman -S postgresql postgresql-libs --noconfirm";
-                printf "    su - postgres -c \"initidb --locale en_US.UTF-8";
-                echo "     -D '/var/lib/postgres/data'\"";
-                echo "    systemctl start postgresql.service";
-                echo "    systemctl enable postgresql.service";
                 echo "    git clone https://aur.archlinux.org/yay.git";
                 echo "    chown -R vagrant:vagrant yay";
                 echo "    su - vagrant -c \"cd yay; makepkg -si\"";
-                echo "    su - vagrant -c \"yay -S --no-confirm criterion\"";
                 echo "  SHELL";
                 echo "end";
         } >> Vagrantfile
