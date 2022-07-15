@@ -5,26 +5,32 @@
 
 # -b,--box (default arch)
 # -k,--sshkey (default $HOME/.ssh/id_rsa)
-# -u,--update (default true)
-# -d,--doc (default true)
 # -p,--purge (default false)
+# -u,--update (default true)
 #
-# ./vgsetup -b arch -k ~/.ssh/id_rsa -u -d -p
+# ./vgsetup -b arch -k ~/.ssh/id_rsa -p -u
 
 
+#                                                               %func:flag_setup
+# __NAME__
+#       flag_setup() - sets up command line flags
+#
 flag_setup()
 {
         DEFINE_string 'box' 'arch' 'Vagrant box' 'b'
         DEFINE_string 'sshkey' "$HOME/.ssh/id_rsa" 'GitHub SSH key' 'k'
-        DEFINE_boolean 'update' true 'update Vagrant box on provisioning' 'u'
-        DEFINE_boolean 'doc' true 'install Pandoc on provisioning' 'd'
         DEFINE_boolean 'purge' false 'purge existing Vagrant box' 'p'
+        DEFINE_boolean 'update' false 'update package manager' 'u'
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
 }
 
 
+#                                                              %func:vgbin_check
+# __NAME__
+#       vgbin_check() - checks existence of vagrant command
+#
 vgbin_check()
 {
         if ! vagrant -v >/dev/null 2>&1; then
@@ -34,6 +40,10 @@ vgbin_check()
 }
 
 
+#                                                               %func:vgbox_boot
+# __NAME__
+#       vgbox_boot() - boots Vagrant box
+#
 vgbox_boot()
 {
         if ! vagrant up; then
@@ -82,6 +92,11 @@ vgbox_boot()
         exit 0
 }
 
+
+#                                                             %func:vgfile_check
+# __NAME__
+#       vgfile_check() - checks for existing Vagrantfile
+#
 vgfile_check()
 {
         if [ -e Vagrantfile ]; then
@@ -102,6 +117,10 @@ vgfile_check()
 }
 
 
+#                                                             %func:vgfile_write
+# __NAME__
+#       vgfile_write() - writes Vagrantfile
+#
 vgfile_write()
 {
         if [ "$FLAGS_box" = arch ]; then
@@ -120,37 +139,40 @@ vgfile_write()
 }
 
 
+#                                                              %func:vgfile_arch
+# __NAME__
+#       vgfile_arch() - writes Vagrantfile for Arch Linux
+#
 vgfile_arch()
 {
         echo "Vagrant.configure(\"2\") do |config|" > Vagrantfile
         {
                 echo "  config.vm.box = \"generic/arch\"";
                 echo "  config.ssh.forward_agent = true";
-                echo "  config.vm.provision \"shell\", inline: <<-SHELL";
-                echo "    pacman -Sy --noconfirm"
+                echo "  config.vm.provision \"shell\", inline: <<-SHELL"
         } >> Vagrantfile
 
         if [ "$FLAGS_update" -eq "$FLAGS_TRUE" ]; then
-                echo "    pacman -Su --noconfirm" >> Vagrantfile
-        fi
-
-        if [ "$FLAGS_doc " -eq "$FLAGS_TRUE" ]; then
-                echo "    pacman -S pandoc --noconfirm" >> Vagrantfile
+                echo "    pacman -Syu --noconfirm" >> Vagrantfile
+        else
+                echo "    pacman -Sy --noconfirm" >> Vagrantfile
         fi
 
         {
-                echo "    pacman -S gcc make git --noconfirm";
-                echo "    pacman -S postgresql postgresql-libs --noconfirm";
-                printf "    su - postgres -c \"initidb --locale en_US.UTF-8";
-                echo "     -D '/var/lib/postgres/data'\"";
-                echo "    systemctl start postgresql.service";
-                echo "    systemctl enable postgresql.service";
+                echo "    pacman -S base-devel git go --noconfirm --needed";
+                echo "    git clone https://aur.archlinux.org/yay.git";
+                echo "    chown -R vagrant:vagrant yay";
+                echo "    su - vagrant -c \"cd yay; makepkg -si --noconfirm\"";
                 echo "  SHELL";
                 echo "end";
         } >> Vagrantfile
 }
 
 
+#                                                            %func:vgfile_alpine
+# __NAME__
+#       vgfile_alpine() - writes Vagrantfile for Alpine Linux
+#
 vgfile_alpine()
 {
         echo "not implemented"
@@ -158,6 +180,10 @@ vgfile_alpine()
 }
 
 
+#                                                            %func:vgfile_debian
+# __NAME__
+#       vgfile_debian() - writes Vagrantfile for Debian Jessie
+#
 vgfile_debian()
 {
         echo "not implemented"
@@ -165,6 +191,10 @@ vgfile_debian()
 }
 
 
+#                                                            %func:vgfile_centos
+# __NAME__
+#       vgfile_centos() - writes Vagrantfile for CentOS
+#
 vgfile_centos()
 {
         echo "not implemented"
@@ -172,6 +202,10 @@ vgfile_centos()
 }
 
 
+#                                                           %func:vgfile_freebsd
+# __NAME__
+#       vgfile_freebsd() - writes Vagrantfile for FreeBSD
+#
 vgfile_freebsd()
 {
         echo "not implemented"
