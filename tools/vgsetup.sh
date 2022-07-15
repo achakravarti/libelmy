@@ -32,17 +32,29 @@ check_vagrant()
 }
 
 
+check_vgfile()
+{
+        if [ -e Vagrantfile ]; then
+                vagrant halt
+                vagrant destroy -f
+                rm Vagrantfile
+
+                echo "Removed existing Vagrantfile..."
+        fi
+}
+
+
 vgfile_write()
 {
-        if [ ${FLAGS_box} = "arch" ]; then
+        if [ ${FLAGS_box} = arch ]; then
                 vgfile_arch
-        elif [ ${FLAGS_box} = "alpine" ]; then
+        elif [ ${FLAGS_box} = alpine ]; then
                 vgfile_alpine
-        elif [ ${FLAGS_box} = "debian" ]; then
+        elif [ ${FLAGS_box} = debian ]; then
                 vgfile_debian
-        elif [ ${FLAGS_box} = "centos" ]; then
+        elif [ ${FLAGS_box} = centos ]; then
                 vgfile_centos
-        elif [ ${FLAGS_box} = "freebsd" ]; then
+        elif [ ${FLAGS_box} = freebsd ]; then
                 vgfile_freebsd
         fi
 }
@@ -85,4 +97,5 @@ vgfile_freebsd()
 
 flag_setup "$@"
 check_vagrant
+check_vgfile
 vgfile_write
