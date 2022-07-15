@@ -170,11 +170,10 @@ vgfile_arch()
                 echo "     -D '/var/lib/postgres/data'\"";
                 echo "    systemctl start postgresql.service";
                 echo "    systemctl enable postgresql.service";
-                echo "    git clone https://aur.archilinux.org/yay.git";
-                echo "    chown -R vagrant:users yay";
-                echo "    cd yay";
-                echo "    makepkg -si";
-                echo "    su - vagrant -c \"yay -S criterion\"";
+                echo "    git clone https://aur.archlinux.org/yay.git";
+                echo "    chown -R vagrant:vagrant yay";
+                echo "    su - vagrant -c \"cd yay; makepkg -si\"";
+                echo "    su - vagrant -c \"yay -S --no-confirm criterion\"";
                 echo "  SHELL";
                 echo "end";
         } >> Vagrantfile
