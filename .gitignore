@@ -3,3 +3,7 @@ build/
 
 # Valgrind artefacts
 vgcore*
+
+# Vagrant artefacts
+Vagrantfile
+.vagrant/
