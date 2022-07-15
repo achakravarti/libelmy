@@ -164,12 +164,17 @@ vgfile_arch()
         fi
 
         {
-                echo "    pacman -S gcc make git --noconfirm";
+                echo "    pacman -S base-devel git --noconfirm --needed";
                 echo "    pacman -S postgresql postgresql-libs --noconfirm";
                 printf "    su - postgres -c \"initidb --locale en_US.UTF-8";
                 echo "     -D '/var/lib/postgres/data'\"";
                 echo "    systemctl start postgresql.service";
                 echo "    systemctl enable postgresql.service";
+                echo "    git clone https://aur.archilinux.org/yay.git";
+                echo "    chown -R vagrant:users yay";
+                echo "    cd yay";
+                echo "    makepkg -si";
+                echo "    su - vagrant -c \"yay -S criterion\"";
                 echo "  SHELL";
                 echo "end";
         } >> Vagrantfile
