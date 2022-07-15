@@ -79,7 +79,8 @@ vgfile_arch()
         fi
 
         {
-                echo "    pacman -S base-devel git postgresql --noconfirm";
+                echo "    pacman -S base-devel git --noconfirm";
+                echo "    pacman -S postgresql postgresql-libs --noconfirm";
                 printf "    su -postgres -c \"initidb --locale en_US.UTF-8";
                 echo "     -D '/var/lib/postgres/data'\"";
                 echo "    systemctl start postgresql.service";
