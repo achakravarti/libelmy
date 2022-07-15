@@ -46,15 +46,15 @@ check_vgfile()
 
 vgfile_write()
 {
-        if [ ${FLAGS_box} = arch ]; then
+        if [ "$FLAGS_box" = arch ]; then
                 vgfile_arch
-        elif [ ${FLAGS_box} = alpine ]; then
+        elif [ "$FLAGS_box" = alpine ]; then
                 vgfile_alpine
-        elif [ ${FLAGS_box} = debian ]; then
+        elif [ "$FLAGS_box" = debian ]; then
                 vgfile_debian
-        elif [ ${FLAGS_box} = centos ]; then
+        elif [ "$FLAGS_box" = centos ]; then
                 vgfile_centos
-        elif [ ${FLAGS_box} = freebsd ]; then
+        elif [ "$FLAGS_box" = freebsd ]; then
                 vgfile_freebsd
         fi
 }
@@ -62,7 +62,31 @@ vgfile_write()
 
 vgfile_arch()
 {
-        echo "not implemented"
+        echo "Vagrant.configure(\"2\") do |config|" > Vagrantfile
+        {
+                echo "  config.vm.box = \"generic/arch\"";
+                echo "  config.ssh.forward_agent = true";
+                echo "  config.vm.provision \"shell\", inline: <<-SHELL";
+                echo "    pacman -Sy --noconfirm";
+                echo "SHELL"
+        } >> Vagrantfile
+
+        if [ "$FLAGS_update" -eq "$FLAGS_true" ]; then
+                echo "    pacman -Su --noconfirm" >> Vagrantfile
+        fi
+
+        if [ "$FLAGS_doc " -eq "$FLAGS_true" ]; then
+                echo "    pacman -S pandoc --noconfirm" >> Vagrantfile
+        fi
+
+        {
+                echo "    pacman -S base-devel git postgresql --noconfirm";
+                printf "    su -postgres -c \"initidb --locale en_US.UTF-8\"";
+                echo "     -D '/var/lib/postgres/data'";
+                echo "    systemctl start postgresql.service"
+                echo "    systemctl enable postgresql.service"
+        } >> Vagrantfile
+
         exit 1
 }
 
