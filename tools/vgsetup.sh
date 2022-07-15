@@ -36,6 +36,11 @@ vgbin_check()
 
 vgbox_boot()
 {
+        if ! vagrant up; then
+                echo "Failed to boot Vagrant box, exiting..."
+                exit 1
+        fi
+
         if ! eval "$(ssh-agent -s)"; then
                 echo "Failed to forward SSH key, exiting..."
                 exit 1
@@ -48,18 +53,13 @@ vgbox_boot()
 
         echo "Forwarded SSH key..."
 
-        if ! vagrant up; then
-                echo "Failed to boot Vagrant box, exiting..."
-                exit 1
-        fi
-
-        if ! vagrant ssh -c \
-            'ssh -o StrictHostKeyChecking=no -T git@github.com'; then
+        vagrant ssh -c 'ssh -o StrictHostKeyChecking=no -T git@github.com'
+        if [ $? -gt 1 ]; then
                 echo "Failed to authenticate with GitHub, exiting..."
                 exit 1
         fi
 
-        if "$1" -eq 0; then
+        if [ "$1" -eq 0 ]; then
                 _chrysalid=git@github.com:achakravarti/libchrysalid.git
                 _elmy=git@github.com:achakravarti/libelmy.git
 
@@ -75,7 +75,7 @@ vgbox_boot()
                         exit 1;
                 fi
 
-                echo "Git clone successful, configure and make as required..."
+                echo "Git clone successful, run ./configure on each project..."
         fi
 
         echo "Vagrant box boot successful, happy coding :)"
@@ -91,7 +91,7 @@ vgfile_check()
                         rm Vagrantfile
                         echo "Purged existing Vagrant box..."
 
-                elif vagrant status | grep "is running"; then
+                elif vagrant status | grep "is running" >/dev/null; then
                         echo "Vagrant box already running, skipping..."
                         exit 0
 
