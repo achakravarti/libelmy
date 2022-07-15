@@ -46,6 +46,8 @@ vgbox_boot()
                 exit 1
         fi
 
+        echo "Forwarded SSH key..."
+
         if ! vagrant up; then
                 echo "Failed to boot Vagrant box, exiting..."
                 exit 1
@@ -58,14 +60,15 @@ vgbox_boot()
 vgfile_check()
 {
         if [ -e Vagrantfile ]; then
-                if vagrant status | grep "is running"; then
-                        echo "Vagrant box already running, skipping..."
-
-                elif [ "$FLAGS_purge" = "$FLAGS_TRUE" ]; then
+                if [ "$FLAGS_purge" = "$FLAGS_TRUE" ]; then
                         vagrant halt >/dev/null 2>&1
                         vagrant destroy -f >/dev/null 2>&1
                         rm Vagrantfile
                         echo "Purged existing Vagrant box..."
+
+                elif vagrant status | grep "is running"; then
+                        echo "Vagrant box already running, skipping..."
+                        exit 0
                 fi
         fi
 }
