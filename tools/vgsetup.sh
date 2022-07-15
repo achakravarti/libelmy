@@ -9,7 +9,7 @@
 # -d,--doc (default true)
 # -p,--purge (default false)
 #
-# ./vgsetup -b arch -k ~/.ssh/id_rsa -u -d
+# ./vgsetup -b arch -k ~/.ssh/id_rsa -u -d -p
 
 
 flag_setup()
@@ -69,6 +69,9 @@ vgfile_check()
                 elif vagrant status | grep "is running"; then
                         echo "Vagrant box already running, skipping..."
                         exit 0
+
+                else
+                        vgbox_boot
                 fi
         fi
 }
@@ -87,6 +90,8 @@ vgfile_write()
         elif [ "$FLAGS_box" = freebsd ]; then
                 vgfile_freebsd
         fi
+
+        vgbox_boot
 }
 
 
@@ -153,4 +158,3 @@ flag_setup "$@"
 vgbin_check
 vgfile_check
 vgfile_write
-vgbox_boot
