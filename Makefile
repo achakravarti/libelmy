@@ -10,3 +10,4 @@ bin: build/elmy
 
 clean:
 	rm -rf build
+	rm -f vgcore*
