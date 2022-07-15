@@ -6,8 +6,9 @@
 # -b,--box (default arch)
 # -k,--sshkey (default $HOME/.ssh/id_rsa)
 # -p,--purge (default false)
+# -u,--update (default true)
 #
-# ./vgsetup -b arch -k ~/.ssh/id_rsa -p
+# ./vgsetup -b arch -k ~/.ssh/id_rsa -p -u
 
 
 #                                                               %func:flag_setup
@@ -19,6 +20,7 @@ flag_setup()
         DEFINE_string 'box' 'arch' 'Vagrant box' 'b'
         DEFINE_string 'sshkey' "$HOME/.ssh/id_rsa" 'GitHub SSH key' 'k'
         DEFINE_boolean 'purge' false 'purge existing Vagrant box' 'p'
+        DEFINE_boolean 'update' false 'update package manager' 'u'
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
@@ -147,8 +149,16 @@ vgfile_arch()
         {
                 echo "  config.vm.box = \"generic/arch\"";
                 echo "  config.ssh.forward_agent = true";
-                echo "  config.vm.provision \"shell\", inline: <<-SHELL";
-                echo "    pacman -Sy --noconfirm"
+                echo "  config.vm.provision \"shell\", inline: <<-SHELL"
+        } >> Vagrantfile
+
+        if [ "$FLAGS_update" -eq "$FLAGS_TRUE" ]; then
+                echo "    pacman -Syu --noconfirm" >> Vagrantfile
+        else
+                echo "    pacman -Sy --noconfirm" >> Vagrantfile
+        fi
+
+        {
                 echo "    pacman -S base-devel git go --noconfirm --needed";
                 echo "    git clone https://aur.archlinux.org/yay.git";
                 echo "    chown -R vagrant:vagrant yay";
