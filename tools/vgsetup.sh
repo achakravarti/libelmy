@@ -67,24 +67,25 @@ vgfile_arch()
                 echo "  config.vm.box = \"generic/arch\"";
                 echo "  config.ssh.forward_agent = true";
                 echo "  config.vm.provision \"shell\", inline: <<-SHELL";
-                echo "    pacman -Sy --noconfirm";
-                echo "SHELL"
+                echo "    pacman -Sy --noconfirm"
         } >> Vagrantfile
 
-        if [ "$FLAGS_update" -eq "$FLAGS_true" ]; then
+        if [ "$FLAGS_update" -eq "$FLAGS_TRUE" ]; then
                 echo "    pacman -Su --noconfirm" >> Vagrantfile
         fi
 
-        if [ "$FLAGS_doc " -eq "$FLAGS_true" ]; then
+        if [ "$FLAGS_doc " -eq "$FLAGS_TRUE" ]; then
                 echo "    pacman -S pandoc --noconfirm" >> Vagrantfile
         fi
 
         {
                 echo "    pacman -S base-devel git postgresql --noconfirm";
-                printf "    su -postgres -c \"initidb --locale en_US.UTF-8\"";
-                echo "     -D '/var/lib/postgres/data'";
-                echo "    systemctl start postgresql.service"
-                echo "    systemctl enable postgresql.service"
+                printf "    su -postgres -c \"initidb --locale en_US.UTF-8";
+                echo "     -D '/var/lib/postgres/data'\"";
+                echo "    systemctl start postgresql.service";
+                echo "    systemctl enable postgresql.service";
+                echo "  SHELL";
+                echo "end";
         } >> Vagrantfile
 
         exit 1
