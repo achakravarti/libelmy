@@ -7,6 +7,7 @@
 # -k,--sshkey (default $HOME/.ssh/id_rsa)
 # -u,--update (default true)
 # -d,--doc (default true)
+# -p,--purge (default false)
 #
 # ./vgsetup -b arch -k ~/.ssh/id_rsa -u -d
 
@@ -17,13 +18,14 @@ flag_setup()
         DEFINE_string 'sshkey' "$HOME/.ssh/id_rsa" 'GitHub SSH key' 'k'
         DEFINE_boolean 'update' true 'update Vagrant box on provisioning' 'u'
         DEFINE_boolean 'doc' true 'install Pandoc on provisioning' 'd'
+        DEFINE_boolean 'purge' false 'purge existing Vagrant box' 'p'
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
 }
 
 
-check_vagrant()
+vgbin_check()
 {
         if ! vagrant -v >/dev/null 2>&1; then
                 echo  "vagrant command not found; install it first"
@@ -32,14 +34,39 @@ check_vagrant()
 }
 
 
-check_vgfile()
+vgbox_boot()
+{
+        if ! eval "$(ssh-agent -s)"; then
+                echo "Failed to forward SSH key, exiting..."
+                exit 1
+        fi
+
+        if ! ssh-add "$FLAGS_sshkey"; then
+                echo "Failed to forward SSH key, exiting..."
+                exit 1
+        fi
+
+        if ! vagrant up; then
+                echo "Failed to boot Vagrant box, exiting..."
+                exit 1
+        fi
+
+        echo "Vagrant box boot successful, happy coding :)"
+        exit 0
+}
+
+vgfile_check()
 {
         if [ -e Vagrantfile ]; then
-                vagrant halt
-                vagrant destroy -f
-                rm Vagrantfile
+                if vagrant status | grep "is running"; then
+                        echo "Vagrant box already running, skipping..."
 
-                echo "Removed existing Vagrantfile..."
+                elif [ "$FLAGS_purge" = "$FLAGS_TRUE" ]; then
+                        vagrant halt >/dev/null 2>&1
+                        vagrant destroy -f >/dev/null 2>&1
+                        rm Vagrantfile
+                        echo "Purged existing Vagrant box..."
+                fi
         fi
 }
 
@@ -88,9 +115,6 @@ vgfile_arch()
                 echo "  SHELL";
                 echo "end";
         } >> Vagrantfile
-
-        vagrant up
-        echo "YAY!"
 }
 
 
@@ -123,6 +147,7 @@ vgfile_freebsd()
 
 
 flag_setup "$@"
-check_vagrant
-check_vgfile
+vgbin_check
+vgfile_check
 vgfile_write
+vgbox_boot
