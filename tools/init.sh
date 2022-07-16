@@ -3,7 +3,7 @@
 . "$(dirname "0")/../external/shflags/shflags"
 
 # -t,--target (default arch)
-# -d,--doc (default true)
+# -p,--pandoc (default true)
 # -u,--update (default true)
 #
 # ./init.sh --target arch --doc --update
@@ -15,7 +15,7 @@
 main_flags()
 {
         DEFINE_string 'target' 'arch' 'target platform' 't'
-        DEFINE_boolean 'doc' true 'install documentation tools' 'd'
+        DEFINE_boolean 'pandoc' true 'install pandoc' 'p'
         DEFINE_boolean 'update' true 'update package manager' 'u'
 
         FLAGS "$@" || exit $?
@@ -161,6 +161,11 @@ arch_init()
         arch_install valgrind 0
         arch_install postgresql 0
         arch_install postgresql-libs 0
+
+        if [ "$FLAGS_pandoc" -eq "$FLAGS_TRUE" ]; then
+                arch_install pandoc 0
+        fi
+
         arch_install criterion 1
         arch_install rsyslog 1
 
