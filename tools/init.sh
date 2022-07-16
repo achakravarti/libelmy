@@ -23,21 +23,21 @@ flag_setup()
 pacman_update()
 {
         if [ "$FLAGS_update" -eq "$FLAGS_FALSE" ]; then
-                echo "Skipping updates..."
-                return
+                    echo "Skipping updates..."
+                    return
         fi
 
         checkupdates >/dev/null 2>&1;
         rv=$?
 
         if [ $rv -eq 1 ]; then
-                echo "Failed to determine pending updates, exiting..."
-                exit 1
+                    echo "Failed to determine pending updates, exiting..."
+                    exit 1
         fi
 
         if [ $rv -eq 2 ]; then
-                echo "No updates pending, skipping..."
-                return
+                    echo "No updates pending, skipping..."
+                    return
         fi
 
         echo "Updates available, syncing..."
@@ -113,6 +113,7 @@ init_arch()
         pacman_install valgrind
         pacman_install postgresql
         pacman_install postgresql-libs
+        yay_install criterion
 
         if ! systemctl is-enabled postgresql.service \
             | grep enabled >/dev/null 2>&1; then
