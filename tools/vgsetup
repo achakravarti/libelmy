@@ -148,7 +148,7 @@ vgfile_arch()
                 echo "  config.vm.box = \"generic/arch\"";
                 echo "  config.ssh.forward_agent = true";
                 echo "  config.vm.provision \"shell\", inline: <<-SHELL";
-                echo "    pacman -Syu --noconfirm";
+                echo "    pacman -Syyu --noconfirm";
                 echo "    pacman -S base-devel git go --noconfirm --needed";
                 echo "    pacman -S pacman-contrib --noconfirm";
                 echo "    git clone https://aur.archlinux.org/yay.git";
