@@ -6,7 +6,7 @@
 # -p,--pandoc (default true)
 # -u,--update (default true)
 #
-# ./init.sh --target arch --doc --update
+# ./init.sh --target arch --pandoc --update
 
 
 # MAIN FUNCTIONS
