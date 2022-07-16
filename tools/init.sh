@@ -9,6 +9,9 @@
 # ./init.sh --target arch --doc --update
 
 
+# MAIN FUNCTIONS
+
+
 main_flags()
 {
         DEFINE_string 'target' 'arch' 'target platform' 't'
@@ -54,6 +57,9 @@ main_run()
 }
 
 
+# SYSTEMD FUNCTIONS
+
+
 systemd_enable()
 {
         if ! systemctl start "$1"; then
@@ -69,7 +75,7 @@ systemd_enable()
 
 
 
-# ARCH LINUX
+# ARCH LINUX FUNCTIONS
 
 
 arch_update()
@@ -159,6 +165,9 @@ arch_init()
                 systemd_enable postgresql.service
         fi
 }
+
+
+# MAIN ENTRY POINT
 
 
 main_flags "$@"
