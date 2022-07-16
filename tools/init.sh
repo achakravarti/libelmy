@@ -63,6 +63,20 @@ pacman_install()
 }
 
 
+yay_install()
+{
+        if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
+                echo "Package $1 not found, installing..."
+                pacman_update
+
+                if ! yay -S --noconfirm "$1"; then
+                        echo "Failed to install package $1, exiting..."
+                        exit 1
+                fi
+        fi
+}
+
+
 enable_systemd()
 {
         if ! systemctl start "$1"; then
@@ -148,5 +162,5 @@ init_run()
 }
 
 
-flags_setup
+flag_setup "$@"
 init_run
