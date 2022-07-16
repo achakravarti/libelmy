@@ -60,6 +60,17 @@ main_run()
 # SYSTEMD FUNCTIONS
 
 
+systemd_enabled()
+{
+        if systemctl is-enabled postgresql.service \
+            | grep enabled >/dev/null 2>&1; then
+                rv=0
+        else
+                rv=1
+        fi
+}
+
+
 systemd_enable()
 {
         if ! systemctl start "$1"; then
@@ -153,8 +164,8 @@ arch_init()
         arch_install criterion 1
         arch_install rsyslog 1
 
-        if ! systemctl is-enabled postgresql.service \
-            | grep enabled >/dev/null 2>&1; then
+        systemd_enabled postgresql.service
+        if [ "$rv" -ne 0 ]; then
                 if ! sudo -u postgres \
                     initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data';
                 then
