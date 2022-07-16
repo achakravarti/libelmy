@@ -101,34 +101,6 @@ arch_update()
 }
 
 
-pacman_install()
-{
-        if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
-                echo "Package $1 not found, installing..."
-                arch_update
-
-                if ! sudo pacman -S --noconfirm "$1"; then
-                        echo "Failed to install package $1, exiting..."
-                        exit 1
-                fi
-        fi
-}
-
-
-yay_install()
-{
-        if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
-                echo "Package $1 not found, installing..."
-                arch_update
-
-                if ! yay -S --noconfirm "$1"; then
-                        echo "Failed to install package $1, exiting..."
-                        exit 1
-                fi
-        fi
-}
-
-
 arch_install()
 {
         if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
@@ -190,4 +162,4 @@ arch_init()
 
 
 main_flags "$@"
-
+main_run
