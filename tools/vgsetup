@@ -155,11 +155,12 @@ vgfile_arch()
         if [ "$FLAGS_update" -eq "$FLAGS_TRUE" ]; then
                 echo "    pacman -Syu --noconfirm" >> Vagrantfile
         else
-                echo "    pacman -Sy --noconfirm" >> Vagrantfile
+                echo "    pacman -Fy --noconfirm" >> Vagrantfile
         fi
 
         {
                 echo "    pacman -S base-devel git go --noconfirm --needed";
+                echo "    pacman -S pacman-contrib --noconfirm";
                 echo "    git clone https://aur.archlinux.org/yay.git";
                 echo "    chown -R vagrant:vagrant yay";
                 echo "    su - vagrant -c \"cd yay; makepkg -si --noconfirm\"";
