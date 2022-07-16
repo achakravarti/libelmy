@@ -155,8 +155,8 @@ arch_init()
 
         if ! systemctl is-enabled postgresql.service \
             | grep enabled >/dev/null 2>&1; then
-                if ! sudo su - postgres -c \
-                    "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'";
+                if ! sudo -u postgres \
+                    initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data';
                 then
                         echo "Failed to initialise postgres cluster, exiting..."
                         exit 1
@@ -168,4 +168,4 @@ arch_init()
 
 
 main_flags "$@"
-main_run
+
