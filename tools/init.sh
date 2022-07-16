@@ -129,6 +129,27 @@ yay_install()
 }
 
 
+arch_install()
+{
+        if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
+                echo "Package $1 not found, installing..."
+                arch_update
+
+                if [ "$1" -eq 0 ]; then
+                        if ! sudo pacman -S --noconfirm "$1"; then
+                                echo "Failed to install package $1, exiting..."
+                                exit 1
+                        fi
+                else
+                        if ! yay -S --noconfirm "$1"; then
+                                echo "Failed to install package $1, exiting..."
+                                exit 1
+                        fi
+                fi
+        fi
+}
+
+
 arch_init()
 {
         if ! pacman -V >/dev/null 2>&1; then
@@ -146,12 +167,13 @@ arch_init()
                 exit 1
         fi
 
-        pacman_install gcc
-        pacman_install make
-        pacman_install valgrind
-        pacman_install postgresql
-        pacman_install postgresql-libs
-        yay_install criterion
+        arch_install gcc 0
+        arch_install make 0
+        arch_install valgrind 0
+        arch_install postgresql 0
+        arch_install postgresql-libs 0
+        arch_install criterion 1
+        arch_install rsyslog 1
 
         if ! systemctl is-enabled postgresql.service \
             | grep enabled >/dev/null 2>&1; then
