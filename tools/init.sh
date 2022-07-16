@@ -73,12 +73,12 @@ systemd_enabled()
 
 systemd_enable()
 {
-        if ! systemctl start "$1"; then
+        if ! sudo systemctl start "$1"; then
                 echo "Failed to start $1, exiting..."
                 exit 1
         fi
 
-        if ! systemctl enable "$1"; then
+        if ! sudo systemctl enable "$1"; then
                 echo "Failed to enable $1, exiting..."
                 exit 1
         fi
