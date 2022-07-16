@@ -25,6 +25,32 @@ flag_setup()
 }
 
 
+# MESSAGE FUNCTIONS
+
+
+msg_ok()
+{
+        printf '[\033[1;32mOK\033[0m] %s...\n' "$1"
+}
+
+
+msg_info()
+{
+        printf '[\033[1;34mINFO\033[0m] %s...\n' "$1"
+}
+
+
+msg_warn() {
+        printf '[\033[1;31mWARN\033[0m] %s...\n' "$1"
+}
+
+
+msg_fail() {
+        printf '[\033[1;33mFAIL\033[0m] %s, exiting...\n' "$1"
+        exit 1
+}
+
+
 #                                                              %func:vgbin_check
 # __NAME__
 #       vgbin_check() - checks existence of vagrant command
@@ -32,8 +58,7 @@ flag_setup()
 vgbin_check()
 {
         if ! vagrant -v >/dev/null 2>&1; then
-                echo  "vagrant command not found; install it first"
-                exit 1
+                msg_fail  "vagrant command not found"
         fi
 }
 
@@ -45,26 +70,22 @@ vgbin_check()
 vgbox_boot()
 {
         if ! vagrant up; then
-                echo "Failed to boot Vagrant box, exiting..."
-                exit 1
+                msg_fail "failed to boot Vagrant box"
         fi
 
         if ! eval "$(ssh-agent -s)"; then
-                echo "Failed to forward SSH key, exiting..."
-                exit 1
+                msg_fail "failed to forward SSH key"
         fi
 
         if ! ssh-add "$FLAGS_sshkey"; then
-                echo "Failed to forward SSH key, exiting..."
-                exit 1
+                msg_fail "failed to forward SSH key"
         fi
 
-        echo "Forwarded SSH key..."
+        msg_ok "forwarded SSH key"
 
         vagrant ssh -c 'ssh -o StrictHostKeyChecking=no -T git@github.com'
         if [ $? -gt 1 ]; then
-                echo "Failed to authenticate with GitHub, exiting..."
-                exit 1
+                msg_fail "failed to authenticate with GitHub"
         fi
 
         if [ "$1" -eq 0 ]; then
@@ -73,20 +94,18 @@ vgbox_boot()
 
                 if ! vagrant ssh -c \
                     "git clone --recurse-submodules $_chrysalid"; then
-                        echo "Failed to clone $_chrysalid, exiting..."
-                        exit 1;
+                        msg_fail "failed to clone $_chrysalid"
                 fi
 
                 if ! vagrant ssh -c \
                     "git clone --recurse-submodules $_elmy"; then
-                        echo "Failed to clone $_elmy, exiting..."
-                        exit 1;
+                        msg_fail "failed to clone $_elmy"
                 fi
 
-                echo "Git clone successful, run ./configure on each project..."
+                msg_ok "Git clone successful, run ./configure on each project"
         fi
 
-        echo "Vagrant box boot successful, happy coding :)"
+        msg_ok "Vagrant box boot successful, happy coding :)"
         exit 0
 }
 
@@ -102,10 +121,10 @@ vgfile_check()
                         vagrant halt >/dev/null 2>&1
                         vagrant destroy -f >/dev/null 2>&1
                         rm Vagrantfile
-                        echo "Purged existing Vagrant box..."
+                        msg_info "purged existing Vagrant box..."
 
                 elif vagrant status | grep "is running" >/dev/null; then
-                        echo "Vagrant box already running, skipping..."
+                        msg_warn "Vagrant box already running, skipping..."
                         exit 0
 
                 else
@@ -166,8 +185,7 @@ vgfile_arch()
 #
 vgfile_alpine()
 {
-        echo "not implemented"
-        exit 1
+        msg_fail "not implemented"
 }
 
 
@@ -177,8 +195,7 @@ vgfile_alpine()
 #
 vgfile_debian()
 {
-        echo "not implemented"
-        exit 1
+        msg_fail "not implemented"
 }
 
 
@@ -188,8 +205,7 @@ vgfile_debian()
 #
 vgfile_centos()
 {
-        echo "not implemented"
-        exit 1
+        msg_fail "not implemented"
 }
 
 
@@ -199,8 +215,7 @@ vgfile_centos()
 #
 vgfile_freebsd()
 {
-        echo "not implemented"
-        exit 1
+        msg_fail "not implemented"
 }
 
 
