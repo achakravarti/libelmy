@@ -51,9 +51,14 @@ pacman_update()
 
 pacman_install()
 {
-        if ! sudo pacman -S --noconfirm --needed "$1"; then
-                echo "Failed to install $1, exiting..."
-                exit 1
+        if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
+                echo "Package $1 not found, installing..."
+                pacman_update
+
+                if ! sudo pacman -S --noconfirm "$1"; then
+                        echo "Failed to install package $1, exiting..."
+                        exit 1
+                fi
         fi
 }
 
@@ -89,24 +94,14 @@ init_arch()
                 exit 1
         fi
 
-        if ! gcc -v >/dev/null 2>&1; then
-                echo "gcc not found, installing..."
-                pacman_update
-                pacman_install gcc
-        fi
+        pacman_install gcc
+        pacman_install make
+        pacman_install valgrind
+        pacman_install postgresql
+        pacman_install postgresql-libs
 
-        if ! make -v >/dev/null 2>&1; then
-                echo "make not found, installing..."
-                pacman_update
-                pacman_install make
-        fi
-
-        if ! postgres -V >/dev/null 2>&1; then
-                echo "postgres not found, installing..."
-                pacman_update
-                pacman_install postgresql
-                pacman_install postgresql-libs
-
+        if ! systemctl is-enabled postgresql.service \
+            | grep enabled >/dev/null 2>&1; then
                 if ! su - postgres \
                     -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'";
                 then
