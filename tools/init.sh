@@ -26,34 +26,53 @@ main_flags()
 main_run()
 {
         if ! id --version >/dev/null 2>&1; then
-                echo "/usr/bin/id not found, exiting..."
-                exit 1
+                msg_fail "id not found"
         fi
 
         if [ "$(id -u)" -eq 0 ]; then
-                echo "Running as root, exiting..."
-                echo "Run as a non-root sudo user"
-                exit 1
+                msg_fail "running as root is dangerous"
         fi
 
         if ! sudo -V >/dev/null 2>&1; then
-                echo "sudo not found, exiting..."
-                echo "Ensure sudo is installed on your system"
-                exit 1
+                msg_fail "sudo not found"
         fi
 
         if ! git -v >/dev/null 2>&1; then
-                echo "git not found, exiting..."
-                echo "Ensure git is installed on your system"
-                exit 1
+                msg_fail "git not found"
         fi
 
         if [ "$FLAGS_target" = "arch" ]; then
                 arch_init
         else
-                echo "Unsupported target platform, exiting..."
-                exit 1
+                msg_fail "unsupported target platform"
         fi
+}
+
+
+# MESSAGE FUNCTIONS
+
+
+msg_ok()
+{
+	printf '[\033[1;32mOK\033[0m] %s...\n' "$1"
+}
+
+
+msg_info()
+{
+	printf '[\033[1;34mINFO\033[0m] %s...\n' "$1"
+}
+
+
+msg_warn() {
+	printf '[\033[1;31mWARN\033[0m] %s, exiting...\n' "$1"
+	exit 1
+}
+
+
+msg_fail() {
+	printf '[\033[1;33mFAIL\033[0m] %s...\n' "$1"
+	exit 1
 }
 
 
@@ -74,13 +93,11 @@ systemd_enabled()
 systemd_enable()
 {
         if ! sudo systemctl start "$1"; then
-                echo "Failed to start $1, exiting..."
-                exit 1
+                msg_fail "failed to start service $1"
         fi
 
         if ! sudo systemctl enable "$1"; then
-                echo "Failed to enable $1, exiting..."
-                exit 1
+                msg_fail "failed to enable service $1"
         fi
 }
 
@@ -92,7 +109,7 @@ systemd_enable()
 arch_update()
 {
         if [ "$FLAGS_update" -eq "$FLAGS_FALSE" ]; then
-                    echo "Skipping updates..."
+                    mgs_warn "skipping updates"
                     return
         fi
 
@@ -100,20 +117,19 @@ arch_update()
         rv=$?
 
         if [ $rv -eq 1 ]; then
-                    echo "Failed to determine pending updates, exiting..."
+                    msg_fail "failed to determine pending updates"
                     exit 1
         fi
 
         if [ $rv -eq 2 ]; then
-                    echo "No updates pending, skipping..."
+                    msg_info "no updates pending, skipping"
                     return
         fi
 
-        echo "Updates available, syncing..."
+        msg_info "updates available, syncing"
 
         if ! sudo pacman -Syu --noconfirm; then
-                echo "Failed to update packages, exiting..."
-                exit 1
+                msg_fail "failed to update packages"
         fi
 }
 
@@ -126,13 +142,11 @@ arch_install()
 
                 if [ "$1" -eq 0 ]; then
                         if ! sudo pacman -S --noconfirm "$1"; then
-                                echo "Failed to install package $1, exiting..."
-                                exit 1
+                                mgs_fail "failed to install package $1"
                         fi
                 else
                         if ! yay -S --noconfirm "$1"; then
-                                echo "Failed to install package $1, exiting..."
-                                exit 1
+                                msg_fail "failed to install package $1"
                         fi
                 fi
         fi
@@ -142,18 +156,15 @@ arch_install()
 arch_init()
 {
         if ! pacman -V >/dev/null 2>&1; then
-                echo "pacman not found, exiting..."
-                exit 1
+                mgs_fail "pacman not found"
         fi
 
         if ! checkupdates -h >/dev/null 2>&1; then
-                echo "checkupdates not found, exiting..."
-                exit 1
+                msg_fail "checkupdates not found"
         fi
 
         if ! yay -V; then
-                echo "yay not found, exiting..."
-                exit 1
+                msg_fail "yay not found"
         fi
 
         arch_install gcc 0
@@ -174,8 +185,7 @@ arch_init()
                 if ! sudo -u postgres \
                     initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data';
                 then
-                        echo "Failed to initialise postgres cluster, exiting..."
-                        exit 1
+                        msg_fail "failed to initialise postgres cluster"
                 fi
 
                 systemd_enable postgresql.service
