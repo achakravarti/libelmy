@@ -39,7 +39,8 @@ $(LIB_OUT): $(LIB_OBJ)
 
 # Rule to build elmy binary
 $(BIN_OUT): $(BIN_SRC) $(LIB_OUT)
-	$(CC) $(LDFLAGS) $^ $(LDEPS) -o $@
+	$(CC) $(LDFLAGS) -L./build $(BIN_SRC) -lelmy $(LDEPS) -o $@
+#       $(CC) $(LDFLAGS) $^ $(LDEPS) -o $@
 
 # Target to build libelmy.so
 lib: $(LIB_OUT)
