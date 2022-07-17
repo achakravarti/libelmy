@@ -68,13 +68,20 @@ systemd_enabled()
 
 systemd_enable()
 {
+        msg_info "starting systemd service $1"
+
         if ! sudo systemctl start "$1"; then
                 msg_fail "failed to start service $1"
         fi
 
+        msg_ok "service $1 started"
+        msg_info "enabling systemd service $1"
+
         if ! sudo systemctl enable "$1"; then
                 msg_fail "failed to enable service $1"
         fi
+
+        msg_ok "service $1 enabled"
 }
 
 
@@ -89,50 +96,56 @@ arch_update()
                     return
         fi
 
+        msg_info "checking for package updates"
+
         checkupdates >/dev/null 2>&1;
         rv=$?
 
         if [ $rv -eq 1 ]; then
-                    msg_fail "failed to determine pending updates"
+                    msg_fail "failed to determine package updates"
                     exit 1
         fi
 
         if [ $rv -eq 2 ]; then
-                    msg_info "no updates pending, skipping"
+                    msg_ok "no package updates pending, skipping"
                     return
         fi
 
-        msg_info "updates available, syncing"
+        msg_ok "package updates available"
+        msg_info "starting update"
 
         if ! sudo pacman -Syu --noconfirm; then
                 msg_fail "failed to update packages"
         fi
+
+        msg_ok "package update complete"
 }
 
 
 arch_install()
 {
-        if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
-                msg_info "package $1 not found, installing"
-                arch_update
+        msg_info "checking package $1"
 
-                if [ "$1" -eq 0 ]; then
-                        if ! sudo pacman -S --noconfirm "$1"; then
-                                mgs_fail "failed to install package $1"
-                        else
-                                msg_ok "installed package $1"
-                        fi
-                else
-                        if ! yay -S --noconfirm "$1"; then
-                                msg_fail "failed to install package $1"
-                        else
-                                msg_ok "installed package $1"
-                        fi
+        if pacman -Qi | grep "$1" >/dev/null 2>&1; then
+                msg_ok "package $1 found, skipping"
+                return
+        fi
+
+        msg_info "package $1 not found, installing"
+
+        arch_update
+
+        if [ "$1" -eq 0 ]; then
+                if ! sudo pacman -S --noconfirm "$1"; then
+                        mgs_fail "failed to install package $1"
                 fi
         else
-                msg_info "package $1 found, skipping"
-
+                if ! yay -S --noconfirm "$1"; then
+                        msg_fail "failed to install package $1"
+                fi
         fi
+
+        msg_ok "installed package $1"
 }
 
 
