@@ -15,7 +15,7 @@
 # __NAME__
 #       flag_setup() - sets up command line flags
 #
-flag_setup()
+main_flags()
 {
         DEFINE_string 'box' 'arch' 'Vagrant box' 'b'
         DEFINE_string 'sshkey' "$HOME/.ssh/id_rsa" 'GitHub SSH key' 'k'
@@ -26,95 +26,34 @@ flag_setup()
 }
 
 
-#                                                              %func:vgbin_check
-# __NAME__
-#       vgbin_check() - checks existence of vagrant command
-#
-vgbin_check()
+main_run()
 {
         if ! vagrant -v >/dev/null 2>&1; then
                 msg_fail  "vagrant command not found"
-        fi
-}
-
-
-#                                                               %func:vgbox_boot
-# __NAME__
-#       vgbox_boot() - boots Vagrant box
-#
-vgbox_boot()
-{
-        if ! vagrant up; then
-                msg_fail "failed to boot Vagrant box"
+        else
+                msg_ok "vagrant command found"
         fi
 
-        if ! eval "$(ssh-agent -s)"; then
-                msg_fail "failed to forward SSH key"
-        fi
-
-        if ! ssh-add "$FLAGS_sshkey"; then
-                msg_fail "failed to forward SSH key"
-        fi
-
-        msg_ok "forwarded SSH key"
-
-        vagrant ssh -c 'ssh -o StrictHostKeyChecking=no -T git@github.com'
-        if [ $? -gt 1 ]; then
-                msg_fail "failed to authenticate with GitHub"
-        fi
-
-        if [ "$1" -eq 0 ]; then
-                _chrysalid=git@github.com:achakravarti/libchrysalid.git
-                _elmy=git@github.com:achakravarti/libelmy.git
-
-                if ! vagrant ssh -c \
-                    "git clone --recurse-submodules $_chrysalid"; then
-                        msg_fail "failed to clone $_chrysalid"
-                fi
-
-                if ! vagrant ssh -c \
-                    "git clone --recurse-submodules $_elmy"; then
-                        msg_fail "failed to clone $_elmy"
-                fi
-
-                msg_ok "Git clone successful, run ./configure on each project"
-        fi
-
-        msg_ok "Vagrant box boot successful, happy coding :)"
-        exit 0
-}
-
-
-#                                                             %func:vgfile_check
-# __NAME__
-#       vgfile_check() - checks for existing Vagrantfile
-#
-vgfile_check()
-{
         if [ -e Vagrantfile ]; then
                 if [ "$FLAGS_purge" = "$FLAGS_TRUE" ]; then
+                        msg_warn "--purge set, removing existing Vagrant box"
+
                         vagrant halt >/dev/null 2>&1
                         vagrant destroy -f >/dev/null 2>&1
                         rm Vagrantfile
-                        msg_info "purged existing Vagrant box..."
 
-                elif vagrant status | grep "is running" >/dev/null; then
-                        msg_warn "Vagrant box already running, skipping..."
+                        msg_ok "purged existing Vagrant box"
+
+                elif vagrant status | grep "is running" >/dev/null 2>&1; then
+                        msg_ok "Vagrant box already running, skipping"
                         exit 0
 
                 else
-                        vgbox_boot 1
+                        msg_ok "existing Vagrantfile found"
+                        vgbox_boot
                 fi
         fi
-}
 
-
-#                                                             %func:vgfile_write
-# __NAME__
-#       vgfile_write() - writes Vagrantfile
-#
-vgfile_write()
-{
         if [ "$FLAGS_box" = arch ]; then
                 vgfile_arch
         elif [ "$FLAGS_box" = alpine ]; then
@@ -127,7 +66,65 @@ vgfile_write()
                 vgfile_freebsd
         fi
 
-        vgbox_boot 0
+        vgbox_boot
+}
+
+
+#                                                               %func:vgbox_boot
+# __NAME__
+#       vgbox_boot() - boots Vagrant box
+#
+vgbox_boot()
+{
+        msg_info "booting Vagrant box"
+
+        if ! vagrant up; then
+                msg_fail "failed to boot box"
+        fi
+
+        msg_info "forwarding SSH key $FLAGS_sshkey"
+
+        if ! eval "$(ssh-agent -s)"; then
+                msg_fail "failed to forward SSH key $FLAGS_sshkey"
+        fi
+
+        if ! ssh-add "$FLAGS_sshkey"; then
+                msg_fail "failed to forward SSH key $FLAGS_sshkey"
+        fi
+
+        msg_ok "forwarded SSH key $FLAGS_sshkey"
+        msg_info "authenticating with GitHub"
+
+        vagrant ssh -c 'ssh -o StrictHostKeyChecking=no -T git@github.com'
+        if [ $? -gt 1 ]; then
+                msg_fail "failed to authenticate with GitHub"
+        fi
+
+        msg_ok "authenticated with GitHub"
+        git_clone libchrysalid
+        git_clone libelmy
+
+        msg_ok "vagrant box boot successful, happy coding :)"
+        exit 0
+}
+
+
+git_clone()
+{
+        msg_info "Looking for $1 repository"
+
+        if [ -d "$1" ]; then
+                msg_ok "$1 repository found, skipping"
+        else
+                _repo="git@github.com:achakravarti/$1.git"
+
+                if ! vagrant ssh -c \
+                    "git clone --recurse-submodules $_repo"; then
+                        msg_fail "failed to clone $1"
+                fi
+
+                msg_ok "cloned $1, run ./configure in it"
+        fi
 }
 
 
@@ -137,6 +134,8 @@ vgfile_write()
 #
 vgfile_arch()
 {
+        msg_info "writing Vagrantfile for arch box"
+
         echo "Vagrant.configure(\"2\") do |config|" > Vagrantfile
         {
                 echo "  config.vm.box = \"generic/arch\"";
@@ -151,6 +150,8 @@ vgfile_arch()
                 echo "  SHELL";
                 echo "end";
         } >> Vagrantfile
+
+        msg_ok "Vagrantfile written for arch box"
 }
 
 
@@ -194,7 +195,5 @@ vgfile_freebsd()
 }
 
 
-flag_setup "$@"
-vgbin_check
-vgfile_check
-vgfile_write
+main_flags "$@"
+main_run
