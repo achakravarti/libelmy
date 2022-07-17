@@ -135,7 +135,7 @@ arch_install()
 
         arch_update
 
-        if [ "$1" -eq 0 ]; then
+        if [ "$2" -eq 0 ]; then
                 if ! sudo pacman -S --noconfirm "$1"; then
                         mgs_fail "failed to install package $1"
                 fi
