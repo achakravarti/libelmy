@@ -39,8 +39,10 @@ $(LIB_OUT): $(LIB_OBJ)
 
 # Rule to build elmy binary
 $(BIN_OUT): $(BIN_SRC) $(LIB_OUT)
-	$(CC) $(LDFLAGS) -L./build $(BIN_SRC) -lelmy $(LDEPS) -o $@
-#       $(CC) $(LDFLAGS) $^ $(LDEPS) -o $@
+	$(CC) $(LDFLAGS) -Lbuild $(BIN_SRC) -lelmy $(LDEPS) -o $@
+	@echo "To run elmy binary before install, run the following first:"
+	@echo "$$ LD_LIBRARY_PATH=\$$LD_LIBRARY_PATH:build"
+	@echo "$$ export LD_LIBRARY_PATH"
 
 # Target to build libelmy.so
 lib: $(LIB_OUT)
