@@ -16,7 +16,7 @@ msg_info()
 
 msg_warn()
 {
-        printf '[\033[1;31mWARN\033[0m] %s...\n' "$1"
+        printf '[\033[1;33mWARN\033[0m] %s...\n' "$1"
 }
 
 
