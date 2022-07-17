@@ -17,6 +17,7 @@ main_flags()
         DEFINE_string 'target' 'arch' 'target platform' 't'
         DEFINE_boolean 'pandoc' true 'install pandoc' 'p'
         DEFINE_boolean 'update' true 'update package manager' 'u'
+        DEFINE_boolean 'check' true 'support check tools' 'u'
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
@@ -168,16 +169,18 @@ arch_init()
 
         arch_install gcc 0
         arch_install make 0
-        arch_install valgrind 0
         arch_install postgresql 0
         arch_install postgresql-libs 0
+        arch_install rsyslog 1
 
         if [ "$FLAGS_pandoc" -eq "$FLAGS_TRUE" ]; then
                 arch_install pandoc 0
         fi
 
-        arch_install criterion 1
-        arch_install rsyslog 1
+        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
+                arch_install valgrind 0
+                arch_install criterion 1
+        fi
 
         systemd_enabled postgresql.service
         if [ "$rv" -ne 0 ]; then
