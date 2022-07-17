@@ -65,12 +65,14 @@ msg_info()
 }
 
 
-msg_warn() {
+msg_warn()
+{
         printf '[\033[1;31mWARN\033[0m] %s...\n' "$1"
 }
 
 
-msg_fail() {
+msg_fail()
+{
         printf '[\033[1;33mFAIL\033[0m] %s, exiting...\n' "$1"
         exit 1
 }
@@ -109,7 +111,7 @@ systemd_enable()
 arch_update()
 {
         if [ "$FLAGS_update" -eq "$FLAGS_FALSE" ]; then
-                    mgs_warn "skipping updates"
+                    mgs_warn "--noupdate set, skipping updates"
                     return
         fi
 
@@ -137,18 +139,25 @@ arch_update()
 arch_install()
 {
         if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
-                echo "Package $1 not found, installing..."
+                msg_info "package $1 not found, installing"
                 arch_update
 
                 if [ "$1" -eq 0 ]; then
                         if ! sudo pacman -S --noconfirm "$1"; then
                                 mgs_fail "failed to install package $1"
+                        else
+                                msg_ok "installed package $1"
                         fi
                 else
                         if ! yay -S --noconfirm "$1"; then
                                 msg_fail "failed to install package $1"
+                        else
+                                msg_ok "installed package $1"
                         fi
                 fi
+        else
+                msg_info "package $1 found, skipping"
+
         fi
 }
 
@@ -175,11 +184,16 @@ arch_init()
 
         if [ "$FLAGS_pandoc" -eq "$FLAGS_TRUE" ]; then
                 arch_install pandoc 0
+        else
+                msg_warn "--nopandoc set, skipping pandoc installation"
         fi
 
         if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
                 arch_install valgrind 0
                 arch_install criterion 1
+        else
+                msg_warn "--nocheck set, skipping valgrind installation"
+                msg_warn "--nocheck set, skipping criterion installation"
         fi
 
         systemd_enabled postgresql.service
