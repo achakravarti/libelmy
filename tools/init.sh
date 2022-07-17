@@ -6,8 +6,9 @@
 # -t,--target (default arch)
 # -p,--pandoc (default true)
 # -u,--update (default true)
+# -c,--check (default true)
 #
-# ./init.sh --target arch --pandoc --update
+# ./init.sh --target arch --pandoc --update --check
 
 
 # MAIN FUNCTIONS
