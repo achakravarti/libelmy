@@ -8,7 +8,7 @@
 # -u,--update (default true)
 # -c,--check (default true)
 #
-# ./init.sh --target arch --pandoc --update --check
+# ./pkgsetup --target arch --pandoc --update --check
 
 
 # MAIN FUNCTIONS
@@ -151,6 +151,8 @@ arch_install()
 
 arch_init()
 {
+        msg_info "setting up packages for Arch Linux"
+
         if ! pacman -V >/dev/null 2>&1; then
                 mgs_fail "pacman not found"
         fi
@@ -193,6 +195,8 @@ arch_init()
 
                 systemd_enable postgresql.service
         fi
+
+        msg_ok "package setup complete"
 }
 
 
