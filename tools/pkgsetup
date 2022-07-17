@@ -19,7 +19,7 @@ main_flags()
         DEFINE_string 'target' 'arch' 'target platform' 't'
         DEFINE_boolean 'pandoc' true 'install pandoc' 'p'
         DEFINE_boolean 'update' true 'update package manager' 'u'
-        DEFINE_boolean 'check' true 'support check tools' 'u'
+        DEFINE_boolean 'check' true 'support check tools' 'c'
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
