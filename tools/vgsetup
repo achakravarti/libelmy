@@ -11,9 +11,12 @@
 # ./vgsetup -b arch -k ~/.ssh/id_rsa -p -u
 
 
-#                                                               %func:flag_setup
+# MAIN FUNCTIONS
+
+
+#                                                               %func:main_flags
 # __NAME__
-#       flag_setup() - sets up command line flags
+#       main_flags() - sets up command line flags
 #
 main_flags()
 {
@@ -26,7 +29,11 @@ main_flags()
 }
 
 
-main_run()
+#                                                                %func:main_exec
+# __NAME__
+#       main_exec() - executes script
+#
+main_exec()
 {
         if ! vagrant -v >/dev/null 2>&1; then
                 msg_fail  "vagrant command not found"
@@ -70,6 +77,38 @@ main_run()
 }
 
 
+# GIT FUNCTIONS
+
+
+#                                                                %func:git_clone
+# __NAME__
+#       git_clone() - clones Git repository
+#
+# __PARAMETERS__
+#       $1: name of repository
+#
+git_clone()
+{
+        msg_info "Looking for $1 repository"
+
+        if [ -d "$1" ]; then
+                msg_ok "$1 repository found, skipping"
+        else
+                _repo="git@github.com:achakravarti/$1.git"
+
+                if ! vagrant ssh -c \
+                    "git clone --recurse-submodules $_repo"; then
+                        msg_fail "failed to clone $1"
+                fi
+
+                msg_ok "cloned $1, run ./configure in it"
+        fi
+}
+
+
+# VAGRANT FUNCTIONS
+
+
 #                                                               %func:vgbox_boot
 # __NAME__
 #       vgbox_boot() - boots Vagrant box
@@ -106,25 +145,6 @@ vgbox_boot()
 
         msg_ok "vagrant box boot successful, happy coding :)"
         exit 0
-}
-
-
-git_clone()
-{
-        msg_info "Looking for $1 repository"
-
-        if [ -d "$1" ]; then
-                msg_ok "$1 repository found, skipping"
-        else
-                _repo="git@github.com:achakravarti/$1.git"
-
-                if ! vagrant ssh -c \
-                    "git clone --recurse-submodules $_repo"; then
-                        msg_fail "failed to clone $1"
-                fi
-
-                msg_ok "cloned $1, run ./configure in it"
-        fi
 }
 
 
@@ -195,5 +215,8 @@ vgfile_freebsd()
 }
 
 
+# MAIN ENTRY POINT
+
+
 main_flags "$@"
-main_run
+main_exec
