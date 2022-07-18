@@ -203,6 +203,7 @@ tg_clean()
         write_ln "clean:"
         write_tln "rm -rf build"
         write_tln "rm -f vgcore*"
+        write_tln "rm -f *~"
 }
 
 
