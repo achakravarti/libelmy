@@ -33,6 +33,8 @@ main_flags()
 
 main_exec()
 {
+        msg_info "detecting OS"
+
         os_freebsd
         os_linux
 }
