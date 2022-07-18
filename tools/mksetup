@@ -50,30 +50,15 @@ main_run()
 
         msg_info "writing Makefile"
 
-        echo "# Makefile for libelmy" > $MKFILE
-        write_ln "# Generated on $(date)"
-        write_ln
-
-        var_cc
-        var_lib
+        write_hdr
+        write_cc
+        write_lib
 
         if [ "$FLAGS_bin" -eq "$FLAGS_TRUE" ]; then
-                var_bin
+                write_bin
         fi
 
-        rule_lib
-
-        if [ "$FLAGS_bin" -eq "$FLAGS_TRUE" ]; then
-                rule_bin
-        fi
-
-        tg_lib
-
-        if [ "$FLAGS_bin" -eq "$FLAGS_TRUE" ]; then
-                tg_bin
-        fi
-
-        tg_clean
+        write_clean
 
         msg_ok "Makefile written"
 }
@@ -94,10 +79,15 @@ write_tln()
 }
 
 
-# MAKEFILE VARIABLES
+write_hdr()
+{
+        echo "# Makefile for libelmy" > $MKFILE
+        write_ln "# Generated on $(date)"
+        write_ln
+}
 
 
-var_cc()
+write_cc()
 {
         write_ln "# Compiler"
         write_ln "CC=gcc"
@@ -115,10 +105,11 @@ var_cc()
         write_ln "# Library dependencies"
         write_ln "LDEPS=-lchrysalid -lpq -lpcre2-8"
         write_ln
+
 }
 
 
-var_lib()
+write_lib()
 {
         write_ln "# Path to generated libelmy.so"
         write_ln "LIB_OUT=build/libelmy.so"
@@ -131,26 +122,7 @@ var_lib()
         write_ln "# List of object files corresponding to LIB_SRC"
         write_ln "LIB_OBJ=\$(LIB_SRC:src/lib/%.c=build/lib/%.o)"
         write_ln
-}
 
-
-var_bin()
-{
-        write_ln "# Path to generated elmy binary"
-        write_ln "BIN_OUT=build/elmy"
-        write_ln
-
-        write_ln "# Source files required to build elmy binary"
-        write_ln "BIN_SRC!=find src/bin/ -type f -name '*.c' | sort"
-        write_ln
-}
-
-
-# MAKEFILE RULES
-
-
-rule_lib()
-{
         write_ln "# Rule to build object files from libelmy source files"
         write_ln "build/lib/%.o: src/lib/%.c"
         write_tln "@mkdir -p build/lib"
@@ -161,11 +133,23 @@ rule_lib()
         write_ln "\$(LIB_OUT): \$(LIB_OBJ)"
         write_tln "\$(CC) -rdynamic -shared \$(LDFLAGS) \$^ \$(LDEPS) -o \$@"
         write_ln
+
+        write_ln "# Target to build libelmy.so"
+        write_ln "lib: \$(LIB_OUT)"
+        write_ln
 }
 
 
-rule_bin()
+write_bin()
 {
+        write_ln "# Path to generated elmy binary"
+        write_ln "BIN_OUT=build/elmy"
+        write_ln
+
+        write_ln "# Source files required to build elmy binary"
+        write_ln "BIN_SRC!=find src/bin/ -type f -name '*.c' | sort"
+        write_ln
+
         write_ln "# Rule to build elmy binary"
         write_ln "\$(BIN_OUT): \$(BIN_SRC) \$(LIB_OUT)"
         write_tln \
@@ -175,29 +159,14 @@ rule_bin()
         write_tln "@echo \"\$\$ export LD_LIBRARY_PATH\""
         write_tln "@echo \"\$\$ build/elmy [opts] arg\""
         write_ln
-}
 
-
-# MAKEFILE TARGETS
-
-
-tg_lib()
-{
-        write_ln "# Target to build libelmy.so"
-        write_ln "lib: \$(LIB_OUT)"
-        write_ln
-}
-
-
-tg_bin()
-{
         write_ln "# Target to build elmy binary"
         write_ln "bin: \$(BIN_OUT)"
         write_ln
 }
 
 
-tg_clean()
+write_clean()
 {
         write_ln "# Target to clean build artefacts"
         write_ln "clean:"
