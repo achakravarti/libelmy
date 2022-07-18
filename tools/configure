@@ -1,0 +1,144 @@
+#!/bin/sh
+
+. "$(dirname "0")/../external/shflags/shflags"
+. "$(dirname "0")/../tools/msg.sh"
+
+
+# -b,--bin (default true)
+# -c,--check (default true)
+# -d,--database (default true)
+# -f,--force (default true)
+# -m,--man (default true)
+# -r,--release (default false)
+# -u,--update (default true)
+
+
+export rv
+
+
+# MAIN FUNCTIONS
+
+
+main_flags()
+{
+        DEFINE_string 'target' 'arch' 'target platform' 't'
+        DEFINE_boolean 'pandoc' true 'install pandoc' 'p'
+        DEFINE_boolean 'update' true 'update package manager' 'u'
+        DEFINE_boolean 'check' true 'support check tools' 'c'
+
+        FLAGS "$@" || exit $?
+        eval set -- "$FLAGS_ARGV"
+}
+
+
+main_exec()
+{
+        os_freebsd
+        os_linux
+}
+
+
+# OS FUNCTIONS
+
+
+os_freebsd()
+{
+
+        [ "$(uname -s)" != FreeBSD ]  && return
+
+        _ver=$(uname -r | cut -d '-' -f 1 | tr -d '.')
+        [ "$_ver" -lt 122 ] &&  msg_fail "FreeBSD version < 12.2 detected"
+
+        rv=FreeBSD
+        msg_ok "FreeBSD $_ver detected"
+}
+
+
+os_linux()
+{
+        [ -z "$rv" ] && return
+        [ "$(uname -s)" != Linux ] && msg_fail "unsupported kernel detected"
+        [ -f /etc/os-release ] || msg_fail "outdated Linux kernel detected"
+
+        _distro=$(grep 'NAME' /etc/os-release   \
+            | head -n1                          \
+            | cut -d '=' -f 2                   \
+            | tr -d '"'                         \
+            | cut -d ' ' -f 1)
+
+        if [ "$_distro" = Arch ]; then
+                rv=Arch
+                msg_ok "detected Arch Linux"
+                return
+        fi
+
+        if [ "$_distro" = Alpine ]; then
+                rv=Alpine
+                msg_ok "detected Alpine Linux"
+                return
+        fi
+
+        msg_fail "unable to determine OS"
+}
+
+
+os_kern() {
+        msg_info "detecting OS kernel"
+
+        _kern=$(uname -s)
+
+        if [ "$_kern" = "FreeBSD" ] ; then
+                rv=$_kern
+
+        elif [ "$_kern" = "Darwin" ] ; then
+                rv=$_kern
+
+        elif [ "$_kern" = "Linux" ] ; then
+                if [ -f /etc/os-release ] ; then
+                        rv=$_kern
+                else
+                        msg_fail "detected outdated Linux kernel: $_kern"
+                fi
+
+        else
+                msg_fail "detected unsupported kernel: $_kern"
+        fi
+
+        msg_ok "detected $_kern kernel"
+}
+
+
+os_distro()
+{
+	msg_info "detecting OS"
+
+	if [ "$1" = "Linux" ] ; then
+		rv=$(grep 'NAME' /etc/os-release				\
+				| head -n1 					\
+				| cut -d '=' -f 2 				\
+	        		| tr -d '"' 					\
+				| cut -d ' ' -f 1)
+	fi
+
+	if [ "$1" = "Darwin" ] ; then
+		rv=$(sw_vers							\
+				| grep "ProductName:"				\
+				| cut -d ':' -f 2				\
+				| tr -d '\n')
+	fi
+
+	if [ "$1" != "FreeBSD" ]						\
+			&& [ "$rv" != "macOS" ]					\
+			&& [ "$rv" != "Arch" ]					\
+	    		&& [ "$rv" != "Debian" ] 				\
+	    		&& [ "$rv" != "Ubuntu" ] ; then
+		mgx_fail "Unsupported distribution: $rv"
+	fi
+}
+
+
+# MAIN ENTRY POINT
+
+
+main_flags "$@"
+main_exec
