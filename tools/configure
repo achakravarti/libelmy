@@ -47,7 +47,7 @@ os_freebsd()
         [ "$(uname -s)" != FreeBSD ]  && return
 
         _ver=$(uname -r | cut -d '-' -f 1 | tr -d '.')
-        [ "$_ver" -lt 122 ] &&  msg_fail "FreeBSD version < 12.2 detected"
+        [ "$_ver" -lt 122 ] &&  msg_fail "FreeBSD < v12.2 unsupported"
 
         rv=FreeBSD
         msg_ok "FreeBSD $_ver detected"
@@ -56,7 +56,7 @@ os_freebsd()
 
 os_linux()
 {
-        [ -z "$rv" ] && return
+        [ -z "$rv" ] || return
         [ "$(uname -s)" != Linux ] && msg_fail "unsupported kernel detected"
         [ -f /etc/os-release ] || msg_fail "outdated Linux kernel detected"
 
@@ -78,62 +78,31 @@ os_linux()
                 return
         fi
 
-        msg_fail "unable to determine OS"
-}
+        if [ "$_distro" = Debian ]; then
+                _ver=$(grep 'VERSION=' /etc/os-release  \
+                    | tr -d '"'                         \
+                    | cut -d '=' -f 2)
 
+                _vern=$(echo "$_ver" | tr -d 'A-Z a-z (  ) .')
 
-os_kern() {
-        msg_info "detecting OS kernel"
-
-        _kern=$(uname -s)
-
-        if [ "$_kern" = "FreeBSD" ] ; then
-                rv=$_kern
-
-        elif [ "$_kern" = "Darwin" ] ; then
-                rv=$_kern
-
-        elif [ "$_kern" = "Linux" ] ; then
-                if [ -f /etc/os-release ] ; then
-                        rv=$_kern
-                else
-                        msg_fail "detected outdated Linux kernel: $_kern"
-                fi
-
-        else
-                msg_fail "detected unsupported kernel: $_kern"
+                [ "$_vern" -lt 10 ] && msg_fail "Debian < v10 unsupported"
+                msg_ok "detected Debian $_ver"
+                return
         fi
 
-        msg_ok "detected $_kern kernel"
-}
+        if [ "$_distro" = Ubuntu ]; then
+                _ver=$(grep 'VERSION_ID' /etc/os-release    \
+                    | tr -d '"'                             \
+                    | cut -d '=' -f 2)
 
+                _vern=$(echo "$_ver" | tr -d 'A-Z a-z (  ) .')
 
-os_distro()
-{
-	msg_info "detecting OS"
+                [ "$_vern" -lt 2004 ] && msg_fail "Ubuntu < v20.04 unsupported"
+                msg_ok "detected Ubuntu $_ver"
+                return
+        fi
 
-	if [ "$1" = "Linux" ] ; then
-		rv=$(grep 'NAME' /etc/os-release				\
-				| head -n1 					\
-				| cut -d '=' -f 2 				\
-	        		| tr -d '"' 					\
-				| cut -d ' ' -f 1)
-	fi
-
-	if [ "$1" = "Darwin" ] ; then
-		rv=$(sw_vers							\
-				| grep "ProductName:"				\
-				| cut -d ':' -f 2				\
-				| tr -d '\n')
-	fi
-
-	if [ "$1" != "FreeBSD" ]						\
-			&& [ "$rv" != "macOS" ]					\
-			&& [ "$rv" != "Arch" ]					\
-	    		&& [ "$rv" != "Debian" ] 				\
-	    		&& [ "$rv" != "Ubuntu" ] ; then
-		mgx_fail "Unsupported distribution: $rv"
-	fi
+        msg_fail "unable to determine OS"
 }
 
 
