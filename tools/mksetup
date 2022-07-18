@@ -94,7 +94,15 @@ write_cc()
         write_ln
 
         write_ln "# Compiler flags"
-        write_ln "CFLAGS=-Wall -Wextra -I \`pg_config --includedir\`"
+
+        _cflg="CFLAGS=-O3 -DNDEBUG -Wall -Wextra -I \`pg_config --includedir\`"
+        _cflgd="CFLAGS=-g -O0 -Wall -Wextra -I \`pg_config --includedir\`"
+
+        if [ "$FLAGS_debug" -eq "$FLAGS_TRUE" ]; then
+                write_ln "$_cflgd"
+        else
+                write_ln "$_cflg"
+        fi
         write_ln
 
         _libdir=/usr/local/lib
