@@ -1,0 +1,179 @@
+#!/bin/sh
+
+. "$(dirname "0")/../external/shflags/shflags"
+. "$(dirname "0")/../tools/msg.sh"
+
+
+# -b,--bin (default true)
+# -c,--check (default true)
+# -d,--debug (default true)
+# -f,--force (default true)
+# -m,--man (default true)
+#
+# ./mksetup --debug --check --man --bin --force
+
+
+# MAIN FUNCTIONS
+
+
+main_flags()
+{
+        DEFINE_boolean 'bin' true 'make bin target' 'b'
+        DEFINE_boolean 'check' true 'make check target' 'c'
+        DEFINE_boolean 'debug' true 'build for debug' 'd'
+        DEFINE_boolean 'force' false 'force regeneration' 'f'
+        DEFINE_boolean 'man' true 'make man target' 'm'
+
+        FLAGS "$@" || exit $?
+        eval set -- "$FLAGS_ARGV"
+}
+
+
+main_run()
+{
+        MKFILE=../Makefile2
+
+        msg_info "looking for existing Makefile"
+
+        if [ -e "$MKFILE" ]; then
+                if [ "$FLAGS_force" -eq "$FLAGS_TRUE" ]; then
+                        msg_warn "--force set, rebuilding Makefile"
+                        cp $MKFILE $MKFILE~
+                        msg_ok "backed up exiting Makefile"
+                        rm $MKFILE
+                        msg_ok "removed existing Makefile"
+                else
+                        msg_ok "Makefile found, skipping"
+                        exit 0
+                fi
+        fi
+
+        msg_info "writing Makefile"
+
+        write_hdr
+        write_cc
+        write_lib
+
+        if [ "$FLAGS_bin" -eq "$FLAGS_TRUE" ]; then
+                write_bin
+        fi
+
+        write_clean
+
+        msg_ok "Makefile written"
+}
+
+
+# WRITE FUNCTIONS
+
+
+write_ln()
+{
+        printf "%s\n" "$1" >> $MKFILE
+}
+
+
+write_tln()
+{
+        printf "\t%s\n" "$1" >> $MKFILE
+}
+
+
+write_hdr()
+{
+        echo "# Makefile for libelmy" > $MKFILE
+        write_ln "# Generated on $(date)"
+        write_ln
+}
+
+
+write_cc()
+{
+        write_ln "# Compiler"
+        write_ln "CC=gcc"
+        write_ln
+
+        write_ln "# Compiler flags"
+        write_ln "CFLAGS=-Wall -Wextra -I \`pg_config --includedir\`"
+        write_ln
+
+        _libdir=/usr/local/lib
+        write_ln "# Linker flags"
+        write_ln "LDFLAGS=-L\`pg_config --libdir\` -L$_libdir -Wl,R$_libdir"
+        write_ln
+
+        write_ln "# Library dependencies"
+        write_ln "LDEPS=-lchrysalid -lpq -lpcre2-8"
+        write_ln
+}
+
+
+write_lib()
+{
+        write_ln "# Path to generated libelmy.so"
+        write_ln "LIB_OUT=build/libelmy.so"
+        write_ln
+
+        write_ln "# Source files required to build libelmy.so"
+        write_ln "LIB_SRC!=find src/lib/ -type f -name '*.c' | sort"
+        write_ln
+
+        write_ln "# List of object files corresponding to LIB_SRC"
+        write_ln "LIB_OBJ!=\$(LIB_SRC:src/lib/%.c=build/lib/%.o)"
+        write_ln
+
+        write_ln "# Rule to build object files from libelmy source files"
+        write_ln "build/lib/%.o: src/lib/%.c"
+        write_tln "@mkdir -p build/lib"
+        write_tln "\$(CC) -fPIC \$(CFLAGS) -c \$< -o \$@"
+        write_ln
+
+        write_ln "# Rule to build libelmy.so from object files"
+        write_ln "\$(LIB_OUT): \$(LIB_OBJ)"
+        write_tln "\$(CC) -rdynamic -shared \$(LDFLAGS) \$^ \$(LDEPS) -o \$@"
+        write_ln
+
+        write_ln "# Target to build libelmy.so"
+        write_ln "lib: \$(LIB_OUT)"
+        write_ln
+}
+
+
+write_bin()
+{
+        write_ln "# Path to generated elmy binary"
+        write_ln "BIN_OUT=build/elmy"
+        write_ln
+
+        write_ln "# Source files required to build elmy binary"
+        write_ln "BIN_SRC!=find src/bin/ -type f -name '*.c' | sort"
+        write_ln
+
+        write_ln "# Rule to build elmy binary"
+        write_ln "\$(BIN_OUT): \$(BIN_SRC) \$(LIB_OUT)"
+        write_tln "\$(CC) \$(LDFLAGS) \$(BIN_SRC) -lelmy \$(LDEPS) -o \$@"
+        write_tln "@echo \"To run elmy before install, export as follows:\""
+        write_tln "@echo \"\$\$ LD_LIBRARY_PATH=\\\$\$LD_LIBRARY_PATH:build\""
+        write_tln "@echo \"\$\$ export LD_LIBRARY_PATH\""
+        write_ln
+
+        write_ln "# Target to build elmy binary"
+        write_ln "bin: \$(BIN_OUT)"
+        write_ln
+}
+
+
+write_clean()
+{
+        write_ln "# Target to clean build artefacts"
+        write_ln "clean:"
+        write_tln "rm -rf build"
+        write_tln "rm -f vgcore*"
+}
+
+
+# MAIN ENTRY POINT
+
+
+main_flags "$@"
+main_run
