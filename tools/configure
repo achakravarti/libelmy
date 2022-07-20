@@ -48,7 +48,7 @@ main_exec()
 
         if [ "$FLAGS_database" -eq "$FLAGS_TRUE" ]; then
                 if [ "$FLAGS_force" -eq "$FLAGS_TRUE" ]; then
-                        ./dbsetup --purge
+                        ./dbsetup --reset
                 else
                         ./dbsetup
                 fi
