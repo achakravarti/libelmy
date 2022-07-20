@@ -18,6 +18,8 @@ os_query()
 
 os_kernel__()
 {
+        msg_info "checking OS"
+
         OS_KERNEL=$(uname -s)
 
         _emsg="unsupported kernel: $OS_KERNEL"
@@ -59,6 +61,8 @@ os_version__()
         if [ "$OS_DISTRO" = "Alpine" ] || [ "$OS_DISTRO" = "Arch" ]; then
                 OS_VERSTR=rolling
                 OS_VERNUM=0
+
+                msg_ok "detected $OS_DISTRO Linux"
                 return
         fi
 
@@ -72,6 +76,7 @@ os_version__()
                 _emsg="outdated FreeBSD version: $OS_VERSTR"
                 [ "$OS_VERNUM" -lt 122 ] && msg_fail _emsg
 
+                msg_ok "detected FreeBSD $OS_VERSTR"
                 return
         fi
 
@@ -85,6 +90,7 @@ os_version__()
                 _emsg="outdated Debian version: $OS_VERSTR"
                 [ "$OS_VERNUM" -lt 10 ] && msg_fail _emsg
 
+                msg_ok "detected Debian $OS_VERSTR"
                 return
         fi
 
@@ -98,6 +104,7 @@ os_version__()
                 _emsg="outdated Ubuntu version: $OS_VERSTR"
                 [ "$OS_VERNUM" -lt 2004 ] && msg_fail _emsg
 
+                msg_ok "detected Ubuntu $OS_VERSTR"
                 return
         fi
 }
