@@ -8,9 +8,10 @@ export OS_VERSTR
 export OS_VERNUM
 
 
+OS_MIN_ALPINE=316
+OS_MIN_DEBIAN=11
 OS_MIN_FREEBSD=122
-OS_MIN_DEBIAN=10
-OS_MIN_UBUNTU=2004
+OS_MIN_UBUNTU=2204
 
 
 os_query()
@@ -65,11 +66,11 @@ os_distro__()
 
 os_version__()
 {
-        if [ "$OS_DISTRO" = "Alpine" ] || [ "$OS_DISTRO" = "Arch" ]; then
+        if [ "$OS_DISTRO" = "Arch" ]; then
                 OS_VERSTR=rolling
                 OS_VERNUM=0
 
-                msg_ok "detected $OS_DISTRO Linux"
+                msg_ok "detected Arch Linux"
                 return
         fi
 
@@ -112,6 +113,20 @@ os_version__()
                 [ "$OS_VERNUM" -lt $OS_MIN_UBUNTU ] && msg_fail _emsg
 
                 msg_ok "detected Ubuntu $OS_VERSTR"
+                return
+        fi
+
+        if [ "$OS_DISTRO" = Alpine ]; then
+                OS_VERSTR=$(grep 'VERSION_ID' /etc/os-release   \
+                    | tr -d '"'                                 \
+                    | cut -d '=' -f 2)
+
+                OS_VERNUM=$(echo "$OS_VERSTR" | tr -d 'A-Z a-z ( ) .')
+
+                _emsg="outdated Alpine Linux version: $OS_VERSTR"
+                [ "$OS_VERNUM" -lt $OS_MIN_ALPINE ] && msg_fail _emsg
+
+                msg_ok "detected Alpine Linux $OS_VERSTR"
                 return
         fi
 }
