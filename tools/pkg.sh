@@ -66,7 +66,7 @@ pkg_upgrade()
 
         case "$OS_DISTRO" in
         Alpine)
-                ! sudo apk update && apk upgrade && msg_fail "$_emsg"
+                ! sudo apk update && sudo apk upgrade && msg_fail "$_emsg"
                 ;;
 
         Arch)
@@ -74,11 +74,11 @@ pkg_upgrade()
                 ;;
 
         FreeBSD)
-                ! sudo pkg update && pkg upgrade -y && msg_fail "$_emsg"
+                ! sudo pkg update && sudo pkg upgrade -y && msg_fail "$_emsg"
                 ;;
 
         *)
-                ! sudo apt update -y && apt upgrade -y && msg_fail "$_emsg"
+                ! sudo apt update -y && sudo apt upgrade -y && msg_fail "$_emsg"
                 ;;
         esac
 
