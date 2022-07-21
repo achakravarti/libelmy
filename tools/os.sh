@@ -8,6 +8,11 @@ export OS_VERSTR
 export OS_VERNUM
 
 
+OS_MIN_FREEBSD=122
+OS_MIN_DEBIAN=10
+OS_MIN_UBUNTU=2004
+
+
 os_query()
 {
         os_kernel__
@@ -74,7 +79,7 @@ os_version__()
                     | tr -d '.')
 
                 _emsg="outdated FreeBSD version: $OS_VERSTR"
-                [ "$OS_VERNUM" -lt 122 ] && msg_fail _emsg
+                [ "$OS_VERNUM" -lt $OS_MIN_FREEBSD ] && msg_fail _emsg
 
                 msg_ok "detected FreeBSD $OS_VERSTR"
                 return
@@ -88,7 +93,7 @@ os_version__()
                 OS_VERNUM=$(echo "$OS_VERSTR" | tr -d 'A-Z a-z ( ) .')
 
                 _emsg="outdated Debian version: $OS_VERSTR"
-                [ "$OS_VERNUM" -lt 10 ] && msg_fail _emsg
+                [ "$OS_VERNUM" -lt $OS_MIN_DEBIAN ] && msg_fail _emsg
 
                 msg_ok "detected Debian $OS_VERSTR"
                 return
@@ -102,7 +107,7 @@ os_version__()
                 OS_VERNUM=$(echo "$OS_VERSTR" | tr -d 'A-Z a-z ( ) .')
 
                 _emsg="outdated Ubuntu version: $OS_VERSTR"
-                [ "$OS_VERNUM" -lt 2004 ] && msg_fail _emsg
+                [ "$OS_VERNUM" -lt $OS_MIN_UBUNTU ] && msg_fail _emsg
 
                 msg_ok "detected Ubuntu $OS_VERSTR"
                 return
