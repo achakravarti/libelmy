@@ -39,7 +39,11 @@ main_setup()
 
 main_exec()
 {
-        [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ] && pkg_upgrade
+        if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
+                pkg_upgrade
+        else
+                msg_warn "--noupgrade set, skipping package upgrades"
+        fi
 
         case "$OS_DISTRO" in
         Alpine)
