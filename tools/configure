@@ -2,6 +2,7 @@
 
 . "$(dirname "0")/../external/shflags/shflags"
 . "$(dirname "0")/../tools/os.sh"
+. "$(dirname "0")/../tools/pkg.sh"
 . "$(dirname "0")/../tools/msg.sh"
 
 
@@ -20,10 +21,10 @@ export OS
 # MAIN FUNCTIONS
 
 
-main_flags()
+main_setup()
 {
         DEFINE_boolean 'man' true 'generate man pages' 'm'
-        DEFINE_boolean 'update' true 'update package manager' 'u'
+        DEFINE_boolean 'upgrade' true 'upgrade package manager' 'u'
         DEFINE_boolean 'check' true 'support check tools' 'c'
         DEFINE_boolean 'database' true 'generate database' 'd'
         DEFINE_boolean 'release' false 'build for release' 'r'
@@ -31,40 +32,81 @@ main_flags()
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
+
+        os_query
 }
 
 
 main_exec()
 {
-        msg_info "detecting OS"
+        [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ] && pkg_upgrade
 
-        os_query
+        case "$OS_DISTRO" in
+        Alpine)
+                pkg_alpine
+                ;;
 
-        _cmd="./pkgsetup -t $OS_DISTRO"
-        [ "$FLAGS_update" -eq "$FLAGS_FALSE" ] && _cmd="_cmd --noupdate"
-        [ "$FLAGS_check" -eq "$FLAGS_FALSE" ] && _cmd="_cmd --nocheck"
-        [ "$FLAGS_man" -eq "$FLAGS_FALSE" ] && _cmd="_cmd --nopandoc"
-        eval "$_cmd"
+        Arch)
+                pkg_arch
+                ;;
 
-        if [ "$FLAGS_database" -eq "$FLAGS_TRUE" ]; then
-                if [ "$FLAGS_force" -eq "$FLAGS_TRUE" ]; then
-                        ./dbsetup --reset
-                else
-                        ./dbsetup
-                fi
+        FreeBSD)
+                pkg_freebsd
+                ;;
+
+        *)
+                pkg_debian
+                ;;
+        esac
+}
+
+
+# PACKAGE INSTALLATION FUNCTIONS
+
+
+pkg_alpine()
+{
+        msg_fail "not implemented"
+}
+
+
+pkg_arch()
+{
+        pkg_install gcc
+        pkg_install make
+        pkg_install postgresql
+        pkg_install postgresql-libs
+        pkg_install rsyslog
+
+        if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
+                pkg_install pandoc
+        else
+                msg_warn "--noman set, skipping support for man pages"
         fi
 
-        _cmd=./mksetup
-        [ "$FLAGS_check" -eq "$FLAGS_FALSE" ] && _cmd="_cmd --nocheck"
-        [ "$FLAGS_man" -eq "$FLAGS_FALSE" ] && _cmd="_cmd --noman"
-        [ "$FLAGS_release" -eq "$FLAGS_TRUE" ] && _cmd="_cmd --nodebug"
-        [ "$FLAGS_force" -eq "$FLAGS_TRUE" ] && _cmd="_cmd --force"
-        eval "$_cmd"
+        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
+                pkg_install valgrind
+                pkg_install criterion
+        else
+                msg_warn "--nocheck set, skipping support for check tools"
+        fi
+}
+
+
+pkg_debian()
+{
+        msg_fail "not implemented"
+}
+
+
+pkg_freebsd()
+{
+        msg_fail "not implemented"
 }
 
 
 # MAIN ENTRY POINT
 
 
-main_flags "$@"
+main_setup "$@"
 main_exec

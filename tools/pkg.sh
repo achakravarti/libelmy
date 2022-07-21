@@ -4,11 +4,12 @@
 
 pkg_install()
 {
-        msg_info "installing package $1, this may take a while"
+        msg_info "looking for package $1"
 
         os_query
         _emsg="failed to install package $1"
         _omsg="package $1 found, skipping"
+        _imsg="installing package $1, this may take a while"
 
         case "$OS_DISTRO" in
         Alpine)
@@ -17,6 +18,7 @@ pkg_install()
                         return
                 fi
 
+                msg_info "$_imsg"
                 ! sudo apk add "$1" && msg_fail "$_emsg"
                 ;;
 
@@ -26,6 +28,7 @@ pkg_install()
                         return
                 fi
 
+                msg_info "$_imsg"
                 ! yay -S --needed --noconfirm "$1" && msg_fail "$_emsg"
                 ;;
 
@@ -35,6 +38,7 @@ pkg_install()
                         return
                 fi
 
+                msg_info "$_imsg"
                 ! sudo pkg install -y "$1" && msg_fail "$_emsg"
                 ;;
 
@@ -44,6 +48,7 @@ pkg_install()
                         return
                 fi
 
+                msg_info "$_imsg"
                 ! sudo apt install -y "$1" && msg_fail "$_emsg"
                 ;;
         esac

@@ -15,6 +15,8 @@ OS_MIN_UBUNTU=2004
 
 os_query()
 {
+        [ -z "$OS_VERNUM" ] || return
+
         os_kernel__
         os_distro__
         os_version__
