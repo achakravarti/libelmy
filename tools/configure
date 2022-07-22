@@ -111,8 +111,7 @@ pkg_alpine()
 
 pkg_arch()
 {
-        pkg_install gcc
-        pkg_install make
+        pkg_install base-devel
         pkg_install postgresql
         pkg_install postgresql-libs
         pkg_install rsyslog
@@ -140,7 +139,25 @@ pkg_debian()
 
 pkg_freebsd()
 {
-        msg_fail "not implemented"
+        pkg_install llvm13
+        pkg_install postgresql14-server
+        pkg_install postgresql14-contrib
+        pkg_install postgresql-libpgeasy
+        pkg_install rsyslog
+
+        if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
+                pkg_install hs-pandoc
+                pkg_install hs-pandoc-crossref
+        else
+                msg_warn "--noman set, skipping support for man pages"
+        fi
+
+        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
+                pkg_install valgrind
+                pkg_install criterion
+        else
+                msg_warn "--nocheck set, skipping support for check tools"
+        fi
 }
 
 
