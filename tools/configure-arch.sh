@@ -25,8 +25,6 @@ main_setup()
 
 main_exec()
 {
-        msg_info "executing ./configure-arch.sh"
-
         if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
                 pkg_upgrade
         else
