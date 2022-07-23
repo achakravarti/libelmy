@@ -39,21 +39,135 @@ main_setup()
 
 main_exec()
 {
+        pkg_base
+        pkg_postgres
+        pkg_rsyslog
+        pkg_check
+        pkg_man
+}
+
+
+# PACKAGE CONFIGURATIONS
+
+
+pkg_base()
+{
+        if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
+                pkg_upgrade
+        else
+                msg_warn "--noupgrade set, skipping package upgrades"
+        fi
+}
+
+
+pkg_postgres()
+{
         case "$OS_DISTRO" in
         Alpine)
-                ./alpine.sh "$@"
+                pkg_install postgresql
+                pkg_install libpq-dev
                 ;;
 
         Arch)
-                ./arch.sh "$@"
+                pkg_install postgresql
+                pkg_install postgresql-libs
                 ;;
 
         FreeBSD)
-                ./freebsd.sh "$@"
+                pkg_install postgresql14-server
+                pkg_install postgresql14-contrib
+                pkg_install postgresql-libpgeasy
                 ;;
 
         *)
-                ./debian.sh "$@"
+                pkg_install postgresql
+                pkg_install postgresql-contrib
+                pkg_install libpq-dev
+                ;;
+        esac
+
+}
+
+pkg_rsyslog()
+{
+        pkg_install rsyslog
+}
+
+
+pkg_check()
+{
+        if [ "$FLAGS_check" -eq "$FLAGS_FALSE" ]; then
+                msg_warn "--nocheck set, skipping support for check tools"
+                return
+        fi
+
+        pkg_install valgrind
+
+        case "$OS_DISTRO" in
+        Alpine)
+                pkg_install libgit2
+                pkg_install libgit2-dev
+                pkg_install libffi-dev
+                pkg_install pkgconf
+                pkg_install ninja
+                pkg_install meson
+                pkg_install cmake
+
+                _repo=https://github.com/Snaipe/Criterion
+                _emsg="failed to clone criterion repository"
+                git clone --recursive "$_repo" || msg_fail _emsg
+
+                _emsg="failed to build criterion"
+                cd build || msg_fail _emsg
+                meson build || msg_fail _emsg
+                ninja -C build || msg_fail _emsg
+
+                _emsg="failed to install criterion"
+                sudo ninja -C build install || msg_fail _emsg
+                sudo ldconfig || msg_fail _emsg
+                ;;
+
+        Arch)
+                pkg_install criterion
+                ;;
+
+        FreeBSD)
+                pkg_install criterion
+                ;;
+
+        *)
+                pkg_install libcriterion-dev
+                ;;
+        esac
+}
+
+
+pkg_man()
+{
+        if [ "$FLAGS_man" -eq "$FLAGS_FALSE" ]; then
+                msg_warn "--noman set, skipping support for man pages"
+                return
+        fi
+
+        case "$OS_DISTRO" in
+        Alpine)
+                msg_warn "--man set, but not supported in Alpine Linux"
+                ;;
+
+        Arch)
+                pkg_install pandoc
+                ;;
+
+        FreeBSD)
+                pkg_install hs-pandoc
+                pkg_install hs-pandoc-crossref
+                pkg_install hs-pandoc-citeproc
+                ;;
+
+        *)
+                pkg_install pandoc
+                pkg_install pandoc-citeproc
+                pkg_install pandoc-crossref
                 ;;
         esac
 }
@@ -63,4 +177,4 @@ main_exec()
 
 
 main_setup "$@"
-main_exec "$@"
+main_exec
