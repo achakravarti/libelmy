@@ -39,19 +39,13 @@ main_setup()
 
 main_exec()
 {
-        if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
-                pkg_upgrade
-        else
-                msg_warn "--noupgrade set, skipping package upgrades"
-        fi
-
         case "$OS_DISTRO" in
         Alpine)
                 pkg_alpine
                 ;;
 
         Arch)
-                pkg_arch
+                ./configure-arch.sh "$@"
                 ;;
 
         FreeBSD)
@@ -103,28 +97,6 @@ pkg_alpine()
                 _emsg="failed to install criterion"
                 sudo ninja -C build install || msg_fail _emsg
                 sudo ldconfig || msg_fail _emsg
-        else
-                msg_warn "--nocheck set, skipping support for check tools"
-        fi
-}
-
-
-pkg_arch()
-{
-        pkg_install base-devel
-        pkg_install postgresql
-        pkg_install postgresql-libs
-        pkg_install rsyslog
-
-        if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
-                pkg_install pandoc
-        else
-                msg_warn "--noman set, skipping support for man pages"
-        fi
-
-        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
-                pkg_install valgrind
-                pkg_install criterion
         else
                 msg_warn "--nocheck set, skipping support for check tools"
         fi
@@ -187,4 +159,4 @@ pkg_freebsd()
 
 
 main_setup "$@"
-main_exec
+main_exec "$@"
