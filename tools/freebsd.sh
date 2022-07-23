@@ -1,24 +1,10 @@
 #!/bin/sh
 
+
 . "$(dirname "0")/../external/shflags/shflags"
 . "$(dirname "0")/../tools/os.sh"
 . "$(dirname "0")/../tools/pkg.sh"
 . "$(dirname "0")/../tools/msg.sh"
-
-
-# -b,--bin (default true)
-# -c,--check (default true)
-# -d,--database (default true)
-# -f,--force (default false)
-# -m,--man (default true)
-# -r,--release (default false)
-# -u,--update (default true)
-
-
-export OS
-
-
-# MAIN FUNCTIONS
 
 
 main_setup()
@@ -39,59 +25,27 @@ main_setup()
 
 main_exec()
 {
-        case "$OS_DISTRO" in
-        Alpine)
-                ./configure-alpine.sh "$@"
-                ;;
-
-        Arch)
-                ./configure-arch.sh "$@"
-                ;;
-
-        FreeBSD)
-                ./freebsd.sh "$@"
-                ;;
-
-        *)
-                pkg_debian
-                ;;
-        esac
-}
-
-
-# PACKAGE INSTALLATION FUNCTIONS
-
-
-pkg_debian()
-{
-        msg_fail "not implemented"
-
-        pkg_install gcc
-        pkg_install make
-        pkg_install postgresql
-        pkg_install postgresql-contrib
-        pkg_install libpq-dev
+        pkg_install llvm
+        pkg_install postgresql14-server
+        pkg_install postgresql14-contrib
+        pkg_install postgresql-libpgeasy
         pkg_install rsyslog
 
         if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
-                pkg_install pandoc
-                pkg_install pandoc-citeproc
-                pkg_install groff
+                pkg_install hs-pandoc
+                pkg_install hs-pandoc-crossref
         else
                 msg_warn "--noman set, skipping support for man pages"
         fi
 
         if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
                 pkg_install valgrind
-                pkg_install libcriterion-dev
+                pkg_install criterion
         else
                 msg_warn "--nocheck set, skipping support for check tools"
         fi
 }
 
 
-# MAIN ENTRY POINT
-
-
 main_setup "$@"
-main_exec "$@"
+main_exec
