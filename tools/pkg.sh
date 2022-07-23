@@ -19,7 +19,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                ! sudo apk add "$1" && msg_fail "$_emsg"
+                sudo apk add "$1" || msg_fail "$_emsg"
                 ;;
 
         Arch)
@@ -29,7 +29,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                ! yay -S --needed --noconfirm "$1" && msg_fail "$_emsg"
+                yay -S --needed --noconfirm "$1" || msg_fail "$_emsg"
                 ;;
 
         FreeBSD)
@@ -39,7 +39,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                ! sudo pkg install -y "$1" && msg_fail "$_emsg"
+                sudo pkg install -y "$1" || msg_fail "$_emsg"
                 ;;
 
         *)
@@ -49,7 +49,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                ! sudo apt install -y "$1" && msg_fail "$_emsg"
+                sudo apt install -y "$1" || msg_fail "$_emsg"
                 ;;
         esac
 
@@ -66,19 +66,19 @@ pkg_upgrade()
 
         case "$OS_DISTRO" in
         Alpine)
-                ! sudo apk update && sudo apk upgrade && msg_fail "$_emsg"
+                (sudo apk update && sudo apk upgrade) || msg_fail "$_emsg"
                 ;;
 
         Arch)
-                ! sudo pacman -Syu --noconfirm && msg_fail "$_emsg"
+                sudo pacman -Syu --noconfirm || msg_fail "$_emsg"
                 ;;
 
         FreeBSD)
-                ! sudo pkg update && sudo pkg upgrade -y && msg_fail "$_emsg"
+                (sudo pkg update && sudo pkg upgrade -y) || msg_fail "$_emsg"
                 ;;
 
         *)
-                ! sudo apt update -y && sudo apt upgrade -y && msg_fail "$_emsg"
+                (sudo apt update -y && sudo apt upgrade -y) || msg_fail "$_emsg"
                 ;;
         esac
 
