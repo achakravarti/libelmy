@@ -41,7 +41,7 @@ main_exec()
 {
         case "$OS_DISTRO" in
         Alpine)
-                pkg_alpine
+                ./configure-alpine.sh "$@"
                 ;;
 
         Arch)
@@ -60,47 +60,6 @@ main_exec()
 
 
 # PACKAGE INSTALLATION FUNCTIONS
-
-
-pkg_alpine()
-{
-        pkg_install gcc
-        pkg_install build-base
-        pkg_install make
-        pkg_install postgresql
-        pkg_install libpq-dev
-        pkg_install rsyslog
-
-        _wmsg="--man set, but not supported in Alpine Linux"
-        [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && msg_warn _wmsg
-
-        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
-                pkg_install valgrind
-                pkg_install git
-                pkg_install libgit2
-                pkg_install libgit2-dev
-                pkg_install libffi-dev
-                pkg_install pkgconf
-                pkg_install ninja
-                pkg_install meson
-                pkg_install cmake
-
-                _repo=https://github.com/Snaipe/Criterion
-                _emsg="failed to clone criterion repository"
-                git clone --recursive "$_repo" || msg_fail _emsg
-
-                _emsg="failed to build criterion"
-                cd build || msg_fail _emsg
-                meson build || msg_fail _emsg
-                ninja -C build || msg_fail _emsg
-
-                _emsg="failed to install criterion"
-                sudo ninja -C build install || msg_fail _emsg
-                sudo ldconfig || msg_fail _emsg
-        else
-                msg_warn "--nocheck set, skipping support for check tools"
-        fi
-}
 
 
 pkg_debian()
