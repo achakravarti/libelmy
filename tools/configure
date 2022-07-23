@@ -41,11 +41,11 @@ main_exec()
 {
         case "$OS_DISTRO" in
         Alpine)
-                ./configure-alpine.sh "$@"
+                ./alpine.sh "$@"
                 ;;
 
         Arch)
-                ./configure-arch.sh "$@"
+                ./arch.sh "$@"
                 ;;
 
         FreeBSD)
@@ -53,40 +53,9 @@ main_exec()
                 ;;
 
         *)
-                pkg_debian
+                ./debian.sh "$@"
                 ;;
         esac
-}
-
-
-# PACKAGE INSTALLATION FUNCTIONS
-
-
-pkg_debian()
-{
-        msg_fail "not implemented"
-
-        pkg_install gcc
-        pkg_install make
-        pkg_install postgresql
-        pkg_install postgresql-contrib
-        pkg_install libpq-dev
-        pkg_install rsyslog
-
-        if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
-                pkg_install pandoc
-                pkg_install pandoc-citeproc
-                pkg_install groff
-        else
-                msg_warn "--noman set, skipping support for man pages"
-        fi
-
-        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
-                pkg_install valgrind
-                pkg_install libcriterion-dev
-        else
-                msg_warn "--nocheck set, skipping support for check tools"
-        fi
 }
 
 

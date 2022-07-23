@@ -25,6 +25,12 @@ main_setup()
 
 main_exec()
 {
+        if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
+                pkg_upgrade
+        else
+                msg_warn "--noupgrade set, skipping package upgrades"
+        fi
+
         pkg_install gcc
         pkg_install build-base
         pkg_install make

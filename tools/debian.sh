@@ -31,22 +31,24 @@ main_exec()
                 msg_warn "--noupgrade set, skipping package upgrades"
         fi
 
-        pkg_install llvm
-        pkg_install postgresql14-server
-        pkg_install postgresql14-contrib
-        pkg_install postgresql-libpgeasy
+        pkg_install gcc
+        pkg_install make
+        pkg_install postgresql
+        pkg_install postgresql-contrib
+        pkg_install libpq-dev
         pkg_install rsyslog
 
         if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
-                pkg_install hs-pandoc
-                pkg_install hs-pandoc-crossref
+                pkg_install pandoc
+                pkg_install pandoc-citeproc
+                pkg_install groff
         else
                 msg_warn "--noman set, skipping support for man pages"
         fi
 
         if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
                 pkg_install valgrind
-                pkg_install criterion
+                pkg_install libcriterion-dev
         else
                 msg_warn "--nocheck set, skipping support for check tools"
         fi
