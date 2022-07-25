@@ -23,7 +23,7 @@ pkg_remove()
                 fi
 
                 msg_info "$_imsg"
-                yay -Rns "$1" || msg_fail "$_emsg"
+                yay -Rns --noconfirm "$1" || msg_warn "$_emsg"
                 ;;
 
         FreeBSD)
