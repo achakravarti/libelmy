@@ -6,6 +6,11 @@
 . "$(dirname "0")/../tools/pkg.sh"
 
 
-sudo pacman -Rns postgresql
-sudo pacman -Rns postgresql-libs
 sudo rm -rfv /var/lib/postgres/data/*
+
+pkg_remove postgresql
+pkg_remove postgresql-libs
+
+msg_info "removing postgres cluster"
+sudo rm -rfv /var/lib/postgres/data/*
+msg_ok "postgres cluster removed"

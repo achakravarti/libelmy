@@ -2,6 +2,42 @@
 . "$(dirname "0")/../tools/os.sh"
 
 
+pkg_remove()
+{
+        os_query
+        msg_info "looking for package $1"
+
+        _emsg="failed to remove package $1"
+        _omsg="package $1 not found, skipping"
+        _imsg="removing package $1, this may take a while"
+
+        case "$OS_DISTRO" in
+        Alpine)
+                msg_fail "not implemented"
+                ;;
+
+        Arch)
+                if ! pacman -Qi | grep "$1" >/dev/null 2>&1; then
+                        msg_ok "$_omsg"
+                        return
+                fi
+
+                msg_info "$_imsg"
+                yay -Rns "$1" || msg_fail "$_emsg"
+                ;;
+
+        FreeBSD)
+                msg_fail "not implemented"
+                ;;
+
+        *)
+                msg_fail "not implemented"
+                ;;
+        esac
+
+        msg_ok "installed package $1"
+}
+
 pkg_install()
 {
         msg_info "looking for package $1"
