@@ -23,7 +23,7 @@ pkg_remove()
                 fi
 
                 msg_info "$_imsg"
-                yay -Rns --noconfirm "$1" || msg_warn "$_emsg"
+                yay -Rns --noconfirm "$1" || msg_warn "$_emsg"; return
                 ;;
 
         FreeBSD)
@@ -35,7 +35,7 @@ pkg_remove()
                 ;;
         esac
 
-        msg_ok "installed package $1"
+        msg_ok "remove package $1"
 }
 
 pkg_install()
