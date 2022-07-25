@@ -17,7 +17,7 @@ pkg_remove()
                 ;;
 
         Arch)
-                if ! pacman -Qi | grep -wq "$1:"; then
+                if ! pacman -Qi | tr -s ' ' | grep -wq "Name : $1\$"; then
                         msg_ok "$_omsg"
                         return
                 fi
@@ -59,7 +59,7 @@ pkg_install()
                 ;;
 
         Arch)
-                if pacman -Qi | grep -wq "$1:"; then
+                if pacman -Qi | tr -s ' ' | grep -wq "$1\$"; then
                         msg_ok "$_omsg"
                         return
                 fi
