@@ -12,5 +12,5 @@ pkg_remove postgresql
 pkg_remove postgresql-libs
 
 msg_info "removing postgres cluster"
-sudo -u postgres rm -rfv /var/lib/postgres/data/*
+sudo rm -rfv /var/lib/postgres/data
 msg_ok "postgres cluster removed"
