@@ -17,7 +17,7 @@ pkg_remove()
                 ;;
 
         Arch)
-                if ! pacman -Qi | grep -w -q "$1"; then
+                if ! pacman -Qi | grep -wq "$1:"; then
                         msg_ok "$_omsg"
                         return
                 fi
@@ -49,7 +49,7 @@ pkg_install()
 
         case "$OS_DISTRO" in
         Alpine)
-                if apk info | grep -w -q "$1"; then
+                if apk info | grep -wq "$1"; then
                         msg_ok "$_omsg"
                         return
                 fi
@@ -59,7 +59,7 @@ pkg_install()
                 ;;
 
         Arch)
-                if pacman -Qi | grep -w -q "$1"; then
+                if pacman -Qi | grep -wq "$1:"; then
                         msg_ok "$_omsg"
                         return
                 fi
@@ -69,7 +69,7 @@ pkg_install()
                 ;;
 
         FreeBSD)
-                if pkg info | grep -w -q "$1"; then
+                if pkg info | grep -wq "$1"; then
                         msg_ok "$_omsg"
                         return
                 fi
@@ -79,7 +79,7 @@ pkg_install()
                 ;;
 
         *)
-                if dpkg -l | grep -w -q "$1"l; then
+                if dpkg -l | grep -wq "$1"l; then
                         msg_ok "$_omsg"
                         return
                 fi
