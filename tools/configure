@@ -81,15 +81,18 @@ pkg_postgres()
                 _omsg='postgres cluster initialised'
 
                 msg_info "$_imsg"
-                if [ -d "$_datadir" ]   \
-                    && [ -n "$(sudo -u postgres ls -A $_datadir)" ]; then
+                if [ -d "$_datadir" ]; then
                         msg_ok "$_omsg"
                         srv_enable postgresql.service
                         return
                 fi
 
-                sudo -u postgres initdb --locale=en_US.UTF-8 --encoding=UTF8 -D "$_datadir"   \
-                        || msg_fail "$_emsg"
+                sudo -u postgres initdb         \
+                    --locale=en_US.UTF-8        \
+                    --encoding=UTF8             \
+                    -D "$_datadir"              \
+                    || msg_fail "$_emsg"
+
                 srv_enable postgresql.service
                 msg_ok "$_omsg"
                 ;;
