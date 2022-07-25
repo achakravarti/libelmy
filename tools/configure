@@ -63,7 +63,7 @@ pkg_base()
 
 pkg_postgres()
 {
-        _opt="--locale=en_US.UTF-8 --encoding=UTF8"
+        _opt=" --locale=en_US.UTF-8 --encoding=UTF8"
 
         case "$OS_DISTRO" in
         Alpine)
