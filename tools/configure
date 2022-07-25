@@ -86,7 +86,7 @@ pkg_postgres()
                         return
                 fi
 
-                sudo -u postgres initdb --locale en_US.UTF-8 -D "'$_datadir'"   \
+                sudo -u postgres initdb --locale en_US.UTF-8 -D "$_datadir"   \
                         || msg_fail "$_emsg"
                 srv_enable postgresql.service
                 msg_ok "$_omsg"
