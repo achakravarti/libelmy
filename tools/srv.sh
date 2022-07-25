@@ -25,8 +25,9 @@ srv_enable()
 {
         _emsg="failed to enable service $1"
         _imsg="enabling service $1"
-        _omsg="service $1 enable"
+        _omsg="service $1 enabled"
 
+        msg_info "$_imsg"
         os_query
 
         if [ "$OS_DISTRO" = "FreeBSD" ] ; then
