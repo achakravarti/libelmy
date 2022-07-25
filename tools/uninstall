@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. "$(dirname "0")/../external/shflags/shflags"
+. "$(dirname "0")/../tools/msg.sh"
+. "$(dirname "0")/../tools/os.sh"
+. "$(dirname "0")/../tools/pkg.sh"
+
+
+sudo pacman -Rns postgresql
+sudo pacman -Rns postgresql-libs
+sudo rm -rfv /var/lib/postgres/data/*
