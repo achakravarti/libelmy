@@ -94,14 +94,27 @@ pkg_postgres()
 
         FreeBSD)
                 pkg_install postgresql14-server
+                pkg_install postgresql14-client
                 pkg_install postgresql14-contrib
                 pkg_install postgresql-libpgeasy
+
+                _datadir=/var/db/postgres/data14
+                _emsg='failed to initialise postgres cluster'
+                _imsg='checking postgres cluster'
+                _omsg='postgres cluster initialised'
+
+                sudo /usr/local/etc/rc.d/postgresql initdb --locale en_US.UTF-8 \
+                        || msg_fail "$_emsg"
+                sudo /usr/local/etc/rc.d/postgresql start || msg_fail "$_emsg"
+                srv_enable postgresql
+                msg_ok "$_omsg"
                 ;;
 
         *)
                 pkg_install postgresql
                 pkg_install postgresql-contrib
                 pkg_install libpq-dev
+                srv_enable postgresql
                 ;;
         esac
 }
