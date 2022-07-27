@@ -16,4 +16,4 @@ fi
 
 
 id --version >/dev/null 2>&1 || msg_fail 'id not found'
-[ "$(id -u)" -eq 0 ] || msg_fail 'running as root is dangerous'
+[ "$(id -u)" -eq 0 ] && msg_fail 'running as root is dangerous'
