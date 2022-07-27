@@ -50,81 +50,39 @@ main_exec()
 # ARCH LINUX FUNCTIONS
 
 
-arch_install()
+arch_setup()
 {
-        msg_info "checking package $1"
+        pkg_install base-devel
+        pkg_install postgresql
+        pkg_install postgresql-libs
+        pkg_rsyslog
 
-        if pacman -Qi | grep "$1" >/dev/null 2>&1; then
-                msg_ok "package $1 found, skipping"
-                return
-        fi
-
-        msg_info "package $1 not found, installing"
-
-        arch_update
-
-        if [ "$2" -eq 0 ]; then
-                if ! sudo pacman -S --noconfirm "$1"; then
-                        mgs_fail "failed to install package $1"
-                fi
+        if [ "$FLAGS_check" -eq "$FLAGS_FALSE" ]; then
+                msg_warn '--nocheck set, skipping support for check tools'
         else
-                if ! yay -S --noconfirm "$1"; then
-                        msg_fail "failed to install package $1"
-                fi
+                pkg_install valgrind
+                pkg_install criterion
         fi
 
-        msg_ok "installed package $1"
-}
-
-
-arch_init()
-{
-        msg_info "setting up packages for Arch Linux"
-
-        if ! pacman -V >/dev/null 2>&1; then
-                mgs_fail "pacman not found"
-        fi
-
-        if ! checkupdates -h >/dev/null 2>&1; then
-                msg_fail "checkupdates not found"
-        fi
-
-        if ! yay -V; then
-                msg_fail "yay not found"
-        fi
-
-        arch_install gcc 0
-        arch_install make 0
-        arch_install postgresql 0
-        arch_install postgresql-libs 0
-        arch_install rsyslog 1
-
-        if [ "$FLAGS_pandoc" -eq "$FLAGS_TRUE" ]; then
-                arch_install pandoc 0
+        if [ "$FLAGS_man" -eq "$FLAGS_FALSE" ]; then
+                msg_warn '--noman set, skipping support for man pages'
         else
-                msg_warn "--nopandoc set, skipping pandoc installation"
+                pkg_install pandoc
         fi
 
-        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
-                arch_install valgrind 0
-                arch_install criterion 1
-        else
-                msg_warn "--nocheck set, skipping valgrind installation"
-                msg_warn "--nocheck set, skipping criterion installation"
+        _pgdir=/var/lib/postgres/data
+        msg_info 'checking postgres cluster'
+
+        if ! [ -d "$_pgdir" ]; then
+                sudo -u postgres initdb         \
+                    --locale=en_US.UTF-8        \
+                    --encoding=UTF8             \
+                    -D "$_pgdir"                \
+                    || msg_fail 'failed to initialise postgres cluster'
         fi
 
-        systemd_enabled postgresql.service
-        if [ "$rv" -ne 0 ]; then
-                if ! sudo -u postgres \
-                    initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data';
-                then
-                        msg_fail "failed to initialise postgres cluster"
-                fi
-
-                systemd_enable postgresql.service
-        fi
-
-        msg_ok "package setup complete"
+        srv_enable postgresql.service
+        msg_ok 'postgres cluster initialised'
 }
 
 
