@@ -22,6 +22,6 @@ msg_warn()
 
 msg_fail()
 {
-        printf '[\033[1;33mFAIL\033[0m] %s, exiting...\n' "$1"
+        printf '[\033[1;31mFAIL\033[0m] %s, exiting...\n' "$1"
         exit 1
 }
