@@ -20,13 +20,13 @@
 
 
 setup_flags() {
-    DEFINE_string 'host' '127.0.0.1' 'database host address' 'a'
-    DEFINE_integer 'port' '5432' 'database port' 'p'
-    DEFINE_string 'database' 'syslog' 'database name' 'd'
-    DEFINE_string 'user' 'rsyslog' 'database user' 'u'
-    DEFINE_string 'password' 'rsyslog' 'database user password' 'w'
-    DEFINE_string 'pgpassword' '' 'database postgres password' 'x'
-    DEFINE_boolean 'reset' false 'reset database' 'r'
+    DEFINE_string 'host' '127.0.0.1' 'database host address' 4001
+    DEFINE_integer 'port' '5432' 'database port' 4002
+    DEFINE_string 'database' 'syslog' 'database name' 4003
+    DEFINE_string 'user' 'rsyslog' 'database user' 4004
+    DEFINE_string 'password' 'rsyslog' 'database user password' 4005
+    DEFINE_string 'pgpassword' '' 'database postgres password' 4006
+    DEFINE_boolean 'force' false 'reset database' 4007
 
     FLAGS "$@" || exit $?
     eval set -- "$FLAGS_ARGV"
@@ -136,7 +136,7 @@ create_db_user()
 
 drop_db()
 {
-    if [ "$FLAGS_reset" -eq "$FLAGS_TRUE" ]; then
+    if [ "$FLAGS_force" -eq "$FLAGS_TRUE" ]; then
         if systemctl is-active --quiet rsyslog.service; then
             sudo systemctl stop rsyslog.service >/dev/null 2>&1
         fi

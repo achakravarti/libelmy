@@ -25,9 +25,14 @@ main_setup()
         DEFINE_boolean 'man' true 'make manpages target' 1001
         DEFINE_boolean 'upgrade' false 'upgrade package manager' 1002
         DEFINE_boolean 'check' true 'make check target' 1003
-        DEFINE_boolean 'database' true 'generate database' 1004
-        DEFINE_boolean 'release' false 'build for release' 1005
-        DEFINE_boolean 'force' false 'force regeneration' 1006
+        DEFINE_boolean 'release' false 'build for release' 1004
+        DEFINE_boolean 'force' false 'force regeneration' 1005
+        DEFINE_string 'host' '127.0.0.1' 'database host address' 4001
+        DEFINE_integer 'port' '5432' 'database port' 4002
+        DEFINE_string 'database' 'syslog' 'database name' 4003
+        DEFINE_string 'user' 'rsyslog' 'database user' 4004
+        DEFINE_string 'password' 'rsyslog' 'database user password' 4005
+        DEFINE_string 'pgpassword' '' 'database postgres password' 4006
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
@@ -47,6 +52,15 @@ main_exec()
             --release="$FLAGS_release"  \
             --force="$FLAGS_force"      \
             --man="$FLAGS_man"
+
+        ./db setup                              \
+            --host="$FLAGS_host"                \
+            --port="$FLAGS_port"                \
+            --database="$FLAGS_database"        \
+            --user="$FLAGS_user"                \
+            --password="$FLAGS_password"        \
+            --pgpassword="$FLAGS_pgpassword"    \
+            --force="$FLAGS_force"
 }
 
 
