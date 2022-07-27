@@ -41,7 +41,7 @@ main_setup()
 
 main_exec()
 {
-        _emsg='configuration faile'
+        _emsg='configuration failed'
 
         ./pkgsetup "$@" || msg_fail "$_emsg"
         ./mksetup "$@" || msg_fail "$_emsg"
