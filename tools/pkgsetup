@@ -4,6 +4,8 @@
 . "$(dirname "0")/../tools/msg.sh"
 . "$(dirname "0")/../tools/os.sh"
 . "$(dirname "0")/../tools/su.sh"
+. "$(dirname "0")/../tools/pkg.sh"
+. "$(dirname "0")/../tools/srv.sh"
 
 
 # -t,--target (default arch)
