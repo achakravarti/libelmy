@@ -11,6 +11,9 @@
 # ./pkgsetup --target arch --pandoc --update --check
 
 
+export SUDO
+
+
 # MAIN FUNCTIONS
 
 
@@ -21,69 +24,41 @@ main_flags()
         DEFINE_boolean 'update' true 'update package manager' 'u'
         DEFINE_boolean 'check' true 'support check tools' 'c'
 
+        DEFINE_string 'os' 'arch' 'OS distribution' 1001
+        DEFINE_boolean 'upgrade' true 'upgrade package manager' 1002
+        DEFINE_boolean 'check' true 'support check tools' 1003
+        DEFINE_boolean 'man' true 'support manpage tools' 1003
+
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
 }
 
 
-main_run()
+main_exec()
 {
-        if ! id --version >/dev/null 2>&1; then
-                msg_fail "id not found"
-        fi
+        id --version >/dev/null 2>&1 || msg_fail 'id not found'
+        [ "$(id -u)" -eq 0 ] || msg_fail 'running as root is dangerous'
 
-        if [ "$(id -u)" -eq 0 ]; then
-                msg_fail "running as root is dangerous"
-        fi
 
-        if ! sudo -V >/dev/null 2>&1; then
-                msg_fail "sudo not found"
-        fi
+        if sudo -V >/dev/null 2>&1; then
+                SUDO=sudo
 
-        if ! git -v >/dev/null 2>&1; then
-                msg_fail "git not found"
-        fi
+        elif doas -L >/dev/null 2>&1; then
+                SUDO=doas
 
-        if [ "$FLAGS_target" = "arch" ]; then
-                arch_init
         else
-                msg_fail "unsupported target platform"
+                msg_fail 'sudo/doas not found'
         fi
+
+        case "$FLAGS_target" in
+        arch)
+                setup_arch;;
+
+        *)
+                msg_fail 'unsupported OS distribution';;
+        esac
+
 }
-
-
-# SYSTEMD FUNCTIONS
-
-
-systemd_enabled()
-{
-        if systemctl is-enabled postgresql.service \
-            | grep enabled >/dev/null 2>&1; then
-                rv=0
-        else
-                rv=1
-        fi
-}
-
-
-systemd_enable()
-{
-        msg_info "starting systemd service $1"
-
-        if ! sudo systemctl start "$1"; then
-                msg_fail "failed to start service $1"
-        fi
-
-        msg_ok "service $1 started"
-        msg_info "enabling systemd service $1"
-
-        if ! sudo systemctl enable "$1"; then
-                msg_fail "failed to enable service $1"
-        fi
-
-        msg_ok "service $1 enabled"
-}
-
 
 
 # ARCH LINUX FUNCTIONS
@@ -204,4 +179,4 @@ arch_init()
 
 
 main_flags "$@"
-main_run
+main_exec "$@"
