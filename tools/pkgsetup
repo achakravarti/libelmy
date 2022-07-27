@@ -56,7 +56,7 @@ arch_setup()
         pkg_install base-devel
         pkg_install postgresql
         pkg_install postgresql-libs
-        pkg_rsyslog
+        pkg_install rsyslog
 
         if [ "$FLAGS_check" -eq "$FLAGS_FALSE" ]; then
                 msg_warn '--nocheck set, skipping support for check tools'
