@@ -21,7 +21,7 @@
 
 main_flags()
 {
-        DEFINE_boolean 'upgrade' false'upgrade package manager' 1001
+        DEFINE_boolean 'upgrade' false 'upgrade package manager' 1001
         DEFINE_boolean 'check' true 'support check tools' 1002
         DEFINE_boolean 'man' true 'support manpage tools' 1003
 
