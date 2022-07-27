@@ -40,7 +40,14 @@ main_setup()
 
 main_exec()
 {
-        pkg_base
+        if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
+                pkg_upgrade
+        else
+                msg_warn "--noupgrade set, skipping package upgrades"
+        fi
+
+        arch_cfg
+
         pkg_postgres
         pkg_rsyslog
         pkg_check
@@ -48,17 +55,76 @@ main_exec()
 }
 
 
-# PACKAGE CONFIGURATIONS
+# ARCH LINUX CONFIGURATAION
 
-
-pkg_base()
+arch_cfg()
 {
-        if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
-                pkg_upgrade
-        else
-                msg_warn "--noupgrade set, skipping package upgrades"
-        fi
+        pkg_install git
+        pkg_install base-devel
+
+        arch_postgres
+        arch_rsyslog
+        arch_check
+        arch_man
 }
+
+
+arch_postgres()
+{
+        _datadir=/var/lib/postgres/data
+
+        pkg_install postgresql
+        pkg_install postgresql-libs
+
+        msg_info 'checking postgres cluster'
+
+        if [ -d "$_datadir" ]; then
+                msg_ok "$_omsg"
+                srv_enable postgresql.service
+                return
+        fi
+
+        sudo -u postgres initdb         \
+            --locale=en_US.UTF-8        \
+            --encoding=UTF8             \
+            -D "$_datadir"              \
+            || msg_fail 'failed to initialise postgres cluster'
+
+        srv_enable postgresql.service
+        msg_ok 'postgres cluster initialised'
+}
+
+
+arch_rsyslog()
+{
+        pkg_install rsyslog
+}
+
+
+arch_check()
+{
+        if [ "$FLAGS_check" -eq "$FLAGS_FALSE" ]; then
+                msg_warn "--nocheck set, skipping support for check tools"
+                return
+        fi
+
+        pkg_install valgrind
+        pkg_install criterion
+}
+
+
+arch_man()
+{
+        if [ "$FLAGS_man" -eq "$FLAGS_FALSE" ]; then
+                msg_warn "--noman set, skipping support for man pages"
+                return
+        fi
+
+        pkg_install pandoc
+}
+
+
+# PACKAGE CONFIGURATIONS
 
 
 pkg_postgres()
@@ -69,32 +135,6 @@ pkg_postgres()
         Alpine)
                 pkg_install postgresql
                 pkg_install libpq-dev
-                ;;
-
-        Arch)
-                pkg_install postgresql
-                pkg_install postgresql-libs
-
-                _datadir=/var/lib/postgres/data
-                _emsg='failed to initialise postgres cluster'
-                _imsg='checking postgres cluster'
-                _omsg='postgres cluster initialised'
-
-                msg_info "$_imsg"
-                if [ -d "$_datadir" ]; then
-                        msg_ok "$_omsg"
-                        srv_enable postgresql.service
-                        return
-                fi
-
-                sudo -u postgres initdb         \
-                    --locale=en_US.UTF-8        \
-                    --encoding=UTF8             \
-                    -D "$_datadir"              \
-                    || msg_fail "$_emsg"
-
-                srv_enable postgresql.service
-                msg_ok "$_omsg"
                 ;;
 
         FreeBSD)
@@ -168,10 +208,6 @@ pkg_check()
                 sudo ldconfig || msg_fail _emsg
                 ;;
 
-        Arch)
-                pkg_install criterion
-                ;;
-
         FreeBSD)
                 pkg_install criterion
                 ;;
@@ -193,10 +229,6 @@ pkg_man()
         case "$OS_DISTRO" in
         Alpine)
                 msg_warn "--man set, but not supported in Alpine Linux"
-                ;;
-
-        Arch)
-                pkg_install pandoc
                 ;;
 
         FreeBSD)
