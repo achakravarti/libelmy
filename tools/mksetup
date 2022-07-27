@@ -18,11 +18,11 @@
 
 main_flags()
 {
-        DEFINE_boolean 'bin' true 'make bin target' 3001
-        DEFINE_boolean 'check' true 'make check target' 3002
-        DEFINE_boolean 'release' true 'build for release' 3003
-        DEFINE_boolean 'force' false 'force regeneration' 3004
-        DEFINE_boolean 'man' true 'make man target' 3005
+        DEFINE_boolean 'bin' true 'make bin target' 1001
+        DEFINE_boolean 'check' true 'make check target' 1002
+        DEFINE_boolean 'release' true 'build for release' 1003
+        DEFINE_boolean 'force' false 'force regeneration' 1004
+        DEFINE_boolean 'man' true 'make man target' 1005
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
