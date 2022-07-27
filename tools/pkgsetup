@@ -2,6 +2,8 @@
 
 . "$(dirname "0")/../external/shflags/shflags"
 . "$(dirname "0")/../tools/msg.sh"
+. "$(dirname "0")/../tools/su.sh"
+
 
 # -t,--target (default arch)
 # -p,--pandoc (default true)
@@ -9,9 +11,6 @@
 # -c,--check (default true)
 #
 # ./pkgsetup --target arch --pandoc --update --check
-
-
-export SUDO
 
 
 # MAIN FUNCTIONS
@@ -74,7 +73,7 @@ arch_setup()
         msg_info 'checking postgres cluster'
 
         if ! [ -d "$_pgdir" ]; then
-                sudo -u postgres initdb         \
+                $SU -u postgres initdb          \
                     --locale=en_US.UTF-8        \
                     --encoding=UTF8             \
                     -D "$_pgdir"                \
