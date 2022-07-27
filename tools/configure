@@ -41,9 +41,11 @@ main_setup()
 
 main_exec()
 {
-        ./pkgsetup "$@"
-        ./mksetup "$@"
-        ./dbsetup "$@"
+        _emsg='configuration faile'
+
+        ./pkgsetup "$@" || msg_fail "$_emsg"
+        ./mksetup "$@" || msg_fail "$_emsg"
+        ./dbsetup "$@" || msg_fail "$_emsg"
 }
 
 
