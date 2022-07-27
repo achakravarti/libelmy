@@ -2,7 +2,7 @@
 . "$(dirname "0")/../tools/os.sh"
 
 
-export su__
+export su_
 
 
 pkg_check__()
@@ -11,10 +11,10 @@ pkg_check__()
         [ "$(id -u)" -eq 0 ] || msg_fail 'running as root is dangerous'
 
         if sudo -V >/dev/null 2>&1; then
-                su__=sudo
+                su_=sudo
 
         elif doas -L >/dev/null 2>&1; then
-                su__=doas
+                su_=doas
 
         else
                 msg_fail 'sudo/doas not found'
@@ -79,7 +79,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                su__ apk add "$1" || msg_fail "$_emsg"
+                $su_ apk add "$1" || msg_fail "$_emsg"
                 ;;
 
         Arch)
@@ -99,7 +99,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                su__ pkg install -y "$1" || msg_fail "$_emsg"
+                $su_ pkg install -y "$1" || msg_fail "$_emsg"
                 ;;
 
         *)
@@ -109,7 +109,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                su__ apt install -y "$1" || msg_fail "$_emsg"
+                $su_ apt install -y "$1" || msg_fail "$_emsg"
                 ;;
         esac
 
@@ -128,19 +128,19 @@ pkg_upgrade()
 
         case "$OS_DISTRO" in
         Alpine)
-                (su__ apk update && su__ apk upgrade) || msg_fail "$_emsg"
+                ($su_ apk update && $su_ apk upgrade) || msg_fail "$_emsg"
                 ;;
 
         Arch)
-                su__ pacman -Syu --noconfirm || msg_fail "$_emsg"
+                $su_ pacman -Syu --noconfirm || msg_fail "$_emsg"
                 ;;
 
         FreeBSD)
-                (su__ pkg update && su__ pkg upgrade -y) || msg_fail "$_emsg"
+                ($su_ pkg update && $su_ pkg upgrade -y) || msg_fail "$_emsg"
                 ;;
 
         *)
-                (su__ apt update -y && su__ apt upgrade -y) || msg_fail "$_emsg"
+                ($su_ apt update -y && $su_ apt upgrade -y) || msg_fail "$_emsg"
                 ;;
         esac
 
