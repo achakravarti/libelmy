@@ -108,8 +108,12 @@ pkg_postgres()
                 _imsg='checking postgres cluster'
                 _omsg='postgres cluster initialised'
 
-                sudo /usr/local/etc/rc.d/postgresql initdb "$_opt"      \
-                        || msg_fail "$_emsg"
+                sudo /usr/local/etc/rc.d/postgresql initdb      \
+                    --locale=en_US.UTF-8                        \
+                    --encoding=UTF8                             \
+                    -D "$_datadir"                              \
+                    || msg_fail "$_emsg"
+
                 sudo /usr/local/etc/rc.d/postgresql start || msg_fail "$_emsg"
                 srv_enable postgresql
                 msg_ok "$_omsg"
