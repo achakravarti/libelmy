@@ -16,9 +16,6 @@
 # -u,--update (default true)
 
 
-export OS
-
-
 # MAIN FUNCTIONS
 
 
