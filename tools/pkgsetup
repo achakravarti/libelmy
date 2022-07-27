@@ -19,11 +19,6 @@ export SUDO
 
 main_flags()
 {
-        DEFINE_string 'target' 'arch' 'target platform' 't'
-        DEFINE_boolean 'pandoc' true 'install pandoc' 'p'
-        DEFINE_boolean 'update' true 'update package manager' 'u'
-        DEFINE_boolean 'check' true 'support check tools' 'c'
-
         DEFINE_string 'os' 'arch' 'OS distribution' 1001
         DEFINE_boolean 'upgrade' true 'upgrade package manager' 1002
         DEFINE_boolean 'check' true 'support check tools' 1003
@@ -50,7 +45,13 @@ main_exec()
                 msg_fail 'sudo/doas not found'
         fi
 
-        case "$FLAGS_target" in
+        if [ "$FLAGS_upgrade" -eq "$FLAGS_FALSE" ]; then
+                mgs_warn '--noupdgrade set, skipping upgrade'
+        else
+                pkg_upgrade
+        fi
+
+        case "$FLAGS_os" in
         arch)
                 setup_arch;;
 
@@ -62,39 +63,6 @@ main_exec()
 
 
 # ARCH LINUX FUNCTIONS
-
-
-arch_update()
-{
-        if [ "$FLAGS_update" -eq "$FLAGS_FALSE" ]; then
-                    mgs_warn "--noupdate set, skipping updates"
-                    return
-        fi
-
-        msg_info "checking for package updates"
-
-        checkupdates >/dev/null 2>&1;
-        rv=$?
-
-        if [ $rv -eq 1 ]; then
-                    msg_fail "failed to determine package updates"
-                    exit 1
-        fi
-
-        if [ $rv -eq 2 ]; then
-                    msg_ok "no package updates pending, skipping"
-                    return
-        fi
-
-        msg_ok "package updates available"
-        msg_info "starting update"
-
-        if ! sudo pacman -Syu --noconfirm; then
-                msg_fail "failed to update packages"
-        fi
-
-        msg_ok "package update complete"
-}
 
 
 arch_install()
