@@ -74,7 +74,7 @@ arch_setup()
         _pgdir=/var/lib/postgres/data
         msg_info 'checking postgres cluster'
 
-        if ! [ -d "$_pgdir" ]; then
+        if ! [ -d "$_pgdir" ] && ! $SU -u postgres ls -A "$_pgdir"; then
                 $SU -u postgres initdb          \
                     --locale=en_US.UTF-8        \
                     --encoding=UTF8             \
