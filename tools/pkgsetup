@@ -31,20 +31,6 @@ main_flags()
 
 main_exec()
 {
-        id --version >/dev/null 2>&1 || msg_fail 'id not found'
-        [ "$(id -u)" -eq 0 ] || msg_fail 'running as root is dangerous'
-
-
-        if sudo -V >/dev/null 2>&1; then
-                SUDO=sudo
-
-        elif doas -L >/dev/null 2>&1; then
-                SUDO=doas
-
-        else
-                msg_fail 'sudo/doas not found'
-        fi
-
         if [ "$FLAGS_upgrade" -eq "$FLAGS_FALSE" ]; then
                 mgs_warn '--noupdgrade set, skipping upgrade'
         else
@@ -53,12 +39,11 @@ main_exec()
 
         case "$FLAGS_os" in
         arch)
-                setup_arch;;
+                arch_setup;;
 
         *)
                 msg_fail 'unsupported OS distribution';;
         esac
-
 }
 
 

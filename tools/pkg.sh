@@ -2,10 +2,32 @@
 . "$(dirname "0")/../tools/os.sh"
 
 
+export su__
+
+
+pkg_check__()
+{
+        id --version >/dev/null 2>&1 || msg_fail 'id not found'
+        [ "$(id -u)" -eq 0 ] || msg_fail 'running as root is dangerous'
+
+        if sudo -V >/dev/null 2>&1; then
+                su__=sudo
+
+        elif doas -L >/dev/null 2>&1; then
+                su__=doas
+
+        else
+                msg_fail 'sudo/doas not found'
+        fi
+}
+
+
 pkg_remove()
 {
-        os_query
         msg_info "looking for package $1"
+
+        os_query
+        pkg_check__
 
         _emsg="failed to remove package $1"
         _omsg="package $1 not found, skipping"
@@ -43,6 +65,8 @@ pkg_install()
         msg_info "looking for package $1"
 
         os_query
+        pkg_check__
+
         _emsg="failed to install package $1"
         _omsg="package $1 found, skipping"
         _imsg="installing package $1, this may take a while"
@@ -55,7 +79,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                sudo apk add "$1" || msg_fail "$_emsg"
+                su__ apk add "$1" || msg_fail "$_emsg"
                 ;;
 
         Arch)
@@ -75,7 +99,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                sudo pkg install -y "$1" || msg_fail "$_emsg"
+                su__ pkg install -y "$1" || msg_fail "$_emsg"
                 ;;
 
         *)
@@ -85,7 +109,7 @@ pkg_install()
                 fi
 
                 msg_info "$_imsg"
-                sudo apt install -y "$1" || msg_fail "$_emsg"
+                su__ apt install -y "$1" || msg_fail "$_emsg"
                 ;;
         esac
 
@@ -98,23 +122,25 @@ pkg_upgrade()
         msg_info "upgrading packages, this may take a while"
 
         os_query
+        pkg_check__
+
         _emsg="failed to upgrade packages"
 
         case "$OS_DISTRO" in
         Alpine)
-                (sudo apk update && sudo apk upgrade) || msg_fail "$_emsg"
+                (su__ apk update && su__ apk upgrade) || msg_fail "$_emsg"
                 ;;
 
         Arch)
-                sudo pacman -Syu --noconfirm || msg_fail "$_emsg"
+                su__ pacman -Syu --noconfirm || msg_fail "$_emsg"
                 ;;
 
         FreeBSD)
-                (sudo pkg update && sudo pkg upgrade -y) || msg_fail "$_emsg"
+                (su__ pkg update && su__ pkg upgrade -y) || msg_fail "$_emsg"
                 ;;
 
         *)
-                (sudo apt update -y && sudo apt upgrade -y) || msg_fail "$_emsg"
+                (su__ apt update -y && su__ apt upgrade -y) || msg_fail "$_emsg"
                 ;;
         esac
 
