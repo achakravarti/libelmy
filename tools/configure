@@ -24,34 +24,24 @@ export OS
 
 main_setup()
 {
-        DEFINE_boolean 'man' true 'generate man pages' 'm'
-        DEFINE_boolean 'upgrade' false 'upgrade package manager' 'u'
-        DEFINE_boolean 'check' true 'support check tools' 'c'
-        DEFINE_boolean 'database' true 'generate database' 'd'
-        DEFINE_boolean 'release' false 'build for release' 'r'
-        DEFINE_boolean 'force' false 'force regeneration' 'f'
+        DEFINE_boolean 'man' true 'generate man pages' 1001
+        DEFINE_boolean 'upgrade' false 'upgrade package manager' 1002
+        DEFINE_boolean 'check' true 'support check tools' 1003
+        DEFINE_boolean 'database' true 'generate database' 1004
+        DEFINE_boolean 'release' false 'build for release' 1005
+        DEFINE_boolean 'force' false 'force regeneration' 1006
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
-
-        os_query
 }
 
 
 main_exec()
 {
-        if [ "$FLAGS_upgrade" -eq "$FLAGS_TRUE" ]; then
-                pkg_upgrade
-        else
-                msg_warn "--noupgrade set, skipping package upgrades"
-        fi
-
-        arch_cfg
-
-        pkg_postgres
-        pkg_rsyslog
-        pkg_check
-        pkg_man
+        ./pkgsetup                      \
+            --upgrade="$FLAGS_upgrade"  \
+            --check="$FLAGS_check"      \
+            --man="$FLAGS_man"
 }
 
 

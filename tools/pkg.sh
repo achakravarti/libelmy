@@ -7,8 +7,6 @@ pkg_remove()
 {
         msg_info "looking for package $1"
 
-        os_query
-
         _emsg="failed to remove package $1"
         _omsg="package $1 not found, skipping"
         _imsg="removing package $1, this may take a while"
@@ -43,8 +41,6 @@ pkg_remove()
 pkg_install()
 {
         msg_info "looking for package $1"
-
-        os_query
 
         _emsg="failed to install package $1"
         _omsg="package $1 found, skipping"
@@ -99,8 +95,6 @@ pkg_install()
 pkg_upgrade()
 {
         msg_info "upgrading packages, this may take a while"
-
-        os_query
 
         _emsg="failed to upgrade packages"
 

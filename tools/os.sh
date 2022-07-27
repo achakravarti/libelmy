@@ -14,16 +14,6 @@ OS_MIN_FREEBSD=122
 OS_MIN_UBUNTU=2204
 
 
-os_query()
-{
-        [ -z "$OS_VERNUM" ] || return
-
-        os_kernel__
-        os_distro__
-        os_version__
-}
-
-
 os_kernel__()
 {
         msg_info "checking OS"
@@ -130,3 +120,10 @@ os_version__()
                 return
         fi
 }
+
+
+[ -z "$OS_VERNUM" ] || return
+
+os_kernel__
+os_distro__
+os_version__

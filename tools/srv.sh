@@ -9,7 +9,6 @@ srv_restart()
         _omsg="service $1 restarted"
 
         msg_info "$_imsg"
-        os_query
 
         if [ "$OS_DISTRO" = "FreeBSD" ] ; then
                 sudo service "$1" restart || msg_fail "$_emsg"
@@ -28,7 +27,6 @@ srv_enable()
         _omsg="service $1 enabled"
 
         msg_info "$_imsg"
-        os_query
 
         if [ "$OS_DISTRO" = "FreeBSD" ] ; then
                 if ! grep -q "$1_enable=\"YES\"" /etc/rc.conf; then

@@ -2,6 +2,7 @@
 
 . "$(dirname "0")/../external/shflags/shflags"
 . "$(dirname "0")/../tools/msg.sh"
+. "$(dirname "0")/../tools/os.sh"
 . "$(dirname "0")/../tools/su.sh"
 
 
@@ -18,10 +19,9 @@
 
 main_flags()
 {
-        DEFINE_string 'os' 'arch' 'OS distribution' 1001
-        DEFINE_boolean 'upgrade' true 'upgrade package manager' 1002
-        DEFINE_boolean 'check' true 'support check tools' 1003
-        DEFINE_boolean 'man' true 'support manpage tools' 1003
+        DEFINE_boolean 'upgrade' true 'upgrade package manager' 2001
+        DEFINE_boolean 'check' true 'support check tools' 2002
+        DEFINE_boolean 'man' true 'support manpage tools' 2003
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
@@ -36,8 +36,8 @@ main_exec()
                 pkg_upgrade
         fi
 
-        case "$FLAGS_os" in
-        arch)
+        case "$OS_DISTRO" in
+        Arch)
                 arch_setup;;
 
         *)
