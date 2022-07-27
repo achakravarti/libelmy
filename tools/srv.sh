@@ -1,5 +1,6 @@
 . "$(dirname "0")/../tools/msg.sh"
 . "$(dirname "0")/../tools/os.sh"
+. "$(dirname "0")/../tools/su.sh"
 
 
 srv_restart()
@@ -11,9 +12,9 @@ srv_restart()
         msg_info "$_imsg"
 
         if [ "$OS_DISTRO" = "FreeBSD" ] ; then
-                sudo service "$1" restart || msg_fail "$_emsg"
+                $SU service "$1" restart || msg_fail "$_emsg"
         else
-                sudo systemctl restart "$1" || msg_fail "$_emsg"
+                $SU systemctl restart "$1" || msg_fail "$_emsg"
         fi
 
         msg_ok "$_omsg"
@@ -30,19 +31,19 @@ srv_enable()
 
         if [ "$OS_DISTRO" = "FreeBSD" ] ; then
                 if ! grep -q "$1_enable=\"YES\"" /etc/rc.conf; then
-                        sudo sysrc "$1_enable=\"YES\"" || msg_fail "$_emsg"
+                        $SU sysrc "$1_enable=\"YES\"" || msg_fail "$_emsg"
                 fi
 
                 if ! service "$1" status | grep -q "is running"; then
-                        sudo service "$1" start || msg_fail "$_emsg"
+                        $SU service "$1" start || msg_fail "$_emsg"
                 fi
         else
                 if ! systemctl is-enabled "$1" | grep -q enabled; then
-                        sudo systemctl enable "$1" || msg_fail "$_emsg"
+                        $SU systemctl enable "$1" || msg_fail "$_emsg"
                 fi
 
                 if ! systemctl is-active --quiet "$1"; then
-                        sudo systemctl start "$1" || msg_fail "$_emsg"
+                        $SU systemctl start "$1" || msg_fail "$_emsg"
                 fi
         fi
 
