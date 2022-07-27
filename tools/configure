@@ -24,9 +24,10 @@ export OS
 
 main_setup()
 {
-        DEFINE_boolean 'man' true 'generate man pages' 1001
+        DEFINE_boolean 'bin' true 'make elmy binary target' 1001
+        DEFINE_boolean 'man' true 'make manpages target' 1001
         DEFINE_boolean 'upgrade' false 'upgrade package manager' 1002
-        DEFINE_boolean 'check' true 'support check tools' 1003
+        DEFINE_boolean 'check' true 'make check target' 1003
         DEFINE_boolean 'database' true 'generate database' 1004
         DEFINE_boolean 'release' false 'build for release' 1005
         DEFINE_boolean 'force' false 'force regeneration' 1006
@@ -41,6 +42,13 @@ main_exec()
         ./pkgsetup                      \
             --upgrade="$FLAGS_upgrade"  \
             --check="$FLAGS_check"      \
+            --man="$FLAGS_man"
+
+        ./mksetup                       \
+            --bin="$FLAGS_bin"          \
+            --check="$FLAGS_check"      \
+            --release="$FLAGS_release"  \
+            --force="$FLAGS_force"      \
             --man="$FLAGS_man"
 }
 
