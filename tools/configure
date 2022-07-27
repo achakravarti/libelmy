@@ -22,17 +22,17 @@
 main_setup()
 {
         DEFINE_boolean 'bin' true 'make elmy binary target' 1001
-        DEFINE_boolean 'man' true 'make manpages target' 1001
-        DEFINE_boolean 'upgrade' false 'upgrade package manager' 1002
-        DEFINE_boolean 'check' true 'make check target' 1003
-        DEFINE_boolean 'release' false 'build for release' 1004
-        DEFINE_boolean 'force' false 'force regeneration' 1005
-        DEFINE_string 'host' '127.0.0.1' 'database host address' 1006
-        DEFINE_integer 'port' '5432' 'database port' 1007
-        DEFINE_string 'database' 'syslog' 'database name' 1008
-        DEFINE_string 'user' 'rsyslog' 'database user' 1009
-        DEFINE_string 'password' 'rsyslog' 'database user password' 1010
-        DEFINE_string 'pgpassword' '' 'database postgres password' 1011
+        DEFINE_boolean 'man' true 'make manpages target' 1002
+        DEFINE_boolean 'upgrade' false 'upgrade package manager' 1003
+        DEFINE_boolean 'check' true 'make check target' 1004
+        DEFINE_boolean 'release' false 'build for release' 1005
+        DEFINE_boolean 'force' false 'force regeneration' 1006
+        DEFINE_string 'host' '127.0.0.1' 'database host address' 1007
+        DEFINE_integer 'port' '5432' 'database port' 1008
+        DEFINE_string 'database' 'syslog' 'database name' 1009
+        DEFINE_string 'user' 'rsyslog' 'database user' 1010
+        DEFINE_string 'password' 'rsyslog' 'database user password' 1011
+        DEFINE_string 'pgpassword' '' 'database postgres password' 1012
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
