@@ -49,13 +49,11 @@ main_exec()
 
         _emsg='configuration failed'
 
-        echo "FLAGS_check = $FLAGS_check"
-
-        [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- --check; shift
-        [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && set -- --man
-        echo "Passing args $@"
+        unset "$@"
+        [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- "$@" --check; shift
+        [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && set -- "$@" --man
+        echo "Passing args $*"
         ./toolsetup.sh "$@" || msg_fail "$_emsg"
-        unset --
 
         set -- --dbhost="$FLAGS_dbhost"; shift
         set -- --dbport="$FLAGS_dbport"; shift
