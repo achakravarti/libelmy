@@ -3,12 +3,43 @@
 . "$(dirname "0")/../tools/su.sh"
 
 
+srv_enable()
+{
+        msg_info "checking if service $1 enabled"
+
+        _emsg="failed to enable service $1"
+        _omsg1="service $1 already enabled, skipping"
+        _omsg2="servcie $1 enabled"
+
+        case "$OS_DISTRO" in
+        Alpine)
+                msg_fail 'not implemented';;
+
+        FreeBSD)
+                if grep -q "$1_enable=\"YES\"" /etc/rc.conf; then
+                        msg_ok "$_omsg1"
+                else
+                        $SU sysrc "$1_enable=\"YES\"" || msg_fail "$_emsg"
+                        msg_ok "$_omsg2"
+                fi;;
+
+        *)
+                if systemctl is-enabled "$1" | grep -q enabled; then
+                        msg_ok "$_omsg1"
+                else
+                        $SU systemctl enable "$1" || msg_fail "$_emsg"
+                        msg_ok "$_omsg2"
+                fi;;
+        esac
+}
+
+
 srv_start()
 {
-        msg_info "starting service $1"
+        msg_info "checking if service $1 started"
 
         _emsg="failed to start service $1"
-        _omsg1="servcie $1 running, skipping"
+        _omsg1="servcie $1 already started, skipping"
         _omsg2="servcie $1 started"
 
         case "$OS_DISTRO" in
@@ -46,25 +77,6 @@ srv_restart()
         fi
 
         msg_ok "service $1 restarted"
-}
-
-
-srv_enable()
-{
-        msg_info "enabling service $1"
-
-        _emsg="failed to enable service $1"
-        if [ "$OS_DISTRO" = "FreeBSD" ] ; then
-                if ! grep -q "$1_enable=\"YES\"" /etc/rc.conf; then
-                        $SU sysrc "$1_enable=\"YES\"" || msg_fail "$_emsg"
-                fi
-        else
-                if ! systemctl is-enabled "$1" | grep -q enabled; then
-                        $SU systemctl enable "$1" || msg_fail "$_emsg"
-                fi
-        fi
-
-        msg_ok "service $1 enabled"
 }
 
 
