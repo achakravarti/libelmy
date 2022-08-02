@@ -77,6 +77,7 @@ infra_server()
         fi
 
         srv_enable postgresql
+        srv_start postgresql
         msg_ok 'postgres cluster initialised'
 }
 
