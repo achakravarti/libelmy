@@ -137,7 +137,7 @@ db_script()
 
 db_user()
 {
-        msg_info 'checking database user'
+        msg_info "looking for database user $FLAGS_dbuser"
 
         _sql="SELECT 1 FROM PG_ROLES WHERE ROLNAME='$FLAGS_dbuser'"
         if db_cmd "$_sql" | grep -q 1; then
@@ -178,6 +178,8 @@ db_schema()
         db_cmd "CREATE DATABASE $FLAGS_dbname;"
         db_cmd "GRANT ALL PRIVILEGES ON DATABASE $FLAGS_dbname TO $FLAGS_dbuser;"
         db_script init.sql
+
+        msg_ok "created database "$FLAGS_dbname"
 }
 
 
