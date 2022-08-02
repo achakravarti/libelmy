@@ -49,11 +49,12 @@ main_exec()
 
         _emsg='configuration failed'
 
-        [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- --check
+        unset --
+        [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- --check; shift
         [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && set -- --man
         ./toolsetup.sh "$@" || msg_fail "$_emsg"
-        unset --
 
+        unset --
         set -- --dbhost="$FLAGS_dbhost"; shift
         set -- --dbport="$FLAGS_dbport"; shift
         set -- --dbname="$FLAGS_dbname"; shift
@@ -62,7 +63,6 @@ main_exec()
         set -- --dbpgpass="$FLAGS_dbpass"; shift
         [ "$FLAGS_reset" -eq "$FLAGS_TRUE" ] && set -- --reset
         ./dbsetup.sh "$@" || msg_fail "$_emsg"
-        unset --
 
         #./mksetup "$@" || msg_fail "$_emsg"
         #./dbsetup "$@" || msg_fail "$_emsg"
