@@ -78,6 +78,7 @@ infra_server()
 
         if ! [ -d "$_pgdir" ]   \
             && ! [ "$($SU -u postgres ls -A "$_pgdir")" ]; then
+                    echo "DEBUG"
                 $SU -u postgres initdb          \
                     --locale=en_US.UTF-8        \
                     --encoding=UTF8             \
