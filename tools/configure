@@ -42,7 +42,7 @@ main_setup()
 main_exec()
 {
         if [ "$FLAGS_upgrade" -eq "$FLAGS_FALSE" ]; then
-                msg_warn '--noupgrade set, skipping upgrade'
+                msg_warn '--upgrade unset, skipping upgrade'
         else
                 pkg_upgrade
         fi
