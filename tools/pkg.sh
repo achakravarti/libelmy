@@ -44,7 +44,7 @@ pkg_install()
 
         _emsg="failed to install package $1"
         _omsg="package $1 found, skipping"
-        _imsg="installing package $1, this may take a while"
+        _imsg="package $1 not found, installing"
 
         case "$OS_DISTRO" in
         Alpine)
