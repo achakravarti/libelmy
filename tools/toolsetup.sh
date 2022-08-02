@@ -127,46 +127,6 @@ setup_check()
 }
 
 
-setup_alpine()
-{
-        pkg_install gcc
-        pkg_isntall make
-        pkg_install git
-
-        if [ "$FLAGS_check" -eq "$FLAGS_FALSE" ]; then
-                msg_warn '--nocheck set, skipping support for check tools'
-        else
-                pkg_install valgrind
-                pkg_install libgit2
-                pkg_install libgit2-dev
-                pkg_install libffi-dev
-                pkg_install pkgconf
-                pkg_install ninja
-                pkg_install meson
-                pkg_install cmake
-
-                _repo=https://github.com/Snaipe/Criterion
-                _emsg="failed to clone criterion repository"
-                git clone --recursive "$_repo" || msg_fail _emsg
-
-                _emsg="failed to build criterion"
-                cd build || msg_fail _emsg
-                meson build || msg_fail _emsg
-                ninja -C build || msg_fail _emsg
-
-                _emsg="failed to install criterion"
-                $SU ninja -C build install || msg_fail _emsg
-                $SU ldconfig || msg_fail _emsg
-        fi
-
-        if [ "$FLAGS_man" -eq "$FLAGS_FALSE" ]; then
-                msg_warn '--noman set, skipping support for man pages'
-        else
-                pkg_install pandoc
-        fi
-}
-
-
 # MAIN ENTRY POINT
 
 
