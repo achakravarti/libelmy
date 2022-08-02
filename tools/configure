@@ -41,6 +41,12 @@ main_setup()
 
 main_exec()
 {
+        if [ "$FLAGS_upgrade" -eq "$FLAGS_FALSE" ]; then
+                msg_warn '--noupgrade set, skipping upgrade'
+        else
+                pkg_upgrade
+        fi
+
         _emsg='configuration failed'
 
         ./pkgsetup "$@" || msg_fail "$_emsg"
