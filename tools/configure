@@ -51,7 +51,7 @@ main_exec()
 
         set -- "$@"
         [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- "$@" --check; shift
-        [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && set -- "$@" --man
+        [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && set -- "$@" --man; shift
         echo "Passing args $*"
         ./toolsetup.sh "$@" || msg_fail "$_emsg"
 
