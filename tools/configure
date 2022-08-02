@@ -55,15 +55,15 @@ main_exec()
         echo "Passing args $*"
         ./toolsetup.sh "$@" || msg_fail "$_emsg"
 
-        set -- --dbhost="$FLAGS_dbhost"; shift
-        set -- --dbport="$FLAGS_dbport"; shift
-        set -- --dbname="$FLAGS_dbname"; shift
-        set -- --dbuser="$FLAGS_dbuser"; shift
-        set -- --dbpass="$FLAGS_dbpass"; shift
-        set -- --dbpgpass="$FLAGS_dbpass"; shift
-        [ "$FLAGS_reset" -eq "$FLAGS_TRUE" ] && set -- --reset
-        ./dbsetup.sh "$@" || msg_fail "$_emsg"
-        unset --
+        #set -- --dbhost="$FLAGS_dbhost"; shift
+        #set -- --dbport="$FLAGS_dbport"; shift
+        #set -- --dbname="$FLAGS_dbname"; shift
+        #set -- --dbuser="$FLAGS_dbuser"; shift
+        #set -- --dbpass="$FLAGS_dbpass"; shift
+        #set -- --dbpgpass="$FLAGS_dbpass"; shift
+        #[ "$FLAGS_reset" -eq "$FLAGS_TRUE" ] && set -- --reset
+        #./dbsetup.sh "$@" || msg_fail "$_emsg"
+        #unset --
 
         #./mksetup "$@" || msg_fail "$_emsg"
         #./dbsetup "$@" || msg_fail "$_emsg"
