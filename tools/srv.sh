@@ -5,7 +5,6 @@
 
 srv_start()
 {
-
         msg_info "starting service $1"
 
         _emsg="failed to start service $1"
