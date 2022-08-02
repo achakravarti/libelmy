@@ -83,8 +83,6 @@ setup_man()
 
 setup_check()
 {
-        echo "FLAGS_check = $FLAGS_check"
-
         if [ "$FLAGS_check" -eq "$FLAGS_FALSE" ]; then
                 msg_warn "--check unset, skipping support for check tools"
                 return
