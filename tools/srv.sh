@@ -8,17 +8,29 @@ srv_start()
         msg_info "starting service $1"
 
         _emsg="failed to start service $1"
-        if [ "$OS_DISTRO" = "FreeBSD" ] ; then
-                if ! service "$1" status | grep -q "is running"; then
-                        $SU service "$1" start || msg_fail "$_emsg"
-                fi
-        else
-                if ! systemctl is-active --quiet "$1"; then
-                        $SU systemctl start "$1" || msg_fail "$_emsg"
-                fi
-        fi
+        _omsg1="servcie $1 running, skipping"
+        _omsg2="servcie $1 started"
 
-        msg_ok "service $1 started"
+        case "$OS_DISTRO" in
+        Alpine)
+                msg_fail 'not implemented';;
+
+        FreeBSD)
+                if service "$1" status | grep -q 'is running'; then
+                        msg_ok "$_omsg1"
+                else
+                        $SU service "$1" start || msg_fail "$_emsg"
+                        msg_ok "$_omsg2"
+                fi;;
+
+        *)
+                if systemctl is-active --quiet "$1"; then
+                        msg_ok "$_omsg1"
+                else
+                        $SU systemctl start "$1" || msg_fail "$_emsg"
+                        msg_ok "$_omsg2"
+                fi;;
+        esac
 }
 
 
