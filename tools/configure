@@ -41,7 +41,7 @@ main_setup()
 
 main_exec()
 {
-        _emsg='configuration failed'
+        msg_info 'starting libelmy configuration'
 
         if [ "$FLAGS_upgrade" -eq "$FLAGS_FALSE" ]; then
                 msg_warn '--upgrade unset, skipping upgrade'
@@ -52,7 +52,7 @@ main_exec()
         setup_tools
         setup_db
 
-        #./mksetup "$@" || msg_fail "$_emsg"
+        msg_ok 'libelmy configuration complete'
 }
 
 
