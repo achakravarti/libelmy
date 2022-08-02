@@ -49,21 +49,8 @@ main_exec()
                 pkg_upgrade
         fi
 
-        msg_info 'setting up tools'
-        set --
-
-        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
-                [ "$#" -gt 1 ] && shift
-                set -- "$@" --check
-        fi
-
-        if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
-                [ "$#" -gt 1 ] && shift
-                set -- "$@" --man
-        fi
-
-        echo "Passing args $*"
-        ./toolsetup.sh "$@" || msg_fail "$_emsg"
+        setup_tools
+        setup_db
 
         #set -- --dbhost="$FLAGS_dbhost"; shift
         #set -- --dbport="$FLAGS_dbport"; shift
@@ -77,6 +64,49 @@ main_exec()
 
         #./mksetup "$@" || msg_fail "$_emsg"
         #./dbsetup "$@" || msg_fail "$_emsg"
+}
+
+
+# SETUP FUNCTIONS
+
+
+setup_tools()
+{
+        msg_info 'setting up tools'
+        set --
+
+        if [ "$FLAGS_check" -eq "$FLAGS_TRUE" ]; then
+                [ "$#" -gt 1 ] && shift
+                set -- "$@" --check
+        fi
+
+        if [ "$FLAGS_man" -eq "$FLAGS_TRUE" ]; then
+                [ "$#" -gt 1 ] && shift
+                set -- "$@" --man
+        fi
+
+        ./toolsetup.sh "$@" || msg_fail 'failed to setup tools'
+}
+
+
+setup_db()
+{
+        msg_info 'setting up database'
+
+        set -- "$@"                     \
+            --dbhost="$FLAGS_dbhost"    \
+            --dbport="$FLAGS_dbport"    \
+            --dbname="$FLAGS_dbname"    \
+            --dbuser="$FLAGS_dbuser"    \
+            --dbpass="$FLAGS_dbpass"    \
+            --dbpgpass="$FLAGS_dbpgpass"
+
+        if [ "$FLAGS_reset" -eq "$FLAGS_TRUE" ]; then
+                shift
+                set -- "$@" --reset
+        fi
+
+        ./dbsetup.sh "$@" || msg_fail 'failed to setup database'
 }
 
 
