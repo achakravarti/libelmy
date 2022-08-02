@@ -111,10 +111,10 @@ infra_client()
 }
 
 
-# PSQL FUNCTIONS
+# DATABASE FUNCTIONS
 
 
-psql_cmd()
+db_cmd()
 {
         PGPASSWORD="$FLAGS_dbpgpass" psql       \
             -h "$FLAGS_dbhost"                  \
@@ -124,7 +124,7 @@ psql_cmd()
 }
 
 
-psql_script()
+db_script()
 {
         PGPASSWORD=$FLAGS_dbpass psql   \
             -h "$FLAGS_dbhost"          \
@@ -135,29 +135,26 @@ psql_script()
 }
 
 
-# DATABASE FUNCTIONS
-
-
 db_user()
 {
         msg_info 'checking database user'
 
         _sql="SELECT 1 FROM PG_ROLES WHERE ROLNAME='$FLAGS_dbuser'"
-        if pg_cmd "$_sql" | grep -q 1; then
+        if db_cmd "$_sql" | grep -q 1; then
                 msg_ok "user $FLAGS_dbuser found, skipping"
                 return
         fi
 
         msg_info "user $FLAGS_dbuser not found, creating"
 
-        pg_cmd "CREATE USER $FLAGS_dbuser WITH PASSWORD '$FLAGS_dbpass';"
-        pg_cmd "ALTER ROLE $FLAGS_dbuser SET CLIENT_ENCODING TO 'UTF8';"
+        db_cmd "CREATE USER $FLAGS_dbuser WITH PASSWORD '$FLAGS_dbpass';"
+        db_cmd "ALTER ROLE $FLAGS_dbuser SET CLIENT_ENCODING TO 'UTF8';"
 
         _sql="ALTER ROLE $FLAGS_dbuser SET DEFAULT_TRANSACTION_ISOLATION"
         _sql="$_sql TO 'READ COMMITTED';"
-        pg_cmd "$_sql"
+        db_cmd "$_sql"
 
-        pg_cmd "ALTER ROLE $FLAGS_dbuser SET TIMEZONE TO 'UTC'"
+        dg_cmd "ALTER ROLE $FLAGS_dbuser SET TIMEZONE TO 'UTC'"
 }
 
 
@@ -166,21 +163,21 @@ db_schema()
         if [ "$FLAGS_reset" -eq "$FLAGS_TRUE" ]; then
                 msg_warn "--reset set, dropping database $FLAGS_dbname"
 
-                pg_cmd "DROP DATABASE IF EXISTS $FLAGS_dbname WITH (FORCE);"
+                db_cmd "DROP DATABASE IF EXISTS $FLAGS_dbname WITH (FORCE);"
                 msg_ok "dropped database $FLAGS_dbname"
         fi
 
         msg_info "looking for database $FLAGS_dbname"
 
         _sql="SELECT 1 FROM PG_DATABASE WHERE DATNAME='$FLAGS_dbname'"
-        if pg_cmd "$_sql" | grep -q 1; then
+        if db_cmd "$_sql" | grep -q 1; then
                 msg_ok "database $FLAGS_dbname found, skipping"
                 return
         fi
 
-        pg_cmd "CREATE DATABASE $FLAGS_dbname;"
-        pg_cmd "GRANT ALL PRIVILEGES ON DATABASE $FLAGS_dbname TO $FLAGS_dbuser;"
-        pg_script init.sql
+        db_cmd "CREATE DATABASE $FLAGS_dbname;"
+        db_cmd "GRANT ALL PRIVILEGES ON DATABASE $FLAGS_dbname TO $FLAGS_dbuser;"
+        db_script init.sql
 }
 
 
