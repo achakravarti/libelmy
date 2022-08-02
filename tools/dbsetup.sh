@@ -77,7 +77,7 @@ infra_server()
         msg_info 'checking postgres cluster'
 
         if ! [ -d "$_pgdir" ]   \
-            && ! [ "$($SU -u postgres ls -A "$_pgdir")" ]; then
+            && ! [ -z "$($SU -u postgres ls -A "$_pgdir")" ]; then
                     echo "DEBUG"
                 $SU -u postgres initdb          \
                     --locale=en_US.UTF-8        \
