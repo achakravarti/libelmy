@@ -12,8 +12,8 @@
 
 main_flags()
 {
-        DEFINE_boolean 'check' true 'support check tools' 1001
-        DEFINE_boolean 'man' true 'support manpage tools' 1002
+        DEFINE_boolean 'check' false 'support check tools' 1001
+        DEFINE_boolean 'man' false 'support manpage tools' 1002
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
@@ -60,7 +60,7 @@ setup_base()
 setup_man()
 {
         if [ "$FLAGS_man" -eq "$FLAGS_FALSE" ]; then
-                msg_warn "--noman set, skipping support for man pages"
+                msg_warn "--man unset, skipping support for man pages"
                 return
         fi
 
@@ -92,7 +92,7 @@ setup_man()
 setup_check()
 {
         if [ "$FLAGS_check" -eq "$FLAGS_FALSE" ]; then
-                msg_warn "--nocheck set, skipping support for check tools"
+                msg_warn "--check unset, skipping support for check tools"
                 return
         fi
 

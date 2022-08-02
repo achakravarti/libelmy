@@ -22,9 +22,9 @@
 main_setup()
 {
         DEFINE_boolean 'bin' true 'make elmy binary target' 1001
-        DEFINE_boolean 'man' true 'make manpages target' 1002
+        DEFINE_boolean 'man' false 'make manpages target' 1002
         DEFINE_boolean 'upgrade' false 'upgrade package manager' 1003
-        DEFINE_boolean 'check' true 'make check target' 1004
+        DEFINE_boolean 'check' false 'make check target' 1004
         DEFINE_boolean 'release' false 'build for release' 1005
         DEFINE_boolean 'force' false 'force regeneration' 1006
         DEFINE_string 'host' '127.0.0.1' 'database host address' 1007
