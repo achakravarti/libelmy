@@ -26,13 +26,13 @@ main_setup()
         DEFINE_boolean 'upgrade' false 'upgrade package manager' 1003
         DEFINE_boolean 'check' false 'make check target' 1004
         DEFINE_boolean 'release' false 'build for release' 1005
-        DEFINE_boolean 'force' false 'force regeneration' 1006
-        DEFINE_string 'host' '127.0.0.1' 'database host address' 1007
-        DEFINE_integer 'port' '5432' 'database port' 1008
-        DEFINE_string 'database' 'syslog' 'database name' 1009
-        DEFINE_string 'user' 'rsyslog' 'database user' 1010
-        DEFINE_string 'password' 'rsyslog' 'database user password' 1011
-        DEFINE_string 'pgpassword' '' 'database postgres password' 1012
+        DEFINE_boolean 'reset' false 'reset setup' 1006
+        DEFINE_string 'dbhost' '127.0.0.1' 'database host address' 1007
+        DEFINE_integer 'dbport' '5432' 'database port' 1008
+        DEFINE_string 'dbname' 'syslog' 'database name' 1009
+        DEFINE_string 'dbuser' 'rsyslog' 'database user' 1010
+        DEFINE_string 'dbpass' 'rsyslog' 'database user password' 1011
+        DEFINE_string 'dbpgpass' '' 'database postgres password' 1012
 
         FLAGS "$@" || exit $?
         eval set -- "$FLAGS_ARGV"
@@ -49,8 +49,20 @@ main_exec()
 
         _emsg='configuration failed'
 
+        [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- --check ; shift
+        [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && set -- --man
         ./toolsetup.sh "$@" || msg_fail "$_emsg"
+        unset --
+
+        set -- --dbhost="$FLAGS_dbhost"; shift
+        set -- --dbport="$FLAGS_dbport"; shift
+        set -- --dbname="$FLAGS_dbname"; shift
+        set -- --dbuser="$FLAGS_dbuser"; shift
+        set -- --dbpass="$FLAGS_dbpass"; shift
+        set -- --dbpgpass="$FLAGS_dbpass"; shift
+        [ "$FLAGS_reset" -eq "$FLAGS_TRUE" ] && set -- --reset
         ./dbsetup.sh "$@" || msg_fail "$_emsg"
+        unset --
 
         #./mksetup "$@" || msg_fail "$_emsg"
         #./dbsetup "$@" || msg_fail "$_emsg"
