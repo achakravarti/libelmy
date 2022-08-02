@@ -49,7 +49,7 @@ main_exec()
 
         _emsg='configuration failed'
 
-        [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- --check ; shift
+        [ "$FLAGS_check" -eq "$FLAGS_TRUE" ] && set -- --check
         [ "$FLAGS_man" -eq "$FLAGS_TRUE" ] && set -- --man
         ./toolsetup.sh "$@" || msg_fail "$_emsg"
         unset --
