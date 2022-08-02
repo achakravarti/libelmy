@@ -50,8 +50,10 @@ main_exec()
         _emsg='configuration failed'
 
         ./toolsetup.sh "$@" || msg_fail "$_emsg"
-        ./mksetup "$@" || msg_fail "$_emsg"
-        ./dbsetup "$@" || msg_fail "$_emsg"
+        ./dbsetup.sh "$@" || msg_fail "$_emsg"
+
+        #./mksetup "$@" || msg_fail "$_emsg"
+        #./dbsetup "$@" || msg_fail "$_emsg"
 }
 
 
