@@ -48,11 +48,14 @@ infra_server()
         case "$OS_DISTRO" in
         Alpine)
                 _pgdir=/var/lib/postgresql/data
+                _pgsrv=postgresql.service
                 pkg_install postgresql
                 pkg_install postgresql-contrib;;
 
         Arch)
                 _pgdir=/var/lib/postgres/data
+                _pgsrv=postgresql
+                _pgsrv=postgresql.service
                 pkg_install postgresql;;
 
         FreeBSD)
@@ -62,6 +65,7 @@ infra_server()
 
         *)
                 _pgdir=/var/lib/postgres/14/main
+                _pgsrv=postgresql.service
                 pkg_install postgresql
                 pkg_install postgresql-contrib;;
         esac
@@ -76,8 +80,8 @@ infra_server()
                     || msg_fail 'failed to initialise postgres cluster'
         fi
 
-        srv_enable postgresql
-        srv_start postgresql
+        srv_enable "$_pgsrv"
+        srv_start "$_pgsrv"
         msg_ok 'postgres cluster initialised'
 }
 
