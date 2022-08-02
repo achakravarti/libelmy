@@ -9,7 +9,7 @@ srv_enable()
 
         _emsg="failed to enable service $1"
         _omsg1="service $1 already enabled, skipping"
-        _omsg2="servcie $1 enabled"
+        _omsg2="service $1 enabled"
 
         case "$OS_DISTRO" in
         Alpine)
@@ -39,8 +39,8 @@ srv_start()
         msg_info "checking if service $1 started"
 
         _emsg="failed to start service $1"
-        _omsg1="servcie $1 already started, skipping"
-        _omsg2="servcie $1 started"
+        _omsg1="service $1 already started, skipping"
+        _omsg2="service $1 started"
 
         case "$OS_DISTRO" in
         Alpine)
