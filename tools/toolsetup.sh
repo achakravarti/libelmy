@@ -37,22 +37,18 @@ setup_base()
         Alpine)
                 pkg_install gcc
                 pkg_install make
-                pkg_install git
-                ;;
+                pkg_install git;;
 
         Arch)
                 pkg_install base-devel
-                pkg_install git
-                ;;
+                pkg_install git;;
 
         FreeBSD)
-                pkg_install git
-                ;;
+                pkg_install git;;
 
         *)
                 pkg_install build-essential
-                pkg_install git
-                ;;
+                pkg_install git;;
         esac
 }
 
@@ -66,25 +62,21 @@ setup_man()
 
         case "$OS_DISTRO" in
         Alpine)
-                msg_warn "--man set, but not supported in Alpine Linux"
-                ;;
+                msg_warn "--man set, but not supported in Alpine Linux";;
 
         Arch)
                 pkg_install pandoc
-                pkg_install pandoc-crossref
-                ;;
+                pkg_install pandoc-crossref;;
 
         FreeBSD)
                 pkg_install hs-pandoc
                 pkg_install hs-pandoc-crossref
-                pkg_install hs-pandoc-citeproc
-                ;;
+                pkg_install hs-pandoc-citeproc;;
 
         *)
                 pkg_install pandoc
                 pkg_install pandoc-citeproc
-                pkg_install pandoc-crossref
-                ;;
+                pkg_install pandoc-crossref;;
         esac
 }
 
@@ -118,24 +110,19 @@ setup_check()
 
                 _emsg="failed to install criterion"
                 sudo ninja -C build install || msg_fail _emsg
-                sudo ldconfig || msg_fail _emsg
-                ;;
+                sudo ldconfig || msg_fail _emsg;;
 
         Arch)
                 pkg_install valgrind
-                pkg_install criterion
-                ;;
-
+                pkg_install criterion;;
 
         FreeBSD)
                 pkg_install valgrind
-                pkg_install criterion
-                ;;
+                pkg_install criterion;;
 
         *)
                 pkg_install valgrind
-                pkg_install libcriterion-dev
-                ;;
+                pkg_install libcriterion-dev;;
         esac
 }
 
