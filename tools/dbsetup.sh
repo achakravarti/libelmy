@@ -154,7 +154,7 @@ db_user()
         _sql="$_sql TO 'READ COMMITTED';"
         db_cmd "$_sql"
 
-        dg_cmd "ALTER ROLE $FLAGS_dbuser SET TIMEZONE TO 'UTC'"
+        db_cmd "ALTER ROLE $FLAGS_dbuser SET TIMEZONE TO 'UTC'"
 }
 
 
