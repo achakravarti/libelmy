@@ -48,31 +48,36 @@ infra_server()
         case "$OS_DISTRO" in
         Alpine)
                 _pgdir=/var/lib/postgresql/data
-                _pgsrv=postgresql.service
+                _pgsrv=postgresql
+
                 pkg_install postgresql
                 pkg_install postgresql-contrib;;
 
         Arch)
                 _pgdir=/var/lib/postgres/data
-                _pgsrv=postgresql
                 _pgsrv=postgresql.service
+
                 pkg_install postgresql;;
 
         FreeBSD)
                 _pgdir=/var/db/postgres/data14
+                _pgsrv=postgresql
+
                 pkg_install postgresql14-server
                 pkg_install postgresql14-contrib;;
 
         *)
                 _pgdir=/var/lib/postgres/14/main
                 _pgsrv=postgresql.service
+
                 pkg_install postgresql
                 pkg_install postgresql-contrib;;
         esac
 
         msg_info 'checking postgres cluster'
 
-        if ! [ -d "$_pgdir" ] && ! $SU -u postgres ls -A "$_pgdir"; then
+        if ! [ -d "$_pgdir" ]   \
+            && ! [ "$($SU -u postgres ls -A "$_pgdir")" ]; then
                 $SU -u postgres initdb          \
                     --locale=en_US.UTF-8        \
                     --encoding=UTF8             \
